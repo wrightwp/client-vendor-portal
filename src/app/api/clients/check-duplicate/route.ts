@@ -1,31 +1,36 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { evaluateFuzzyMatch } from "@/lib/similarity";
 
 export async function POST(request: Request) {
   try {
     const { name, taxId, npiNumber } = await request.json();
 
-    const cleanTaxId = (taxId || "").replace(/[^a-zA-Z0-9]/g, "");
-    const cleanNpi = (npiNumber || "").replace(/[^a-zA-Z0-9]/g, "");
-    const cleanName = (name || "").trim().toLowerCase();
+    const inputData = { name, taxId, npiNumber };
 
     // Query existing clients
     const allClients = await db.client.findMany();
 
-    const matches = allClients.filter((c) => {
-      const dbTaxId = (c.taxId || "").replace(/[^a-zA-Z0-9]/g, "");
-      const dbNpi = (c.npiNumber || "").replace(/[^a-zA-Z0-9]/g, "");
-      const dbName = (c.name || "").trim().toLowerCase();
+    const matches: any[] = [];
 
-      // Check for exact Tax ID match
-      if (cleanTaxId && dbTaxId && cleanTaxId === dbTaxId) return true;
-      // Check for exact NPI match
-      if (cleanNpi && dbNpi && cleanNpi === dbNpi) return true;
-      // Check for exact Name match
-      if (cleanName && dbName && cleanName === dbName) return true;
+    for (const client of allClients) {
+      const result = evaluateFuzzyMatch(inputData, {
+        name: client.name,
+        taxId: client.taxId,
+        npiNumber: client.npiNumber || undefined,
+      });
 
-      return false;
-    });
+      if (result.isMatch) {
+        matches.push({
+          ...client,
+          matchReason: result.reason,
+          matchScore: Math.round(result.score * 100),
+        });
+      }
+    }
+
+    // Sort by highest match score
+    matches.sort((a, b) => b.matchScore - a.matchScore);
 
     return NextResponse.json({
       success: true,
