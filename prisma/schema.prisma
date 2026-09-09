@@ -1,0 +1,60 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Client {
+  id          String         @id @default(uuid())
+  name        String
+  taxId       String
+  npiNumber   String?
+  phone       String?
+  email       String?
+  address     String?
+  city        String?
+  state       String?
+  zipCode     String?
+  status      String         @default("ACTIVE")
+  specialty   String?
+  notes       String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  vendors     ClientVendor[]
+}
+
+model Vendor {
+  id          String         @id @default(uuid())
+  name        String
+  taxId       String
+  phone       String?
+  email       String?
+  address     String?
+  city        String?
+  state       String?
+  zipCode     String?
+  vendorType  String         @default("GENERAL")
+  status      String         @default("ACTIVE")
+  notes       String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  clients     ClientVendor[]
+}
+
+model ClientVendor {
+  id         String   @id @default(uuid())
+  clientId   String
+  vendorId   String
+  assignedAt DateTime @default(now())
+  notes      String?
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@unique([clientId, vendorId])
+  @@index([clientId])
+  @@index([vendorId])
+}
