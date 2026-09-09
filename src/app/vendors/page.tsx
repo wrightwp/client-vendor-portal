@@ -155,12 +155,15 @@ function VendorsContent() {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+    <div className="theme-vendors-page" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
         <div>
-          <h1 style={{ fontSize: "1.75rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.6rem" }}>
-            <Store size={28} style={{ color: "var(--accent-blue)" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
+            <span className="badge badge-blue">VENDOR REPOSITORY PORTAL</span>
+          </div>
+          <h1 style={{ fontSize: "2rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.6rem" }}>
+            <Store size={30} style={{ color: "var(--accent-blue)" }} />
             <span>Vendor Repository</span>
           </h1>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>

@@ -199,7 +199,7 @@ export default function VendorDetailPage({
   );
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
+    <div className="theme-vendors-page" style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
       {/* Top Action Bar */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
         <Link href="/vendors" className="btn btn-secondary btn-sm" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
@@ -253,13 +253,14 @@ export default function VendorDetailPage({
         className="glass-panel"
         style={{
           padding: "2rem",
-          background: "linear-gradient(135deg, rgba(0, 174, 219, 0.25) 0%, rgba(12, 14, 20, 0.95) 100%)",
-          border: "1px solid rgba(0, 174, 219, 0.3)",
+          background: "linear-gradient(135deg, rgba(0, 174, 219, 0.35) 0%, rgba(12, 14, 20, 0.95) 100%)",
+          border: "1px solid rgba(0, 174, 219, 0.4)",
         }}
       >
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "1.5rem" }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.5rem" }}>
+              <span className="badge badge-blue">Vendor Profile</span>
               <span className="badge badge-purple">{vendor.vendorType}</span>
               <span
                 className={`badge ${

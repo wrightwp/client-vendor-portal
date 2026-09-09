@@ -158,12 +158,15 @@ function ClientsContent() {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+    <div className="theme-clients-page" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
       {/* Header Bar */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
         <div>
-          <h1 style={{ fontSize: "1.75rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.6rem" }}>
-            <Users size={28} style={{ color: "var(--accent-pink)" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
+            <span className="badge badge-pink">HEALTHCARE CLIENTS PORTAL</span>
+          </div>
+          <h1 style={{ fontSize: "2rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.6rem" }}>
+            <Users size={30} style={{ color: "var(--accent-pink)" }} />
             <span>Healthcare Clients & Groups</span>
           </h1>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
