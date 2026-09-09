@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import SearchSelect from "@/components/SearchSelect";
 import {
   ArrowLeft,
   Building2,
@@ -198,6 +199,10 @@ export default function ClientDetailPage({
     );
   }
 
+  const unlinkedVendors = vendorsList.filter(
+    (v) => !client.vendors?.some((cv: any) => cv.vendorId === v.id)
+  );
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
       {/* Top Action Bar */}
@@ -253,14 +258,14 @@ export default function ClientDetailPage({
         className="glass-panel"
         style={{
           padding: "2rem",
-          background: "linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)",
-          border: "1px solid rgba(59, 130, 246, 0.2)",
+          background: "linear-gradient(135deg, rgba(184, 28, 102, 0.25) 0%, rgba(12, 14, 20, 0.95) 100%)",
+          border: "1px solid rgba(184, 28, 102, 0.3)",
         }}
       >
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "1.5rem" }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.5rem" }}>
-              <span className="badge badge-blue">Healthcare Client</span>
+              <span className="badge badge-pink">Healthcare Client</span>
               <span
                 className={`badge ${
                   client.status === "ACTIVE"
@@ -289,7 +294,7 @@ export default function ClientDetailPage({
               )}
               {client.specialty && (
                 <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                  <Tag size={15} style={{ color: "var(--accent-blue)" }} />
+                  <Tag size={15} style={{ color: "var(--accent-pink)" }} />
                   <span>{client.specialty}</span>
                 </div>
               )}
@@ -297,7 +302,7 @@ export default function ClientDetailPage({
           </div>
 
           <div style={{ background: "rgba(255, 255, 255, 0.04)", border: "1px solid var(--border)", borderRadius: "var(--radius-md)", padding: "1rem 1.5rem", textAlign: "center" }}>
-            <div style={{ fontSize: "1.75rem", fontWeight: "800", color: "#60a5fa" }}>
+            <div style={{ fontSize: "1.75rem", fontWeight: "800", color: "#f472b6" }}>
               {client.vendors?.length || 0}
             </div>
             <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Associated Vendors</div>
@@ -311,8 +316,8 @@ export default function ClientDetailPage({
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
           {/* Contact & Location Info */}
           <div className="glass-panel" style={{ padding: "1.5rem" }}>
-            <h2 style={{ fontSize: "1.1rem", fontWeight: "700", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <Building2 size={20} style={{ color: "var(--accent-blue)" }} />
+            <h2 style={{ fontSize: "1.1rem", fontWeight: "800", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <Building2 size={20} style={{ color: "var(--accent-pink)" }} />
               <span>Contact & Location Details</span>
             </h2>
 
@@ -350,8 +355,8 @@ export default function ClientDetailPage({
 
           {/* Operational Notes & Metadata */}
           <div className="glass-panel" style={{ padding: "1.5rem" }}>
-            <h2 style={{ fontSize: "1.1rem", fontWeight: "700", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <FileText size={20} style={{ color: "var(--accent-blue)" }} />
+            <h2 style={{ fontSize: "1.1rem", fontWeight: "800", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <FileText size={20} style={{ color: "var(--accent-pink)" }} />
               <span>Operational Notes & Info</span>
             </h2>
 
@@ -378,8 +383,8 @@ export default function ClientDetailPage({
       ) : (
         /* Edit Mode Form */
         <form onSubmit={handleSave} className="glass-panel" style={{ padding: "2rem" }}>
-          <h2 style={{ fontSize: "1.25rem", fontWeight: "700", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <Edit3 size={20} style={{ color: "var(--accent-blue)" }} />
+          <h2 style={{ fontSize: "1.25rem", fontWeight: "800", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <Edit3 size={20} style={{ color: "var(--accent-pink)" }} />
             <span>Edit Healthcare Client Record</span>
           </h2>
 
@@ -532,8 +537,8 @@ export default function ClientDetailPage({
       <div className="glass-panel" style={{ padding: "1.75rem" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem", flexWrap: "wrap", gap: "1rem" }}>
           <div>
-            <h2 style={{ fontSize: "1.25rem", fontWeight: "700", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <Store size={22} style={{ color: "var(--accent-teal)" }} />
+            <h2 style={{ fontSize: "1.25rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <Store size={22} style={{ color: "var(--accent-blue)" }} />
               <span>Associated Vendors ({client.vendors?.length || 0})</span>
             </h2>
             <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
@@ -542,39 +547,31 @@ export default function ClientDetailPage({
           </div>
         </div>
 
-        {/* Form to Link New Vendor */}
+        {/* Interactive Search-Based Vendor Linking Form */}
         <form onSubmit={handleAddAssociation} className="glass-panel" style={{ padding: "1.25rem", marginBottom: "1.5rem", border: "1px dashed var(--accent-blue)" }}>
-          <h3 style={{ fontSize: "0.9rem", fontWeight: "700", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+          <h3 style={{ fontSize: "0.9rem", fontWeight: "800", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
             <LinkIcon size={16} style={{ color: "var(--accent-blue)" }} />
-            <span>Link a New Vendor</span>
+            <span>Search & Link a Vendor</span>
           </h3>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: "0.75rem", alignItems: "center" }}>
-            <select
-              className="form-select"
-              required
-              value={newAssociation.vendorId}
-              onChange={(e) => setNewAssociation({ ...newAssociation, vendorId: e.target.value })}
-            >
-              <option value="">-- Select Vendor to Link --</option>
-              {vendorsList
-                .filter((v) => !client.vendors?.some((cv: any) => cv.vendorId === v.id))
-                .map((v) => (
-                  <option key={v.id} value={v.id}>
-                    {v.name} ({v.vendorType} • Tax ID: {v.taxId})
-                  </option>
-                ))}
-            </select>
+            <SearchSelect
+              items={unlinkedVendors}
+              selectedId={newAssociation.vendorId}
+              onSelect={(item) => setNewAssociation({ ...newAssociation, vendorId: item ? item.id : "" })}
+              placeholder="Search vendor by name, category, tax ID, city..."
+              type="vendor"
+            />
 
             <input
               type="text"
               className="form-input"
-              placeholder="Association notes (e.g. Contract #998, Primary lab)"
+              placeholder="Association notes (e.g. Primary PPE Supplier, Contract #998)"
               value={newAssociation.notes}
               onChange={(e) => setNewAssociation({ ...newAssociation, notes: e.target.value })}
             />
 
-            <button type="submit" disabled={associating || !newAssociation.vendorId} className="btn btn-primary btn-sm">
+            <button type="submit" disabled={associating || !newAssociation.vendorId} className="btn btn-blue btn-sm">
               {associating ? "Linking..." : "Link Vendor"}
             </button>
           </div>
@@ -591,11 +588,11 @@ export default function ClientDetailPage({
               <thead>
                 <tr>
                   <th>Vendor Name</th>
-                  <th>Tax ID</th>
-                  <th>Category</th>
-                  <th>Location</th>
+                  <th className="nowrap">Tax ID</th>
+                  <th className="nowrap">Category</th>
+                  <th className="nowrap">Location</th>
                   <th>Association Notes</th>
-                  <th style={{ textAlign: "right" }}>Actions</th>
+                  <th style={{ textAlign: "right" }} className="nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -604,16 +601,16 @@ export default function ClientDetailPage({
                     <td>
                       <Link
                         href={`/vendors/${item.vendor.id}`}
-                        style={{ fontWeight: "700", color: "#60a5fa", textDecoration: "underline" }}
+                        style={{ fontWeight: "700", color: "#38bdf8" }}
                       >
                         {item.vendor.name}
                       </Link>
                     </td>
-                    <td className="text-mono">{item.vendor.taxId}</td>
-                    <td>
+                    <td className="text-mono nowrap">{item.vendor.taxId}</td>
+                    <td className="nowrap">
                       <span className="badge badge-purple">{item.vendor.vendorType}</span>
                     </td>
-                    <td>
+                    <td className="nowrap">
                       {item.vendor.city && item.vendor.state
                         ? `${item.vendor.city}, ${item.vendor.state}`
                         : "—"}
@@ -621,7 +618,7 @@ export default function ClientDetailPage({
                     <td style={{ color: "#93c5fd", fontStyle: item.notes ? "normal" : "italic" }}>
                       {item.notes || "No notes"}
                     </td>
-                    <td style={{ textAlign: "right" }}>
+                    <td style={{ textAlign: "right" }} className="nowrap">
                       <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
                         <Link href={`/vendors/${item.vendor.id}`} className="btn btn-secondary btn-sm">
                           View Vendor

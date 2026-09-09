@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import SearchSelect from "@/components/SearchSelect";
 import {
   ArrowLeft,
   Store,
@@ -185,13 +186,17 @@ export default function VendorDetailPage({
     return (
       <div style={{ padding: "3rem", textAlign: "center" }}>
         <h2 style={{ marginBottom: "1rem" }}>Vendor Not Found</h2>
-        <Link href="/vendors" className="btn btn-primary">
+        <Link href="/vendors" className="btn btn-blue">
           <ArrowLeft size={16} />
           <span>Back to Vendor Directory</span>
         </Link>
       </div>
     );
   }
+
+  const unlinkedClients = clientsList.filter(
+    (c) => !vendor.clients?.some((cv: any) => cv.clientId === c.id)
+  );
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
@@ -203,7 +208,7 @@ export default function VendorDetailPage({
         </Link>
 
         {!isEditing ? (
-          <button onClick={() => setIsEditing(true)} className="btn btn-primary">
+          <button onClick={() => setIsEditing(true)} className="btn btn-blue">
             <Edit3 size={16} />
             <span>Edit Vendor Information</span>
           </button>
@@ -213,7 +218,7 @@ export default function VendorDetailPage({
               <X size={16} />
               <span>Cancel</span>
             </button>
-            <button onClick={handleSave} disabled={saving} className="btn btn-primary">
+            <button onClick={handleSave} disabled={saving} className="btn btn-blue">
               <Save size={16} />
               <span>{saving ? "Saving..." : "Save Changes"}</span>
             </button>
@@ -248,8 +253,8 @@ export default function VendorDetailPage({
         className="glass-panel"
         style={{
           padding: "2rem",
-          background: "linear-gradient(135deg, rgba(19, 78, 74, 0.5) 0%, rgba(15, 23, 42, 0.95) 100%)",
-          border: "1px solid rgba(20, 184, 166, 0.3)",
+          background: "linear-gradient(135deg, rgba(0, 174, 219, 0.25) 0%, rgba(12, 14, 20, 0.95) 100%)",
+          border: "1px solid rgba(0, 174, 219, 0.3)",
         }}
       >
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "1.5rem" }}>
@@ -279,7 +284,7 @@ export default function VendorDetailPage({
               </div>
               {vendor.city && (
                 <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                  <MapPin size={15} style={{ color: "var(--accent-teal)" }} />
+                  <MapPin size={15} style={{ color: "var(--accent-blue)" }} />
                   <span>{vendor.city}, {vendor.state}</span>
                 </div>
               )}
@@ -287,7 +292,7 @@ export default function VendorDetailPage({
           </div>
 
           <div style={{ background: "rgba(255, 255, 255, 0.04)", border: "1px solid var(--border)", borderRadius: "var(--radius-md)", padding: "1rem 1.5rem", textAlign: "center" }}>
-            <div style={{ fontSize: "1.75rem", fontWeight: "800", color: "#22d3ee" }}>
+            <div style={{ fontSize: "1.75rem", fontWeight: "800", color: "#38bdf8" }}>
               {vendor.clients?.length || 0}
             </div>
             <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Associated Clients</div>
@@ -301,8 +306,8 @@ export default function VendorDetailPage({
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
           {/* Contact & Location Info */}
           <div className="glass-panel" style={{ padding: "1.5rem" }}>
-            <h2 style={{ fontSize: "1.1rem", fontWeight: "700", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <Store size={20} style={{ color: "var(--accent-teal)" }} />
+            <h2 style={{ fontSize: "1.1rem", fontWeight: "800", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <Store size={20} style={{ color: "var(--accent-blue)" }} />
               <span>Contact & Location Details</span>
             </h2>
 
@@ -340,8 +345,8 @@ export default function VendorDetailPage({
 
           {/* Operational Notes & Metadata */}
           <div className="glass-panel" style={{ padding: "1.5rem" }}>
-            <h2 style={{ fontSize: "1.1rem", fontWeight: "700", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <FileText size={20} style={{ color: "var(--accent-teal)" }} />
+            <h2 style={{ fontSize: "1.1rem", fontWeight: "800", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <FileText size={20} style={{ color: "var(--accent-blue)" }} />
               <span>Vendor Capabilities & Notes</span>
             </h2>
 
@@ -368,8 +373,8 @@ export default function VendorDetailPage({
       ) : (
         /* Edit Mode Form */
         <form onSubmit={handleSave} className="glass-panel" style={{ padding: "2rem" }}>
-          <h2 style={{ fontSize: "1.25rem", fontWeight: "700", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <Edit3 size={20} style={{ color: "var(--accent-teal)" }} />
+          <h2 style={{ fontSize: "1.25rem", fontWeight: "800", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <Edit3 size={20} style={{ color: "var(--accent-blue)" }} />
             <span>Edit Vendor Record</span>
           </h2>
 
@@ -506,7 +511,7 @@ export default function VendorDetailPage({
             <button type="button" onClick={() => setIsEditing(false)} className="btn btn-secondary">
               Cancel
             </button>
-            <button type="submit" disabled={saving} className="btn btn-primary">
+            <button type="submit" disabled={saving} className="btn btn-blue">
               <Save size={16} />
               <span>{saving ? "Saving..." : "Save Changes"}</span>
             </button>
@@ -518,8 +523,8 @@ export default function VendorDetailPage({
       <div className="glass-panel" style={{ padding: "1.75rem" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem", flexWrap: "wrap", gap: "1rem" }}>
           <div>
-            <h2 style={{ fontSize: "1.25rem", fontWeight: "700", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <Users size={22} style={{ color: "var(--accent-blue)" }} />
+            <h2 style={{ fontSize: "1.25rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <Users size={22} style={{ color: "var(--accent-pink)" }} />
               <span>Associated Healthcare Clients ({vendor.clients?.length || 0})</span>
             </h2>
             <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
@@ -528,34 +533,26 @@ export default function VendorDetailPage({
           </div>
         </div>
 
-        {/* Form to Link New Client */}
-        <form onSubmit={handleAddAssociation} className="glass-panel" style={{ padding: "1.25rem", marginBottom: "1.5rem", border: "1px dashed var(--accent-teal)" }}>
-          <h3 style={{ fontSize: "0.9rem", fontWeight: "700", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
-            <LinkIcon size={16} style={{ color: "var(--accent-teal)" }} />
-            <span>Link a Healthcare Client</span>
+        {/* Interactive Search-Based Client Linking Form */}
+        <form onSubmit={handleAddAssociation} className="glass-panel" style={{ padding: "1.25rem", marginBottom: "1.5rem", border: "1px dashed var(--accent-pink)" }}>
+          <h3 style={{ fontSize: "0.9rem", fontWeight: "800", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+            <LinkIcon size={16} style={{ color: "var(--accent-pink)" }} />
+            <span>Search & Link a Healthcare Client</span>
           </h3>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: "0.75rem", alignItems: "center" }}>
-            <select
-              className="form-select"
-              required
-              value={newAssociation.clientId}
-              onChange={(e) => setNewAssociation({ ...newAssociation, clientId: e.target.value })}
-            >
-              <option value="">-- Select Healthcare Client --</option>
-              {clientsList
-                .filter((c) => !vendor.clients?.some((cv: any) => cv.clientId === c.id))
-                .map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name} ({c.specialty || "Healthcare Group"} • Tax ID: {c.taxId})
-                  </option>
-                ))}
-            </select>
+            <SearchSelect
+              items={unlinkedClients}
+              selectedId={newAssociation.clientId}
+              onSelect={(item) => setNewAssociation({ ...newAssociation, clientId: item ? item.id : "" })}
+              placeholder="Search healthcare client by name, specialty, tax ID..."
+              type="client"
+            />
 
             <input
               type="text"
               className="form-input"
-              placeholder="Association notes (e.g. Primary PPE supplier)"
+              placeholder="Association notes (e.g. Primary PPE contract)"
               value={newAssociation.notes}
               onChange={(e) => setNewAssociation({ ...newAssociation, notes: e.target.value })}
             />
@@ -577,11 +574,11 @@ export default function VendorDetailPage({
               <thead>
                 <tr>
                   <th>Healthcare Group</th>
-                  <th>Tax ID (EIN)</th>
-                  <th>NPI</th>
-                  <th>Location</th>
+                  <th className="nowrap">Tax ID (EIN)</th>
+                  <th className="nowrap">NPI</th>
+                  <th className="nowrap">Location</th>
                   <th>Association Notes</th>
-                  <th style={{ textAlign: "right" }}>Actions</th>
+                  <th style={{ textAlign: "right" }} className="nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -590,22 +587,22 @@ export default function VendorDetailPage({
                     <td>
                       <Link
                         href={`/clients/${item.client.id}`}
-                        style={{ fontWeight: "700", color: "#60a5fa", textDecoration: "underline" }}
+                        style={{ fontWeight: "700", color: "#f472b6" }}
                       >
                         {item.client.name}
                       </Link>
                     </td>
-                    <td className="text-mono">{item.client.taxId}</td>
-                    <td className="text-mono">{item.client.npiNumber || "—"}</td>
-                    <td>
+                    <td className="text-mono nowrap">{item.client.taxId}</td>
+                    <td className="text-mono nowrap">{item.client.npiNumber || "—"}</td>
+                    <td className="nowrap">
                       {item.client.city && item.client.state
                         ? `${item.client.city}, ${item.client.state}`
                         : "—"}
                     </td>
-                    <td style={{ color: "#a5f3fc", fontStyle: item.notes ? "normal" : "italic" }}>
+                    <td style={{ color: "#f472b6", fontStyle: item.notes ? "normal" : "italic" }}>
                       {item.notes || "No notes"}
                     </td>
-                    <td style={{ textAlign: "right" }}>
+                    <td style={{ textAlign: "right" }} className="nowrap">
                       <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
                         <Link href={`/clients/${item.client.id}`} className="btn btn-secondary btn-sm">
                           View Client

@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import DuplicateAlertModal from "@/components/DuplicateAlertModal";
 import {
   Users,
   Search,
@@ -49,6 +50,9 @@ function ClientsContent() {
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
 
+  // Duplicate Check Modal State
+  const [duplicateMatches, setDuplicateMatches] = useState<any[]>([]);
+
   useEffect(() => {
     if (searchParams.get("action") === "new") {
       setIsAddModalOpen(true);
@@ -75,13 +79,7 @@ function ClientsContent() {
     fetchClients();
   }, [searchQuery, statusFilter]);
 
-  const handleCreateClient = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newClient.name.trim() || !newClient.taxId.trim()) {
-      setFormError("Client Name and Tax ID are required.");
-      return;
-    }
-
+  const executeCreateClient = async () => {
     setSubmitting(true);
     setFormError("");
 
@@ -118,6 +116,44 @@ function ClientsContent() {
       setFormError(err.message || "Failed to submit.");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newClient.name.trim() || !newClient.taxId.trim()) {
+      setFormError("Client Name and Tax ID are required.");
+      return;
+    }
+
+    setSubmitting(true);
+    setFormError("");
+
+    try {
+      // Step 1: Run Duplicate Detection Check
+      const dupRes = await fetch("/api/clients/check-duplicate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newClient.name,
+          taxId: newClient.taxId,
+          npiNumber: newClient.npiNumber,
+        }),
+      });
+
+      const dupData = await dupRes.json();
+      setSubmitting(false);
+
+      if (dupData.success && dupData.isDuplicate) {
+        setDuplicateMatches(dupData.matches);
+        return;
+      }
+
+      // Step 2: If no duplicates, proceed with creation
+      await executeCreateClient();
+    } catch (err: any) {
+      setSubmitting(false);
+      setFormError(err.message || "Failed to check duplicates.");
     }
   };
 
@@ -276,7 +312,7 @@ function ClientsContent() {
               </button>
             </div>
 
-            <form onSubmit={handleCreateClient}>
+            <form onSubmit={handleFormSubmit}>
               <div className="modal-body">
                 {formError && (
                   <div style={{ padding: "0.75rem", background: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.3)", borderRadius: "8px", color: "#ef4444", fontSize: "0.85rem", marginBottom: "1rem" }}>
@@ -438,12 +474,25 @@ function ClientsContent() {
                   Cancel
                 </button>
                 <button type="submit" disabled={submitting} className="btn btn-primary">
-                  {submitting ? "Saving..." : "Create Client"}
+                  {submitting ? "Checking..." : "Create Client"}
                 </button>
               </div>
             </form>
           </div>
         </div>
+      )}
+
+      {/* DUPLICATE WARNING MODAL */}
+      {duplicateMatches.length > 0 && (
+        <DuplicateAlertModal
+          type="client"
+          matches={duplicateMatches}
+          onClose={() => setDuplicateMatches([])}
+          onConfirmCreate={() => {
+            setDuplicateMatches([]);
+            executeCreateClient();
+          }}
+        />
       )}
     </div>
   );

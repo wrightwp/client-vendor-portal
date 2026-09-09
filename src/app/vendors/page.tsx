@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import DuplicateAlertModal from "@/components/DuplicateAlertModal";
 import {
   Store,
   Search,
@@ -48,6 +49,9 @@ function VendorsContent() {
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
 
+  // Duplicate Check Modal State
+  const [duplicateMatches, setDuplicateMatches] = useState<any[]>([]);
+
   useEffect(() => {
     if (searchParams.get("action") === "new") {
       setIsAddModalOpen(true);
@@ -74,13 +78,7 @@ function VendorsContent() {
     fetchVendors();
   }, [searchQuery, vendorTypeFilter, statusFilter]);
 
-  const handleCreateVendor = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newVendor.name.trim() || !newVendor.taxId.trim()) {
-      setFormError("Vendor Name and Tax ID are required.");
-      return;
-    }
-
+  const executeCreateVendor = async () => {
     setSubmitting(true);
     setFormError("");
 
@@ -116,6 +114,43 @@ function VendorsContent() {
       setFormError(err.message || "Failed to submit.");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newVendor.name.trim() || !newVendor.taxId.trim()) {
+      setFormError("Vendor Name and Tax ID are required.");
+      return;
+    }
+
+    setSubmitting(true);
+    setFormError("");
+
+    try {
+      // Step 1: Run Duplicate Detection Check
+      const dupRes = await fetch("/api/vendors/check-duplicate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newVendor.name,
+          taxId: newVendor.taxId,
+        }),
+      });
+
+      const dupData = await dupRes.json();
+      setSubmitting(false);
+
+      if (dupData.success && dupData.isDuplicate) {
+        setDuplicateMatches(dupData.matches);
+        return;
+      }
+
+      // Step 2: If no duplicates, proceed with creation
+      await executeCreateVendor();
+    } catch (err: any) {
+      setSubmitting(false);
+      setFormError(err.message || "Failed to check duplicates.");
     }
   };
 
@@ -291,7 +326,7 @@ function VendorsContent() {
               </button>
             </div>
 
-            <form onSubmit={handleCreateVendor}>
+            <form onSubmit={handleFormSubmit}>
               <div className="modal-body">
                 {formError && (
                   <div style={{ padding: "0.75rem", background: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.3)", borderRadius: "8px", color: "#ef4444", fontSize: "0.85rem", marginBottom: "1rem" }}>
@@ -447,12 +482,25 @@ function VendorsContent() {
                   Cancel
                 </button>
                 <button type="submit" disabled={submitting} className="btn btn-blue">
-                  {submitting ? "Saving..." : "Create Vendor"}
+                  {submitting ? "Checking..." : "Create Vendor"}
                 </button>
               </div>
             </form>
           </div>
         </div>
+      )}
+
+      {/* DUPLICATE WARNING MODAL */}
+      {duplicateMatches.length > 0 && (
+        <DuplicateAlertModal
+          type="vendor"
+          matches={duplicateMatches}
+          onClose={() => setDuplicateMatches([])}
+          onConfirmCreate={() => {
+            setDuplicateMatches([]);
+            executeCreateVendor();
+          }}
+        />
       )}
     </div>
   );
