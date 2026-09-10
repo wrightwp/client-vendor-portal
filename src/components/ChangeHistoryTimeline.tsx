@@ -20,21 +20,40 @@ interface ChangeHistoryTimelineProps {
   history: any[];
   onSelectVersion?: (index: number) => void;
   accentColor?: "pink" | "blue";
+  collapsible?: boolean;
+  defaultOpen?: boolean;
+  isOpen?: boolean;
+  onToggleOpen?: () => void;
 }
 
 export default function ChangeHistoryTimeline({
   history,
   onSelectVersion,
   accentColor = "pink",
+  collapsible = true,
+  defaultOpen = false,
+  isOpen,
+  onToggleOpen,
 }: ChangeHistoryTimelineProps) {
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
+  const [internalExpanded, setInternalExpanded] = useState(defaultOpen);
+
+  const isCardExpanded = isOpen !== undefined ? isOpen : internalExpanded;
+
+  const handleToggleCard = () => {
+    if (onToggleOpen) {
+      onToggleOpen();
+    } else {
+      setInternalExpanded(!internalExpanded);
+    }
+  };
 
   if (!history || history.length === 0) {
     return (
-      <div className="glass-panel" style={{ padding: "2rem", textAlign: "center" }}>
-        <History size={32} style={{ color: "var(--text-muted)", marginBottom: "0.75rem", opacity: 0.5 }} />
-        <h3 style={{ fontSize: "1rem", fontWeight: "700", marginBottom: "0.25rem" }}>No Change History Recorded</h3>
-        <p style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
+      <div className="glass-panel" style={{ padding: "1.5rem 2rem", textAlign: "center" }}>
+        <History size={28} style={{ color: "var(--text-muted)", marginBottom: "0.5rem", opacity: 0.5 }} />
+        <h3 style={{ fontSize: "0.95rem", fontWeight: "700", marginBottom: "0.2rem" }}>No Change History Recorded</h3>
+        <p style={{ fontSize: "0.825rem", color: "var(--text-muted)" }}>
           Future edits, status updates, and association changes will be tracked here automatically.
         </p>
       </div>
@@ -91,16 +110,28 @@ export default function ChangeHistoryTimeline({
   };
 
   return (
-    <div className="glass-panel" style={{ padding: "1.75rem" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.5rem" }}>
-        <h2 style={{ fontSize: "1.15rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.55rem" }}>
+    <div className="glass-panel" style={{ padding: "1.25rem 1.75rem", transition: "all 0.2s ease" }}>
+      {/* Header / Expander Bar */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          cursor: collapsible ? "pointer" : "default",
+          marginBottom: isCardExpanded ? "1.5rem" : 0,
+        }}
+        onClick={() => {
+          if (collapsible) handleToggleCard();
+        }}
+      >
+        <h2 style={{ fontSize: "1.1rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.55rem" }}>
           <History size={20} style={{ color: accentColor === "pink" ? "var(--accent-pink)" : "var(--accent-blue)" }} />
-          <span>Change History & Audit Trail</span>
+          <span>Audit Trail & Change History</span>
           <span
             style={{
               fontSize: "0.75rem",
               background: "rgba(255, 255, 255, 0.08)",
-              padding: "0.15rem 0.6rem",
+              padding: "0.15rem 0.65rem",
               borderRadius: "12px",
               color: "var(--text-muted)",
               fontWeight: "600",
@@ -109,7 +140,53 @@ export default function ChangeHistoryTimeline({
             {history.length} event{history.length !== 1 ? "s" : ""}
           </span>
         </h2>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          {onSelectVersion && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelectVersion(history.length - 1);
+              }}
+              className="btn btn-secondary btn-sm"
+              style={{ fontSize: "0.75rem", display: "inline-flex", alignItems: "center", gap: "0.35rem" }}
+              title="Launch step-by-step audit walkthrough modal"
+            >
+              <Eye size={13} style={{ color: accentColor === "pink" ? "var(--accent-pink)" : "var(--accent-blue)" }} />
+              <span>Interactive Walkthrough</span>
+            </button>
+          )}
+
+          {collapsible && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggleCard();
+              }}
+              style={{
+                background: "var(--bg-card-hover)",
+                border: "1px solid var(--border)",
+                color: "var(--text-primary)",
+                padding: "0.25rem 0.6rem",
+                borderRadius: "6px",
+                fontSize: "0.8rem",
+                fontWeight: "600",
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.35rem",
+              }}
+            >
+              <span>{isCardExpanded ? "Hide Audit Trail" : "Expand Audit Trail"}</span>
+              {isCardExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Expandable Content Area */}
+      {isCardExpanded && (
 
       <div style={{ position: "relative", paddingLeft: "1.5rem", borderLeft: "2px solid var(--border)" }}>
         {history.map((item: any, index: number) => {
@@ -280,6 +357,7 @@ export default function ChangeHistoryTimeline({
           );
         })}
       </div>
+      )}
     </div>
   );
 }

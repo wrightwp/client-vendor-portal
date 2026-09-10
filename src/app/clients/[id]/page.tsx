@@ -4,11 +4,11 @@ import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import SearchSelect from "@/components/SearchSelect";
-import LastChangeHighlight from "@/components/LastChangeHighlight";
 import ChangeHistoryTimeline from "@/components/ChangeHistoryTimeline";
 import HistoryWalkthroughModal from "@/components/HistoryWalkthroughModal";
 import ContactsList from "@/components/ContactsList";
 import EditAssociationNoteModal from "@/components/EditAssociationNoteModal";
+import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
 import { MarkdownNoteRenderer } from "@/components/MarkdownNotes";
 import {
   ArrowLeft,
@@ -28,6 +28,9 @@ import {
   ShieldCheck,
   Tag,
   Calendar,
+  History,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 
 export default function ClientDetailPage({
@@ -45,6 +48,9 @@ export default function ClientDetailPage({
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
+  // Audit Trail Expander State (starts closed by default)
+  const [isAuditOpen, setIsAuditOpen] = useState(false);
+
   // Walkthrough Modal State
   const [isWalkthroughOpen, setIsWalkthroughOpen] = useState(false);
   const [walkthroughIndex, setWalkthroughIndex] = useState(0);
@@ -54,6 +60,12 @@ export default function ClientDetailPage({
     vendorId: string;
     name: string;
     notes: string;
+  } | null>(null);
+
+  // Confirm Delete Vendor Association Modal State
+  const [deleteVendorTarget, setDeleteVendorTarget] = useState<{
+    id: string;
+    name: string;
   } | null>(null);
 
   // Edit Form State
@@ -182,8 +194,6 @@ export default function ClientDetailPage({
   };
 
   const handleRemoveAssociation = async (vendorId: string) => {
-    if (!confirm("Are you sure you want to remove this vendor association?")) return;
-
     try {
       const res = await fetch(`/api/associations?clientId=${id}&vendorId=${vendorId}`, {
         method: "DELETE",
@@ -325,16 +335,6 @@ export default function ClientDetailPage({
           </div>
         </div>
       </div>
-
-      {/* Highlight Last Change Banner */}
-      <LastChangeHighlight
-        lastChange={client.history?.[0] || null}
-        onOpenWalkthrough={() => {
-          setWalkthroughIndex(client.history?.length ? client.history.length - 1 : 0);
-          setIsWalkthroughOpen(true);
-        }}
-        accentColor="pink"
-      />
 
       {/* VIEW or EDIT Section */}
       {!isEditing ? (
@@ -674,9 +674,9 @@ export default function ClientDetailPage({
                           View Vendor
                         </Link>
                         <button
-                          onClick={() => handleRemoveAssociation(item.vendorId)}
+                          onClick={() => setDeleteVendorTarget({ id: item.vendorId, name: item.vendor.name })}
                           className="btn btn-danger btn-sm"
-                          title="Unlink"
+                          title="Unlink Vendor"
                         >
                           <Trash2 size={14} />
                         </button>
@@ -690,7 +690,7 @@ export default function ClientDetailPage({
         )}
       </div>
 
-      {/* Change History Timeline Section */}
+      {/* Change History & Audit Trail Expander Card (At bottom, starts closed) */}
       <ChangeHistoryTimeline
         history={client.history || []}
         onSelectVersion={(stepIdx) => {
@@ -698,6 +698,8 @@ export default function ClientDetailPage({
           setIsWalkthroughOpen(true);
         }}
         accentColor="pink"
+        collapsible={true}
+        defaultOpen={false}
       />
 
       {/* Interactive History Walkthrough Modal */}
@@ -723,6 +725,17 @@ export default function ClientDetailPage({
           onSaveSuccess={fetchClientDetails}
         />
       )}
+
+      {/* Confirm Delete Vendor Association Modal */}
+      <ConfirmDeleteModal
+        isOpen={!!deleteVendorTarget}
+        onClose={() => setDeleteVendorTarget(null)}
+        onConfirm={() => deleteVendorTarget && handleRemoveAssociation(deleteVendorTarget.id)}
+        itemType="vendor"
+        itemName={deleteVendorTarget?.name}
+        parentName={client.name}
+        confirmText="Remove Vendor"
+      />
     </div>
   );
 }

@@ -4,10 +4,12 @@ import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import SearchSelect from "@/components/SearchSelect";
-import LastChangeHighlight from "@/components/LastChangeHighlight";
 import ChangeHistoryTimeline from "@/components/ChangeHistoryTimeline";
 import HistoryWalkthroughModal from "@/components/HistoryWalkthroughModal";
 import ContactsList from "@/components/ContactsList";
+import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
+import EditAssociationNoteModal from "@/components/EditAssociationNoteModal";
+import { MarkdownNoteRenderer } from "@/components/MarkdownNotes";
 import {
   ArrowLeft,
   Store,
@@ -23,6 +25,9 @@ import {
   Trash2,
   Tag,
   Calendar,
+  History,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 
 export default function VendorDetailPage({
@@ -40,9 +45,25 @@ export default function VendorDetailPage({
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
+  // Audit Trail Expander State (starts closed by default)
+  const [isAuditOpen, setIsAuditOpen] = useState(false);
+
   // Walkthrough Modal State
   const [isWalkthroughOpen, setIsWalkthroughOpen] = useState(false);
   const [walkthroughIndex, setWalkthroughIndex] = useState(0);
+
+  // Confirm Delete Client Association Modal State
+  const [deleteClientTarget, setDeleteClientTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+
+  // Client Association Note Modal State
+  const [activeNoteClient, setActiveNoteClient] = useState<{
+    clientId: string;
+    name: string;
+    notes: string;
+  } | null>(null);
 
   // Edit Form State
   const [formData, setFormData] = useState({
@@ -168,8 +189,6 @@ export default function VendorDetailPage({
   };
 
   const handleRemoveAssociation = async (clientId: string) => {
-    if (!confirm("Are you sure you want to remove this client association?")) return;
-
     try {
       const res = await fetch(`/api/associations?clientId=${clientId}&vendorId=${id}`, {
         method: "DELETE",
@@ -307,16 +326,6 @@ export default function VendorDetailPage({
           </div>
         </div>
       </div>
-
-      {/* Highlight Last Change Banner */}
-      <LastChangeHighlight
-        lastChange={vendor.history?.[0] || null}
-        onOpenWalkthrough={() => {
-          setWalkthroughIndex(vendor.history?.length ? vendor.history.length - 1 : 0);
-          setIsWalkthroughOpen(true);
-        }}
-        accentColor="blue"
-      />
 
       {/* VIEW or EDIT Section */}
       {!isEditing ? (
@@ -626,18 +635,33 @@ export default function VendorDetailPage({
                         ? `${item.client.city}, ${item.client.state}`
                         : "—"}
                     </td>
-                    <td style={{ color: "#f472b6", fontStyle: item.notes ? "normal" : "italic" }}>
-                      {item.notes || "No notes"}
+                    <td style={{ color: "var(--text-secondary)", fontStyle: item.notes ? "normal" : "italic", minWidth: "260px" }}>
+                      {item.notes ? (
+                        <div style={{ background: "rgba(255, 255, 255, 0.025)", border: "1px solid var(--border)", padding: "0.4rem 0.75rem", borderRadius: "8px" }}>
+                          <MarkdownNoteRenderer content={item.notes} />
+                        </div>
+                      ) : (
+                        <span style={{ color: "var(--text-muted)" }}>No client-specific notes</span>
+                      )}
                     </td>
                     <td style={{ textAlign: "right" }} className="nowrap">
                       <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
+                        <button
+                          onClick={() => setActiveNoteClient({ clientId: item.clientId, name: item.client.name, notes: item.notes || "" })}
+                          className="btn btn-secondary btn-sm"
+                          style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                          title="Edit Client-Specific Vendor Notes"
+                        >
+                          <FileText size={14} style={{ color: "var(--accent-blue)" }} />
+                          <span>{item.notes ? "Edit Note" : "+ Add Note"}</span>
+                        </button>
                         <Link href={`/clients/${item.client.id}`} className="btn btn-secondary btn-sm">
                           View Client
                         </Link>
                         <button
-                          onClick={() => handleRemoveAssociation(item.clientId)}
+                          onClick={() => setDeleteClientTarget({ id: item.clientId, name: item.client.name })}
                           className="btn btn-danger btn-sm"
-                          title="Unlink"
+                          title="Unlink Client"
                         >
                           <Trash2 size={14} />
                         </button>
@@ -651,7 +675,7 @@ export default function VendorDetailPage({
         )}
       </div>
 
-      {/* Change History Timeline Section */}
+      {/* Change History & Audit Trail Expander Card (At bottom, starts closed) */}
       <ChangeHistoryTimeline
         history={vendor.history || []}
         onSelectVersion={(stepIdx) => {
@@ -659,6 +683,8 @@ export default function VendorDetailPage({
           setIsWalkthroughOpen(true);
         }}
         accentColor="blue"
+        collapsible={true}
+        defaultOpen={false}
       />
 
       {/* Interactive History Walkthrough Modal */}
@@ -670,6 +696,31 @@ export default function VendorDetailPage({
         entityName={vendor.name}
         initialStepIndex={walkthroughIndex}
         accentColor="blue"
+      />
+
+      {/* Edit Client-Specific Vendor Note Modal */}
+      {activeNoteClient && (
+        <EditAssociationNoteModal
+          isOpen={!!activeNoteClient}
+          onClose={() => setActiveNoteClient(null)}
+          clientId={activeNoteClient.clientId}
+          vendorId={id}
+          clientName={activeNoteClient.name}
+          vendorName={vendor.name}
+          currentNotes={activeNoteClient.notes}
+          onSaveSuccess={fetchVendorDetails}
+        />
+      )}
+
+      {/* Confirm Delete Client Association Modal */}
+      <ConfirmDeleteModal
+        isOpen={!!deleteClientTarget}
+        onClose={() => setDeleteClientTarget(null)}
+        onConfirm={() => deleteClientTarget && handleRemoveAssociation(deleteClientTarget.id)}
+        itemType="client"
+        itemName={deleteClientTarget?.name}
+        parentName={vendor.name}
+        confirmText="Remove Client"
       />
     </div>
   );

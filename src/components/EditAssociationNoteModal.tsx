@@ -10,7 +10,8 @@ interface EditAssociationNoteModalProps {
   onClose: () => void;
   clientId: string;
   vendorId: string;
-  vendorName: string;
+  vendorName?: string;
+  clientName?: string;
   currentNotes: string;
   onSaveSuccess: () => void;
 }
@@ -21,6 +22,7 @@ export default function EditAssociationNoteModal({
   clientId,
   vendorId,
   vendorName,
+  clientName,
   currentNotes,
   onSaveSuccess,
 }: EditAssociationNoteModalProps) {
@@ -112,7 +114,7 @@ export default function EditAssociationNoteModal({
                 Client-Specific Vendor Notes
               </div>
               <h3 style={{ fontSize: "1.1rem", fontWeight: "800", color: "var(--text-primary)" }}>
-                {vendorName}
+                {vendorName && clientName ? `${vendorName} — ${clientName}` : vendorName || clientName || "Association Notes"}
               </h3>
             </div>
           </div>

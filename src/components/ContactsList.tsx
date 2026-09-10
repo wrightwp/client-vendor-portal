@@ -16,6 +16,7 @@ import {
   Users,
   Briefcase,
 } from "lucide-react";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
 
 interface ContactItem {
   id: string;
@@ -43,6 +44,7 @@ export default function ContactsList({
 }: ContactsListProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<ContactItem | null>(null);
+  const [deleteContactTarget, setDeleteContactTarget] = useState<{ id: string; name: string } | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -127,9 +129,7 @@ export default function ContactsList({
     }
   };
 
-  const handleDeleteContact = async (contactId: string, contactName: string) => {
-    if (!confirm(`Are you sure you want to remove contact "${contactName}"?`)) return;
-
+  const handleDeleteContact = async (contactId: string) => {
     try {
       const res = await fetch(`/api/contacts/${contactId}`, {
         method: "DELETE",
@@ -156,7 +156,7 @@ export default function ContactsList({
         <div>
           <h2 style={{ fontSize: "1.25rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.5rem" }}>
             <Users size={22} style={{ color: themeAccentColor }} />
-            <span>Key Point of Contacts ({contacts?.length || 0})</span>
+            <span>Contacts ({contacts?.length || 0})</span>
           </h2>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.1rem" }}>
             Designated personnel, medical directors, procurement leads, and administrative contacts.
@@ -254,7 +254,7 @@ export default function ContactsList({
                       <Edit2 size={14} />
                     </button>
                     <button
-                      onClick={() => handleDeleteContact(contact.id, contact.name)}
+                      onClick={() => setDeleteContactTarget({ id: contact.id, name: contact.name })}
                       style={{
                         background: "none",
                         border: "none",
@@ -292,21 +292,23 @@ export default function ContactsList({
                     </a>
                   )}
                 </div>
-
-                {contact.notes && (
-                  <div
-                    style={{
-                      marginTop: "0.75rem",
-                      paddingTop: "0.5rem",
-                      borderTop: "1px dashed var(--border)",
-                      fontSize: "0.8rem",
-                      color: "var(--text-muted)",
-                    }}
-                  >
-                    <div style={{ fontStyle: "italic" }}>"{contact.notes}"</div>
-                  </div>
-                )}
               </div>
+
+              {contact.notes && (
+                <div
+                  style={{
+                    marginTop: "0.75rem",
+                    paddingTop: "0.6rem",
+                    borderTop: "1px solid var(--border)",
+                    fontSize: "0.825rem",
+                    color: "var(--text-secondary)",
+                    lineHeight: "1.45",
+                  }}
+                >
+                  <span style={{ fontWeight: "600", color: "var(--text-muted)" }}>Note: </span>
+                  {contact.notes}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -335,7 +337,7 @@ export default function ContactsList({
             className="glass-panel"
             style={{
               width: "100%",
-              maxWidth: "520px",
+              maxWidth: "500px",
               padding: "1.75rem",
               background: "var(--bg-elevated)",
               border: `1px solid ${themeAccentColor}`,
@@ -345,10 +347,31 @@ export default function ContactsList({
             onClick={(e) => e.stopPropagation()}
           >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
-              <h3 style={{ fontSize: "1.15rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <User size={20} style={{ color: themeAccentColor }} />
-                <span>{editingContact ? "Edit Contact Details" : "Add Key Contact"}</span>
-              </h3>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+                <div
+                  style={{
+                    width: "36px",
+                    height: "36px",
+                    borderRadius: "10px",
+                    background: isPink ? "var(--accent-pink-light)" : "var(--accent-blue-light)",
+                    color: themeAccentColor,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <User size={20} />
+                </div>
+                <div>
+                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: "700" }}>
+                    {editingContact ? "Edit Contact" : "Add New Contact"}
+                  </div>
+                  <h3 style={{ fontSize: "1.1rem", fontWeight: "800", color: "var(--text-primary)" }}>
+                    {editingContact ? editingContact.name : "Contact Details"}
+                  </h3>
+                </div>
+              </div>
+
               <button
                 onClick={() => setIsModalOpen(false)}
                 style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer" }}
@@ -378,55 +401,55 @@ export default function ContactsList({
                 <label className="form-label">Full Name *</label>
                 <input
                   type="text"
-                  className="form-input"
                   required
+                  className="form-input"
                   placeholder="e.g. Dr. Sarah Jenkins"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Title / Role</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="e.g. Medical Director, Procurement Officer"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                />
-              </div>
-
               <div className="grid-cols-2">
+                <div className="form-group">
+                  <label className="form-label">Job Title / Role</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="e.g. Medical Director"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  />
+                </div>
+
                 <div className="form-group">
                   <label className="form-label">Phone Number</label>
                   <input
                     type="text"
                     className="form-input"
-                    placeholder="(555) 000-0000"
+                    placeholder="e.g. (555) 234-5678"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Email Address</label>
-                  <input
-                    type="email"
-                    className="form-input"
-                    placeholder="email@example.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   />
                 </div>
               </div>
 
               <div className="form-group">
-                <label className="form-label">Contact Notes</label>
+                <label className="form-label">Email Address</label>
+                <input
+                  type="email"
+                  className="form-input"
+                  placeholder="e.g. s.jenkins@example.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Notes / Preferences</label>
                 <textarea
                   rows={3}
                   className="form-textarea"
-                  placeholder="Direct extension, availability hours, operational notes..."
+                  placeholder="e.g. Preferred point of contact for billing & contract renewals..."
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 ></textarea>
@@ -454,6 +477,18 @@ export default function ContactsList({
           </div>
         </div>
       )}
+
+      {/* Confirm Delete Contact Modal */}
+      <ConfirmDeleteModal
+        isOpen={!!deleteContactTarget}
+        onClose={() => setDeleteContactTarget(null)}
+        onConfirm={() => deleteContactTarget && handleDeleteContact(deleteContactTarget.id)}
+        itemType="contact"
+        title="Delete Contact"
+        itemName={deleteContactTarget?.name}
+        description={`Are you sure you want to delete contact "${deleteContactTarget?.name}"? This action cannot be undone.`}
+        confirmText="Delete Contact"
+      />
     </div>
   );
 }
