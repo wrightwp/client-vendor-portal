@@ -7,6 +7,7 @@ import SearchSelect from "@/components/SearchSelect";
 import LastChangeHighlight from "@/components/LastChangeHighlight";
 import ChangeHistoryTimeline from "@/components/ChangeHistoryTimeline";
 import HistoryWalkthroughModal from "@/components/HistoryWalkthroughModal";
+import ContactsList from "@/components/ContactsList";
 import {
   ArrowLeft,
   Store,
@@ -535,6 +536,15 @@ export default function VendorDetailPage({
           </div>
         </form>
       )}
+
+      {/* Key Contacts List Section */}
+      <ContactsList
+        contacts={vendor.contacts || []}
+        entityId={id}
+        entityType="VENDOR"
+        onRefresh={fetchVendorDetails}
+        accentColor="blue"
+      />
 
       {/* Associated Healthcare Clients Section */}
       <div className="glass-panel" style={{ padding: "1.75rem" }}>

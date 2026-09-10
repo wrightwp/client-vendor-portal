@@ -296,6 +296,51 @@ a {
   border: 1px solid #e2e8f0;
 }
 
+/* Rich Text Formatting Styles */
+.rich-highlight {
+  background: rgba(0, 174, 219, 0.2);
+  color: #38bdf8;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+  border: 1px solid rgba(0, 174, 219, 0.3);
+}
+
+[data-theme="light"] .rich-highlight {
+  background: rgba(0, 174, 219, 0.12);
+  color: #0284c7;
+  border-color: rgba(0, 174, 219, 0.25);
+}
+
+.rich-code {
+  font-family: var(--font-mono);
+  background: rgba(255, 255, 255, 0.06);
+  color: #f472b6;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.825rem;
+  border: 1px solid var(--border);
+}
+
+[data-theme="light"] .rich-code {
+  background: #f1f5f9;
+  color: #db2777;
+  border-color: #cbd5e1;
+}
+
+.rich-h3 {
+  font-size: 1rem;
+  font-weight: 800;
+  margin-top: 0.4rem;
+  margin-bottom: 0.2rem;
+  color: var(--text-primary);
+}
+
+.toolbar-btn:hover {
+  background: var(--accent-blue-light) !important;
+  color: var(--accent-blue) !important;
+}
+
 /* Glassmorphism containers */
 .glass-panel {
   background: rgba(19, 23, 34, 0.85);
@@ -711,3 +756,66 @@ a {
     grid-template-columns: 1fr;
   }
 }
+
+/* Markdown & Rich Notes Renderer Styling */
+.rich-note-container .rich-h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+  color: var(--text-primary);
+}
+
+.rich-note-container .rich-code {
+  background: rgba(0, 174, 219, 0.12);
+  color: var(--accent-blue);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.825rem;
+  border: 1px solid rgba(0, 174, 219, 0.2);
+}
+
+.rich-note-container .rich-highlight {
+  background: rgba(236, 72, 153, 0.2);
+  color: #f472b6;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+[data-theme="light"] .rich-note-container .rich-highlight {
+  background: rgba(236, 72, 153, 0.15);
+  color: #be185d;
+}
+
+.rich-note-container .rich-quote {
+  margin: 0.4rem 0;
+  padding: 0.4rem 0.75rem;
+  border-left: 3px solid var(--accent-pink);
+  background: rgba(255, 255, 255, 0.03);
+  font-style: italic;
+  color: var(--text-secondary);
+  border-radius: 0 4px 4px 0;
+}
+
+[data-theme="light"] .rich-note-container .rich-quote {
+  background: rgba(184, 28, 102, 0.05);
+  color: #475569;
+}
+
+.rich-note-container .rich-list-item,
+.markdown-note-container .markdown-list-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0.1rem 0;
+  line-height: 1.45;
+}
+
+.rich-note-container .rich-bullet,
+.markdown-note-container .markdown-bullet {
+  color: var(--accent-pink);
+  font-weight: bold;
+}
+

@@ -6,6 +6,7 @@ async function main() {
   console.log("Seeding database...");
 
   // Clean existing data
+  await prisma.contact.deleteMany();
   await prisma.changeHistory.deleteMany();
   await prisma.clientVendor.deleteMany();
   await prisma.client.deleteMany();
@@ -292,6 +293,52 @@ async function main() {
         clientId: client4.id,
         vendorId: vendor4.id,
         notes: "Medicaid & FQHC specialized billing service.",
+      },
+    ],
+  });
+
+  // Seed Key Point of Contacts
+  await prisma.contact.createMany({
+    data: [
+      {
+        clientId: client1.id,
+        name: "Dr. Arthur Pendelton",
+        title: "Chief Medical Officer",
+        phone: "(555) 234-5690",
+        email: "apendelton@apexhealth.org",
+        notes: "Direct contact for clinical network approvals.",
+      },
+      {
+        clientId: client1.id,
+        name: "Jennifer Sterling",
+        title: "VP of Supply Chain",
+        phone: "(555) 234-5691",
+        email: "jsterling@apexhealth.org",
+        notes: "Handles high-volume vendor contracts and RFP requests.",
+      },
+      {
+        clientId: client2.id,
+        name: "Dr. Maria Rodriguez",
+        title: "Lead Pediatrician & Managing Partner",
+        phone: "(555) 876-5433",
+        email: "mrodriguez@valleypediatrics.com",
+        notes: "Primary decision maker for clinical equipment and pharmaceutical supply.",
+      },
+      {
+        vendorId: vendor1.id,
+        name: "Robert Vance",
+        title: "Senior Account Executive",
+        phone: "(800) 555-0199 ext 402",
+        email: "rvance@medsupplydirect.com",
+        notes: "Available Mon-Fri 8am-5pm EST for urgent order overrides.",
+      },
+      {
+        vendorId: vendor2.id,
+        name: "Claire Lin",
+        title: "Implementation & Technical Support Director",
+        phone: "(888) 555-0244",
+        email: "clin@nexushealthtech.com",
+        notes: "EHR integration lead for new hospital site onboarding.",
       },
     ],
   });

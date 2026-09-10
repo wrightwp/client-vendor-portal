@@ -16,6 +16,9 @@ export async function GET(
             vendor: true,
           },
         },
+        contacts: {
+          orderBy: { createdAt: "asc" },
+        },
         history: {
           orderBy: { createdAt: "desc" },
         },
@@ -58,6 +61,9 @@ export async function PATCH(
           include: {
             vendor: true,
           },
+        },
+        contacts: {
+          orderBy: { createdAt: "asc" },
         },
         history: {
           orderBy: { createdAt: "desc" },

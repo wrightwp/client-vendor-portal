@@ -7,6 +7,9 @@ import SearchSelect from "@/components/SearchSelect";
 import LastChangeHighlight from "@/components/LastChangeHighlight";
 import ChangeHistoryTimeline from "@/components/ChangeHistoryTimeline";
 import HistoryWalkthroughModal from "@/components/HistoryWalkthroughModal";
+import ContactsList from "@/components/ContactsList";
+import EditAssociationNoteModal from "@/components/EditAssociationNoteModal";
+import { MarkdownNoteRenderer } from "@/components/MarkdownNotes";
 import {
   ArrowLeft,
   Building2,
@@ -45,6 +48,13 @@ export default function ClientDetailPage({
   // Walkthrough Modal State
   const [isWalkthroughOpen, setIsWalkthroughOpen] = useState(false);
   const [walkthroughIndex, setWalkthroughIndex] = useState(0);
+
+  // Vendor Association Note Modal State
+  const [activeNoteVendor, setActiveNoteVendor] = useState<{
+    vendorId: string;
+    name: string;
+    notes: string;
+  } | null>(null);
 
   // Edit Form State
   const [formData, setFormData] = useState({
@@ -549,6 +559,15 @@ export default function ClientDetailPage({
         </form>
       )}
 
+      {/* Key Contacts List Section */}
+      <ContactsList
+        contacts={client.contacts || []}
+        entityId={id}
+        entityType="CLIENT"
+        onRefresh={fetchClientDetails}
+        accentColor="pink"
+      />
+
       {/* Associated Vendors Section */}
       <div className="glass-panel" style={{ padding: "1.75rem" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem", flexWrap: "wrap", gap: "1rem" }}>
@@ -631,11 +650,26 @@ export default function ClientDetailPage({
                         ? `${item.vendor.city}, ${item.vendor.state}`
                         : "—"}
                     </td>
-                    <td style={{ color: "#93c5fd", fontStyle: item.notes ? "normal" : "italic" }}>
-                      {item.notes || "No notes"}
+                    <td style={{ color: "var(--text-secondary)", fontStyle: item.notes ? "normal" : "italic", minWidth: "260px" }}>
+                      {item.notes ? (
+                        <div style={{ background: "rgba(255, 255, 255, 0.025)", border: "1px solid var(--border)", padding: "0.4rem 0.75rem", borderRadius: "8px" }}>
+                          <MarkdownNoteRenderer content={item.notes} />
+                        </div>
+                      ) : (
+                        <span style={{ color: "var(--text-muted)" }}>No client-specific notes</span>
+                      )}
                     </td>
                     <td style={{ textAlign: "right" }} className="nowrap">
                       <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
+                        <button
+                          onClick={() => setActiveNoteVendor({ vendorId: item.vendorId, name: item.vendor.name, notes: item.notes || "" })}
+                          className="btn btn-secondary btn-sm"
+                          style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                          title="Edit Client-Specific Vendor Notes"
+                        >
+                          <FileText size={14} style={{ color: "var(--accent-blue)" }} />
+                          <span>{item.notes ? "Edit Note" : "+ Add Note"}</span>
+                        </button>
                         <Link href={`/vendors/${item.vendor.id}`} className="btn btn-secondary btn-sm">
                           View Vendor
                         </Link>
@@ -676,6 +710,19 @@ export default function ClientDetailPage({
         initialStepIndex={walkthroughIndex}
         accentColor="pink"
       />
+
+      {/* Edit Client-Specific Vendor Note Modal */}
+      {activeNoteVendor && (
+        <EditAssociationNoteModal
+          isOpen={!!activeNoteVendor}
+          onClose={() => setActiveNoteVendor(null)}
+          clientId={id}
+          vendorId={activeNoteVendor.vendorId}
+          vendorName={activeNoteVendor.name}
+          currentNotes={activeNoteVendor.notes}
+          onSaveSuccess={fetchClientDetails}
+        />
+      )}
     </div>
   );
 }
