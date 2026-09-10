@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { createSnapshot } from "@/lib/history";
 
 export async function GET(request: Request) {
   try {
@@ -78,6 +79,17 @@ export async function POST(request: Request) {
         vendorType: vendorType || "GENERAL",
         notes: notes || null,
         status: status || "ACTIVE",
+      },
+    });
+
+    await db.changeHistory.create({
+      data: {
+        entityType: "VENDOR",
+        entityId: vendor.id,
+        vendorId: vendor.id,
+        action: "CREATE",
+        summary: "Initial vendor profile created",
+        snapshot: createSnapshot(vendor),
       },
     });
 

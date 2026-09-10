@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { createSnapshot } from "@/lib/history";
 
 export async function GET(request: Request) {
   try {
@@ -75,6 +76,17 @@ export async function POST(request: Request) {
         specialty: specialty || null,
         notes: notes || null,
         status: status || "ACTIVE",
+      },
+    });
+
+    await db.changeHistory.create({
+      data: {
+        entityType: "CLIENT",
+        entityId: client.id,
+        clientId: client.id,
+        action: "CREATE",
+        summary: "Initial client profile created",
+        snapshot: createSnapshot(client),
       },
     });
 

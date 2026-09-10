@@ -4,6 +4,9 @@ import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import SearchSelect from "@/components/SearchSelect";
+import LastChangeHighlight from "@/components/LastChangeHighlight";
+import ChangeHistoryTimeline from "@/components/ChangeHistoryTimeline";
+import HistoryWalkthroughModal from "@/components/HistoryWalkthroughModal";
 import {
   ArrowLeft,
   Building2,
@@ -38,6 +41,10 @@ export default function ClientDetailPage({
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
+
+  // Walkthrough Modal State
+  const [isWalkthroughOpen, setIsWalkthroughOpen] = useState(false);
+  const [walkthroughIndex, setWalkthroughIndex] = useState(0);
 
   // Edit Form State
   const [formData, setFormData] = useState({
@@ -255,10 +262,9 @@ export default function ClientDetailPage({
 
       {/* Main Profile Header */}
       <div
-        className="glass-panel"
+        className="glass-panel client-profile-header"
         style={{
           padding: "2rem",
-          background: "linear-gradient(135deg, rgba(184, 28, 102, 0.35) 0%, rgba(12, 14, 20, 0.95) 100%)",
           border: "1px solid rgba(184, 28, 102, 0.4)",
         }}
       >
@@ -309,6 +315,16 @@ export default function ClientDetailPage({
           </div>
         </div>
       </div>
+
+      {/* Highlight Last Change Banner */}
+      <LastChangeHighlight
+        lastChange={client.history?.[0] || null}
+        onOpenWalkthrough={() => {
+          setWalkthroughIndex(client.history?.length ? client.history.length - 1 : 0);
+          setIsWalkthroughOpen(true);
+        }}
+        accentColor="pink"
+      />
 
       {/* VIEW or EDIT Section */}
       {!isEditing ? (
@@ -639,6 +655,27 @@ export default function ClientDetailPage({
           </div>
         )}
       </div>
+
+      {/* Change History Timeline Section */}
+      <ChangeHistoryTimeline
+        history={client.history || []}
+        onSelectVersion={(stepIdx) => {
+          setWalkthroughIndex(stepIdx);
+          setIsWalkthroughOpen(true);
+        }}
+        accentColor="pink"
+      />
+
+      {/* Interactive History Walkthrough Modal */}
+      <HistoryWalkthroughModal
+        isOpen={isWalkthroughOpen}
+        onClose={() => setIsWalkthroughOpen(false)}
+        history={client.history || []}
+        entityType="CLIENT"
+        entityName={client.name}
+        initialStepIndex={walkthroughIndex}
+        accentColor="pink"
+      />
     </div>
   );
 }

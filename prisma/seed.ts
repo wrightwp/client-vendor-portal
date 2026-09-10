@@ -6,6 +6,7 @@ async function main() {
   console.log("Seeding database...");
 
   // Clean existing data
+  await prisma.changeHistory.deleteMany();
   await prisma.clientVendor.deleteMany();
   await prisma.client.deleteMany();
   await prisma.vendor.deleteMany();
@@ -26,6 +27,90 @@ async function main() {
       specialty: "Multi-Specialty Hospital System",
       notes: "Primary regional hospital system with 4 outpatient clinics.",
     },
+  });
+
+  // Seed sample change history steps for Client 1
+  const t0 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const t1 = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+  const t2 = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
+
+  await prisma.changeHistory.createMany({
+    data: [
+      {
+        entityType: "CLIENT",
+        entityId: client1.id,
+        clientId: client1.id,
+        action: "CREATE",
+        summary: "Initial client profile created",
+        changes: JSON.stringify([]),
+        snapshot: JSON.stringify({
+          name: "Apex Healthcare Network",
+          taxId: "12-3456789",
+          npiNumber: "1982736450",
+          phone: "(555) 100-0000",
+          email: "info@apexhealth.org",
+          address: "10 Main Street",
+          city: "Boston",
+          state: "MA",
+          zipCode: "02115",
+          status: "PENDING",
+          specialty: "General Hospital",
+          notes: "Initial registration.",
+        }),
+        createdAt: t0,
+      },
+      {
+        entityType: "CLIENT",
+        entityId: client1.id,
+        clientId: client1.id,
+        action: "STATUS_CHANGE",
+        summary: "Updated Account Status to ACTIVE",
+        changes: JSON.stringify([
+          { field: "status", label: "Account Status", oldValue: "PENDING", newValue: "ACTIVE" },
+        ]),
+        snapshot: JSON.stringify({
+          name: "Apex Healthcare Network",
+          taxId: "12-3456789",
+          npiNumber: "1982736450",
+          phone: "(555) 100-0000",
+          email: "info@apexhealth.org",
+          address: "10 Main Street",
+          city: "Boston",
+          state: "MA",
+          zipCode: "02115",
+          status: "ACTIVE",
+          specialty: "General Hospital",
+          notes: "Credentialing verified. Account activated.",
+        }),
+        createdAt: t1,
+      },
+      {
+        entityType: "CLIENT",
+        entityId: client1.id,
+        clientId: client1.id,
+        action: "UPDATE",
+        summary: "Updated Phone Number, Street Address",
+        changes: JSON.stringify([
+          { field: "phone", label: "Phone Number", oldValue: "(555) 100-0000", newValue: "(555) 234-5678" },
+          { field: "address", label: "Street Address", oldValue: "10 Main Street", newValue: "100 Medical Center Blvd" },
+        ]),
+        snapshot: JSON.stringify({
+          name: "Apex Healthcare Network",
+          taxId: "12-3456789",
+          npiNumber: "1982736450",
+          phone: "(555) 234-5678",
+          email: "contact@apexhealth.org",
+          address: "100 Medical Center Blvd",
+          city: "Boston",
+          state: "MA",
+          zipCode: "02115",
+          status: "ACTIVE",
+          specialty: "Multi-Specialty Hospital System",
+          notes: "Primary regional hospital system with 4 outpatient clinics.",
+        }),
+        createdAt: t2,
+      },
+    ],
   });
 
   const client2 = await prisma.client.create({

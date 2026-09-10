@@ -24,6 +24,7 @@ model Client {
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
   vendors     ClientVendor[]
+  history     ChangeHistory[]
 }
 
 model Vendor {
@@ -42,6 +43,7 @@ model Vendor {
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
   clients     ClientVendor[]
+  history     ChangeHistory[]
 }
 
 model ClientVendor {
@@ -58,3 +60,24 @@ model ClientVendor {
   @@index([clientId])
   @@index([vendorId])
 }
+
+model ChangeHistory {
+  id          String   @id @default(uuid())
+  entityType  String   // "CLIENT" | "VENDOR"
+  entityId    String
+  action      String   // "CREATE" | "UPDATE" | "STATUS_CHANGE" | "ASSOCIATION_ADDED" | "ASSOCIATION_REMOVED"
+  summary     String
+  changes     String?  // JSON stringified array: [{ field, oldValue, newValue }]
+  snapshot    String?  // JSON stringified state snapshot of the profile at this version
+  createdAt   DateTime @default(now())
+
+  clientId    String?
+  client      Client?  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  vendorId    String?
+  vendor      Vendor?  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@index([entityType, entityId])
+  @@index([clientId])
+  @@index([vendorId])
+}
+

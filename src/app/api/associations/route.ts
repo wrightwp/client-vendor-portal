@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { createSnapshot } from "@/lib/history";
 
 export async function POST(request: Request) {
   try {
@@ -24,6 +25,36 @@ export async function POST(request: Request) {
         vendor: true,
       },
     });
+
+    // Create history records for both Client and Vendor
+    await Promise.all([
+      db.changeHistory.create({
+        data: {
+          entityType: "CLIENT",
+          entityId: clientId,
+          clientId: clientId,
+          action: "ASSOCIATION_ADDED",
+          summary: `Linked Vendor: ${association.vendor.name}`,
+          changes: JSON.stringify([
+            { field: "association", label: "Vendor Association", oldValue: null, newValue: association.vendor.name },
+          ]),
+          snapshot: createSnapshot(association.client),
+        },
+      }),
+      db.changeHistory.create({
+        data: {
+          entityType: "VENDOR",
+          entityId: vendorId,
+          vendorId: vendorId,
+          action: "ASSOCIATION_ADDED",
+          summary: `Linked Client: ${association.client.name}`,
+          changes: JSON.stringify([
+            { field: "association", label: "Client Association", oldValue: null, newValue: association.client.name },
+          ]),
+          snapshot: createSnapshot(association.vendor),
+        },
+      }),
+    ]);
 
     return NextResponse.json({ success: true, association }, { status: 201 });
   } catch (error: any) {
@@ -54,14 +85,58 @@ export async function DELETE(request: Request) {
       );
     }
 
-    await db.clientVendor.delete({
+    const association = await db.clientVendor.findUnique({
       where: {
         clientId_vendorId: {
           clientId,
           vendorId,
         },
       },
+      include: {
+        client: true,
+        vendor: true,
+      },
     });
+
+    if (association) {
+      await db.clientVendor.delete({
+        where: {
+          clientId_vendorId: {
+            clientId,
+            vendorId,
+          },
+        },
+      });
+
+      await Promise.all([
+        db.changeHistory.create({
+          data: {
+            entityType: "CLIENT",
+            entityId: clientId,
+            clientId: clientId,
+            action: "ASSOCIATION_REMOVED",
+            summary: `Unlinked Vendor: ${association.vendor.name}`,
+            changes: JSON.stringify([
+              { field: "association", label: "Vendor Association", oldValue: association.vendor.name, newValue: null },
+            ]),
+            snapshot: createSnapshot(association.client),
+          },
+        }),
+        db.changeHistory.create({
+          data: {
+            entityType: "VENDOR",
+            entityId: vendorId,
+            vendorId: vendorId,
+            action: "ASSOCIATION_REMOVED",
+            summary: `Unlinked Client: ${association.client.name}`,
+            changes: JSON.stringify([
+              { field: "association", label: "Client Association", oldValue: association.client.name, newValue: null },
+            ]),
+            snapshot: createSnapshot(association.vendor),
+          },
+        }),
+      ]);
+    }
 
     return NextResponse.json({ success: true, message: "Association removed successfully." });
   } catch (error: any) {

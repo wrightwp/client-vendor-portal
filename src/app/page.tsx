@@ -36,10 +36,9 @@ export default async function DashboardPage() {
     <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
       {/* Banner with ASR Color Accents */}
       <div
-        className="glass-panel"
+        className="glass-panel hero-dashboard-banner"
         style={{
           padding: "2.25rem 2.5rem",
-          background: "linear-gradient(135deg, rgba(184, 28, 102, 0.25) 0%, rgba(0, 174, 219, 0.15) 60%, rgba(19, 23, 34, 0.95) 100%)",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",

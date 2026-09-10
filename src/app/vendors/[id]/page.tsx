@@ -4,6 +4,9 @@ import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import SearchSelect from "@/components/SearchSelect";
+import LastChangeHighlight from "@/components/LastChangeHighlight";
+import ChangeHistoryTimeline from "@/components/ChangeHistoryTimeline";
+import HistoryWalkthroughModal from "@/components/HistoryWalkthroughModal";
 import {
   ArrowLeft,
   Store,
@@ -35,6 +38,10 @@ export default function VendorDetailPage({
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
+
+  // Walkthrough Modal State
+  const [isWalkthroughOpen, setIsWalkthroughOpen] = useState(false);
+  const [walkthroughIndex, setWalkthroughIndex] = useState(0);
 
   // Edit Form State
   const [formData, setFormData] = useState({
@@ -250,10 +257,9 @@ export default function VendorDetailPage({
 
       {/* Main Profile Header */}
       <div
-        className="glass-panel"
+        className="glass-panel vendor-profile-header"
         style={{
           padding: "2rem",
-          background: "linear-gradient(135deg, rgba(0, 174, 219, 0.35) 0%, rgba(12, 14, 20, 0.95) 100%)",
           border: "1px solid rgba(0, 174, 219, 0.4)",
         }}
       >
@@ -300,6 +306,16 @@ export default function VendorDetailPage({
           </div>
         </div>
       </div>
+
+      {/* Highlight Last Change Banner */}
+      <LastChangeHighlight
+        lastChange={vendor.history?.[0] || null}
+        onOpenWalkthrough={() => {
+          setWalkthroughIndex(vendor.history?.length ? vendor.history.length - 1 : 0);
+          setIsWalkthroughOpen(true);
+        }}
+        accentColor="blue"
+      />
 
       {/* VIEW or EDIT Section */}
       {!isEditing ? (
@@ -624,6 +640,27 @@ export default function VendorDetailPage({
           </div>
         )}
       </div>
+
+      {/* Change History Timeline Section */}
+      <ChangeHistoryTimeline
+        history={vendor.history || []}
+        onSelectVersion={(stepIdx) => {
+          setWalkthroughIndex(stepIdx);
+          setIsWalkthroughOpen(true);
+        }}
+        accentColor="blue"
+      />
+
+      {/* Interactive History Walkthrough Modal */}
+      <HistoryWalkthroughModal
+        isOpen={isWalkthroughOpen}
+        onClose={() => setIsWalkthroughOpen(false)}
+        history={vendor.history || []}
+        entityType="VENDOR"
+        entityName={vendor.name}
+        initialStepIndex={walkthroughIndex}
+        accentColor="blue"
+      />
     </div>
   );
 }
