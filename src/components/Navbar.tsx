@@ -12,11 +12,15 @@ import {
   ShieldCheck,
   X,
   ArrowRight,
-  Sparkles,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [mounted, setMounted] = useState(false);
+
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<{ clients: any[]; vendors: any[] }>({
@@ -24,6 +28,25 @@ export default function Navbar() {
     vendors: [],
   });
   const [loading, setLoading] = useState(false);
+
+  // Initialize theme state on mount
+  useEffect(() => {
+    setMounted(true);
+    const savedTheme = localStorage.getItem("theme") as "dark" | "light" | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      document.documentElement.setAttribute("data-theme", savedTheme);
+    } else {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    localStorage.setItem("theme", nextTheme);
+    document.documentElement.setAttribute("data-theme", nextTheme);
+  };
 
   useEffect(() => {
     if (!query.trim()) {
@@ -67,8 +90,8 @@ export default function Navbar() {
         <Link href="/" className="nav-logo">
           <div
             style={{
-              width: "32px",
-              height: "32px",
+              width: "34px",
+              height: "34px",
               borderRadius: "50%",
               background: "linear-gradient(135deg, #b81c66 0%, #00aedb 60%, #ffc20e 100%)",
               display: "flex",
@@ -78,7 +101,7 @@ export default function Navbar() {
               boxShadow: "0 2px 10px rgba(184, 28, 102, 0.4)",
             }}
           >
-            <ShieldCheck size={20} />
+            <ShieldCheck size={22} />
           </div>
           <span>HealthPortal</span>
         </Link>
@@ -101,6 +124,7 @@ export default function Navbar() {
           <Link
             href="/vendors"
             className={`nav-link ${pathname.startsWith("/vendors") ? "active" : ""}`}
+            style={pathname.startsWith("/vendors") ? { background: "var(--accent-blue)", color: "#fff" } : {}}
           >
             <Store size={18} />
             <span>Vendor Repository</span>
@@ -119,7 +143,7 @@ export default function Navbar() {
               style={{
                 marginLeft: "0.5rem",
                 padding: "0.15rem 0.4rem",
-                background: "rgba(255, 255, 255, 0.1)",
+                background: "rgba(0, 0, 0, 0.08)",
                 borderRadius: "4px",
                 fontSize: "0.7rem",
                 fontFamily: "var(--font-mono)",
@@ -128,6 +152,32 @@ export default function Navbar() {
               Ctrl K
             </kbd>
           </button>
+
+          {/* Dark / Light Theme Toggle Button */}
+          {mounted && (
+            <button
+              onClick={toggleTheme}
+              className="btn btn-secondary"
+              style={{
+                padding: "0.55rem",
+                borderRadius: "50%",
+                width: "40px",
+                height: "40px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+              }}
+              title={`Switch to ${theme === "dark" ? "Light" : "Dark"} Mode`}
+              aria-label="Toggle Theme"
+            >
+              {theme === "dark" ? (
+                <Sun size={20} style={{ color: "#ffc20e" }} />
+              ) : (
+                <Moon size={20} style={{ color: "#6366f1" }} />
+              )}
+            </button>
+          )}
         </div>
       </header>
 
