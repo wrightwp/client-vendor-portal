@@ -51,21 +51,21 @@ export default async function DashboardPage() {
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
             <Activity size={20} style={{ color: "var(--accent-yellow)" }} />
             <span style={{ fontSize: "0.85rem", fontWeight: "800", textTransform: "uppercase", color: "var(--accent-yellow)", letterSpacing: "0.05em" }}>
-              Healthcare Administration Portal
+              Administration Portal
             </span>
           </div>
           <h1 style={{ fontSize: "2.25rem", fontWeight: "800", marginBottom: "0.5rem", letterSpacing: "-0.02em" }}>
-            Client & Vendor Management System
+            Group & Vendor Management System
           </h1>
           <p style={{ color: "var(--text-secondary)", maxWidth: "680px", fontSize: "0.95rem" }}>
-            Repository for healthcare providers, clinical networks, and vendor partners. Track tax IDs, NPIs, service locations, and many-to-many associations.
+            Directory for providers, clinical networks, and vendor partners. Track NPIs, service locations, and many-to-many associations.
           </p>
         </div>
 
         <div style={{ display: "flex", gap: "1rem", zIndex: 2 }}>
           <Link href="/clients?action=new" className="btn btn-primary">
             <Plus size={18} />
-            <span>Add Client / Group</span>
+            <span>Add Group</span>
           </Link>
           <Link href="/vendors?action=new" className="btn btn-blue">
             <Plus size={18} />
@@ -80,7 +80,7 @@ export default async function DashboardPage() {
         <div className="glass-card" style={{ padding: "1.5rem", borderTop: "4px solid var(--accent-pink)" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
             <span style={{ fontSize: "0.85rem", fontWeight: "700", color: "var(--text-secondary)" }}>
-              Total Healthcare Clients
+              Total Groups
             </span>
             <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "var(--accent-pink-light)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <Users size={20} style={{ color: "var(--accent-pink)" }} />
@@ -88,7 +88,7 @@ export default async function DashboardPage() {
           </div>
           <div style={{ fontSize: "2.25rem", fontWeight: "800", color: "#f472b6" }}>{clientCount}</div>
           <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>
-            Active healthcare groups & practices
+            Active groups & practices
           </div>
         </div>
 
@@ -120,19 +120,19 @@ export default async function DashboardPage() {
           </div>
           <div style={{ fontSize: "2.25rem", fontWeight: "800", color: "#ffc20e" }}>{associationCount}</div>
           <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>
-            Many-to-many Client ↔ Vendor links
+            Many-to-many Group ↔ Vendor links
           </div>
         </div>
       </div>
 
-      {/* Main Grid: Recent Clients & Vendors */}
+      {/* Main Grid: Recent Groups & Vendors */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
-        {/* Recent Clients */}
+        {/* Recent Groups */}
         <div className="glass-panel" style={{ padding: "1.5rem" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <Users size={20} style={{ color: "var(--accent-pink)" }} />
-              <h2 style={{ fontSize: "1.1rem", fontWeight: "800" }}>Recent Healthcare Groups</h2>
+              <h2 style={{ fontSize: "1.1rem", fontWeight: "800" }}>Recent Groups</h2>
             </div>
             <Link href="/clients" className="btn btn-outline btn-sm">
               <span>View All</span>
@@ -151,8 +151,7 @@ export default async function DashboardPage() {
                 <div>
                   <div style={{ fontWeight: "700", marginBottom: "0.2rem", color: "#f472b6" }}>{client.name}</div>
                   <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
-                    Tax ID: <span className="text-mono">{client.taxId}</span>
-                    {client.specialty && ` • ${client.specialty}`}
+                    {client.specialty || "Group"}
                   </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
@@ -187,11 +186,11 @@ export default async function DashboardPage() {
                 <div>
                   <div style={{ fontWeight: "700", marginBottom: "0.2rem", color: "#38bdf8" }}>{vendor.name}</div>
                   <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
-                    Tax ID: <span className="text-mono">{vendor.taxId}</span> • Type: {vendor.vendorType}
+                    Type: {vendor.vendorType}
                   </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                  <span className="badge badge-blue">{vendor.clients.length} Clients</span>
+                  <span className="badge badge-blue">{vendor.clients.length} Groups</span>
                 </div>
               </Link>
             ))}

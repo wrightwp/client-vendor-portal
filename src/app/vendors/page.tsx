@@ -160,11 +160,11 @@ function VendorsContent() {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
-            <span className="badge badge-blue">VENDOR REPOSITORY PORTAL</span>
+            <span className="badge badge-blue">VENDOR PORTAL</span>
           </div>
           <h1 style={{ fontSize: "2rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.6rem" }}>
             <Store size={30} style={{ color: "var(--accent-blue)" }} />
-            <span>Vendor Repository</span>
+            <span>Vendors</span>
           </h1>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
             Directory of medical suppliers, EHR systems, labs, and service providers. Click any row to view & edit details.
@@ -230,24 +230,23 @@ function VendorsContent() {
           <thead>
             <tr>
               <th style={{ minWidth: "220px" }}>Vendor Name</th>
-              <th className="nowrap">Tax ID (EIN)</th>
               <th className="nowrap">Category</th>
               <th style={{ minWidth: "180px" }}>Contact & Location</th>
               <th className="nowrap">Status</th>
-              <th className="nowrap">Associated Clients</th>
+              <th className="nowrap">Associated Groups</th>
               <th style={{ textAlign: "right" }} className="nowrap">Actions</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={7} style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)" }}>
-                  Loading vendor repository...
+                <td colSpan={6} style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)" }}>
+                  Loading vendors...
                 </td>
               </tr>
             ) : vendors.length === 0 ? (
               <tr>
-                <td colSpan={7} style={{ textAlign: "center", padding: "2.5rem", color: "var(--text-muted)" }}>
+                <td colSpan={6} style={{ textAlign: "center", padding: "2.5rem", color: "var(--text-muted)" }}>
                   No vendors match your search criteria.
                 </td>
               </tr>
@@ -266,7 +265,6 @@ function VendorsContent() {
                       <div style={{ fontSize: "0.775rem", color: "var(--text-muted)" }}>{vendor.email}</div>
                     )}
                   </td>
-                  <td className="text-mono nowrap">{vendor.taxId}</td>
                   <td className="nowrap">
                     <span className="badge badge-purple">{vendor.vendorType}</span>
                   </td>
@@ -293,7 +291,7 @@ function VendorsContent() {
                   </td>
                   <td className="nowrap">
                     <span className="badge badge-blue">
-                      {vendor.clients?.length || 0} Clients
+                      {vendor.clients?.length || 0} Groups
                     </span>
                   </td>
                   <td style={{ textAlign: "right" }} className="nowrap" onClick={(e) => e.stopPropagation()}>

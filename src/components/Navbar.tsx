@@ -119,7 +119,7 @@ export default function Navbar() {
             className={`nav-link ${pathname.startsWith("/clients") ? "active" : ""}`}
           >
             <Users size={18} />
-            <span>Clients & Groups</span>
+            <span>Groups</span>
           </Link>
           <Link
             href="/vendors"
@@ -127,7 +127,7 @@ export default function Navbar() {
             style={pathname.startsWith("/vendors") ? { background: "var(--accent-blue)", color: "#fff" } : {}}
           >
             <Store size={18} />
-            <span>Vendor Repository</span>
+            <span>Vendors</span>
           </Link>
         </nav>
 
@@ -194,7 +194,7 @@ export default function Navbar() {
                 <Search size={20} style={{ color: "var(--accent-pink)" }} />
                 <input
                   type="text"
-                  placeholder="Search Clients or Vendors by Name, Tax ID, NPI, City, Phone..."
+                  placeholder="Search Groups or Vendors by Name, Tax ID, NPI, City, Phone..."
                   className="form-input"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
@@ -215,7 +215,7 @@ export default function Navbar() {
 
               {!loading && query.trim() && results.clients.length === 0 && results.vendors.length === 0 && (
                 <div style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)" }}>
-                  No matching Clients or Vendors found for "{query}".
+                  No matching Groups or Vendors found for "{query}".
                 </div>
               )}
 
@@ -223,7 +223,7 @@ export default function Navbar() {
               {results.clients.length > 0 && (
                 <div style={{ marginBottom: "1.5rem" }}>
                   <div style={{ fontSize: "0.75rem", fontWeight: "800", textTransform: "uppercase", color: "var(--accent-pink)", marginBottom: "0.5rem" }}>
-                    Clients & Groups ({results.clients.length})
+                    Groups ({results.clients.length})
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                     {results.clients.map((c) => (
@@ -271,7 +271,7 @@ export default function Navbar() {
                           </div>
                         </div>
                         <span className="badge badge-blue">
-                          {v.clients?.length || 0} Clients
+                          {v.clients?.length || 0} Groups
                         </span>
                       </Link>
                     ))}

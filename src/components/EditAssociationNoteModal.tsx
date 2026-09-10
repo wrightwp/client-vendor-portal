@@ -111,7 +111,7 @@ export default function EditAssociationNoteModal({
             </div>
             <div>
               <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: "700" }}>
-                Client-Specific Vendor Notes
+                Group-Specific Vendor Notes
               </div>
               <h3 style={{ fontSize: "1.1rem", fontWeight: "800", color: "var(--text-primary)" }}>
                 {vendorName && clientName ? `${vendorName} — ${clientName}` : vendorName || clientName || "Association Notes"}
@@ -152,7 +152,7 @@ export default function EditAssociationNoteModal({
             <MarkdownNoteEditor
               value={notes}
               onChange={setNotes}
-              placeholder="Enter client-specific vendor notes... (Use toolbar for bold, italic, highlights, lists, or code tags)"
+              placeholder="Enter group-specific vendor notes... (Use toolbar for bold, italic, highlights, lists, or code tags)"
               minRows={5}
             />
           </div>

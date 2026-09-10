@@ -3,8 +3,8 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "Healthcare Client & Vendor Portal",
-  description: "Enterprise management system for healthcare groups, vendor repositories, and associations.",
+  title: "Group & Vendor Portal",
+  description: "Enterprise management system for groups, vendors, and associations.",
 };
 
 export default function RootLayout({

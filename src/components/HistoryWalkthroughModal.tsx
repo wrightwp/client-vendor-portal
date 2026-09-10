@@ -148,7 +148,7 @@ export default function HistoryWalkthroughModal({
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                 <span className={`badge ${isPink ? "badge-pink" : "badge-blue"}`}>
-                  {entityType === "CLIENT" ? "Client History Walkthrough" : "Vendor History Walkthrough"}
+                  {entityType === "CLIENT" ? "Group History Walkthrough" : "Vendor History Walkthrough"}
                 </span>
                 <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
                   {entityName}

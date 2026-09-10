@@ -122,7 +122,7 @@ function ClientsContent() {
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newClient.name.trim() || !newClient.taxId.trim()) {
-      setFormError("Client Name and Tax ID are required.");
+      setFormError("Group Name and Tax ID are required.");
       return;
     }
 
@@ -163,11 +163,11 @@ function ClientsContent() {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
-            <span className="badge badge-pink">HEALTHCARE CLIENTS PORTAL</span>
+            <span className="badge badge-pink">GROUPS PORTAL</span>
           </div>
           <h1 style={{ fontSize: "2rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.6rem" }}>
             <Users size={30} style={{ color: "var(--accent-pink)" }} />
-            <span>Healthcare Clients & Groups</span>
+            <span>Groups</span>
           </h1>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
             Manage medical groups, hospitals, and outpatient networks. Click any row to view & edit details.
@@ -176,7 +176,7 @@ function ClientsContent() {
 
         <button onClick={() => setIsAddModalOpen(true)} className="btn btn-primary">
           <Plus size={18} />
-          <span>Add Group / Client</span>
+          <span>Add Group</span>
         </button>
       </div>
 
@@ -215,8 +215,7 @@ function ClientsContent() {
         <table className="custom-table">
           <thead>
             <tr>
-              <th style={{ minWidth: "220px" }}>Client / Practice Name</th>
-              <th className="nowrap">Tax ID (EIN)</th>
+              <th style={{ minWidth: "220px" }}>Group / Practice Name</th>
               <th className="nowrap">NPI Number</th>
               <th style={{ minWidth: "180px" }}>Location & Contact</th>
               <th>Specialty / Group Type</th>
@@ -228,14 +227,14 @@ function ClientsContent() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={8} style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)" }}>
-                  Loading healthcare client repository...
+                <td colSpan={7} style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)" }}>
+                  Loading groups...
                 </td>
               </tr>
             ) : clients.length === 0 ? (
               <tr>
-                <td colSpan={8} style={{ textAlign: "center", padding: "2.5rem", color: "var(--text-muted)" }}>
-                  No healthcare clients match your search criteria.
+                <td colSpan={7} style={{ textAlign: "center", padding: "2.5rem", color: "var(--text-muted)" }}>
+                  No groups match your search criteria.
                 </td>
               </tr>
             ) : (
@@ -253,7 +252,6 @@ function ClientsContent() {
                       <div style={{ fontSize: "0.775rem", color: "var(--text-muted)" }}>{client.email}</div>
                     )}
                   </td>
-                  <td className="text-mono nowrap">{client.taxId}</td>
                   <td className="text-mono nowrap">{client.npiNumber || "—"}</td>
                   <td className="nowrap">
                     <div style={{ fontSize: "0.85rem" }}>
@@ -263,7 +261,7 @@ function ClientsContent() {
                       <div style={{ fontSize: "0.775rem", color: "var(--text-muted)" }}>{client.phone}</div>
                     )}
                   </td>
-                  <td>{client.specialty || "General Healthcare"}</td>
+                  <td>{client.specialty || "General"}</td>
                   <td className="nowrap">
                     <span
                       className={`badge ${
@@ -298,14 +296,14 @@ function ClientsContent() {
         </table>
       </div>
 
-      {/* MODAL: Add Group / Client */}
+      {/* MODAL: Add Group */}
       {isAddModalOpen && (
         <div className="modal-overlay" onClick={() => setIsAddModalOpen(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                 <Building2 size={22} style={{ color: "var(--accent-pink)" }} />
-                <h2 className="modal-title">Add Healthcare Group / Client</h2>
+                <h2 className="modal-title">Add Group</h2>
               </div>
               <button
                 onClick={() => setIsAddModalOpen(false)}
@@ -325,7 +323,7 @@ function ClientsContent() {
 
                 <div className="grid-cols-2">
                   <div className="form-group">
-                    <label className="form-label">Client / Group Name *</label>
+                    <label className="form-label">Group Name *</label>
                     <input
                       type="text"
                       className="form-input"
@@ -362,7 +360,7 @@ function ClientsContent() {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Healthcare Specialty / Type</label>
+                    <label className="form-label">Specialty / Type</label>
                     <input
                       type="text"
                       className="form-input"
@@ -461,7 +459,7 @@ function ClientsContent() {
                   <textarea
                     rows={3}
                     className="form-textarea"
-                    placeholder="Internal notes regarding this healthcare group..."
+                    placeholder="Internal notes regarding this group..."
                     value={newClient.notes}
                     onChange={(e) => setNewClient({ ...newClient, notes: e.target.value })}
                   ></textarea>
@@ -477,7 +475,7 @@ function ClientsContent() {
                   Cancel
                 </button>
                 <button type="submit" disabled={submitting} className="btn btn-primary">
-                  {submitting ? "Checking..." : "Create Client"}
+                  {submitting ? "Checking..." : "Create Group"}
                 </button>
               </div>
             </form>
@@ -503,7 +501,7 @@ function ClientsContent() {
 
 export default function ClientsPage() {
   return (
-    <Suspense fallback={<div style={{ color: "var(--text-muted)", padding: "2rem" }}>Loading clients...</div>}>
+    <Suspense fallback={<div style={{ color: "var(--text-muted)", padding: "2rem" }}>Loading groups...</div>}>
       <ClientsContent />
     </Suspense>
   );

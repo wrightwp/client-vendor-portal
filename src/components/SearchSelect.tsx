@@ -133,7 +133,7 @@ export default function SearchSelect({
             >
               {filteredItems.length === 0 ? (
                 <div style={{ padding: "0.875rem", textAlign: "center", color: "var(--text-muted)", fontSize: "0.85rem" }}>
-                  No matching {type === "vendor" ? "vendors" : "clients"} found.
+                  No matching {type === "vendor" ? "vendors" : "groups"} found.
                 </div>
               ) : (
                 filteredItems.map((item) => (

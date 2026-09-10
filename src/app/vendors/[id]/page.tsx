@@ -177,9 +177,9 @@ export default function VendorDetailPage({
       if (data.success) {
         setNewAssociation({ clientId: "", notes: "" });
         await fetchVendorDetails();
-        setMessage({ text: "Healthcare client associated successfully!", type: "success" });
+        setMessage({ text: "Group associated successfully!", type: "success" });
       } else {
-        alert(data.error || "Failed to associate client");
+        alert(data.error || "Failed to associate group");
       }
     } catch (err) {
       console.error(err);
@@ -322,7 +322,7 @@ export default function VendorDetailPage({
             <div style={{ fontSize: "1.75rem", fontWeight: "800", color: "#38bdf8" }}>
               {vendor.clients?.length || 0}
             </div>
-            <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Associated Clients</div>
+            <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Associated Groups</div>
           </div>
         </div>
       </div>
@@ -555,16 +555,16 @@ export default function VendorDetailPage({
         accentColor="blue"
       />
 
-      {/* Associated Healthcare Clients Section */}
+      {/* Associated Groups Section */}
       <div className="glass-panel" style={{ padding: "1.75rem" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem", flexWrap: "wrap", gap: "1rem" }}>
           <div>
             <h2 style={{ fontSize: "1.25rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <Users size={22} style={{ color: "var(--accent-pink)" }} />
-              <span>Associated Healthcare Clients ({vendor.clients?.length || 0})</span>
+              <span>Associated Groups ({vendor.clients?.length || 0})</span>
             </h2>
             <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-              Healthcare groups and practices associated with this vendor.
+              Groups and practices associated with this vendor.
             </p>
           </div>
         </div>
@@ -573,7 +573,7 @@ export default function VendorDetailPage({
         <form onSubmit={handleAddAssociation} className="glass-panel" style={{ padding: "1.25rem", marginBottom: "1.5rem", border: "1px dashed var(--accent-pink)" }}>
           <h3 style={{ fontSize: "0.9rem", fontWeight: "800", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
             <LinkIcon size={16} style={{ color: "var(--accent-pink)" }} />
-            <span>Search & Link a Healthcare Client</span>
+            <span>Search & Link a Group</span>
           </h3>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: "0.75rem", alignItems: "center" }}>
@@ -581,7 +581,7 @@ export default function VendorDetailPage({
               items={unlinkedClients}
               selectedId={newAssociation.clientId}
               onSelect={(item) => setNewAssociation({ ...newAssociation, clientId: item ? item.id : "" })}
-              placeholder="Search healthcare client by name, specialty, tax ID..."
+              placeholder="Search group by name, specialty, tax ID..."
               type="client"
             />
 
@@ -594,7 +594,7 @@ export default function VendorDetailPage({
             />
 
             <button type="submit" disabled={associating || !newAssociation.clientId} className="btn btn-primary btn-sm">
-              {associating ? "Linking..." : "Link Client"}
+              {associating ? "Linking..." : "Link Group"}
             </button>
           </div>
         </form>
@@ -602,15 +602,14 @@ export default function VendorDetailPage({
         {/* Clients Table */}
         {vendor.clients?.length === 0 ? (
           <div style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)" }}>
-            No healthcare clients are currently associated with this vendor.
+            No groups are currently associated with this vendor.
           </div>
         ) : (
           <div className="table-container">
             <table className="custom-table">
               <thead>
                 <tr>
-                  <th>Healthcare Group</th>
-                  <th className="nowrap">Tax ID (EIN)</th>
+                  <th>Group</th>
                   <th className="nowrap">NPI</th>
                   <th className="nowrap">Location</th>
                   <th>Association Notes</th>
@@ -628,7 +627,6 @@ export default function VendorDetailPage({
                         {item.client.name}
                       </Link>
                     </td>
-                    <td className="text-mono nowrap">{item.client.taxId}</td>
                     <td className="text-mono nowrap">{item.client.npiNumber || "—"}</td>
                     <td className="nowrap">
                       {item.client.city && item.client.state
@@ -641,7 +639,7 @@ export default function VendorDetailPage({
                           <MarkdownNoteRenderer content={item.notes} />
                         </div>
                       ) : (
-                        <span style={{ color: "var(--text-muted)" }}>No client-specific notes</span>
+                        <span style={{ color: "var(--text-muted)" }}>No group-specific notes</span>
                       )}
                     </td>
                     <td style={{ textAlign: "right" }} className="nowrap">
@@ -650,18 +648,18 @@ export default function VendorDetailPage({
                           onClick={() => setActiveNoteClient({ clientId: item.clientId, name: item.client.name, notes: item.notes || "" })}
                           className="btn btn-secondary btn-sm"
                           style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
-                          title="Edit Client-Specific Vendor Notes"
+                          title="Edit Group-Specific Vendor Notes"
                         >
                           <FileText size={14} style={{ color: "var(--accent-blue)" }} />
                           <span>{item.notes ? "Edit Note" : "+ Add Note"}</span>
                         </button>
                         <Link href={`/clients/${item.client.id}`} className="btn btn-secondary btn-sm">
-                          View Client
+                          View Group
                         </Link>
                         <button
                           onClick={() => setDeleteClientTarget({ id: item.clientId, name: item.client.name })}
                           className="btn btn-danger btn-sm"
-                          title="Unlink Client"
+                          title="Unlink Group"
                         >
                           <Trash2 size={14} />
                         </button>
@@ -720,7 +718,7 @@ export default function VendorDetailPage({
         itemType="client"
         itemName={deleteClientTarget?.name}
         parentName={vendor.name}
-        confirmText="Remove Client"
+        confirmText="Remove Group"
       />
     </div>
   );

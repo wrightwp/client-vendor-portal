@@ -29,7 +29,7 @@ export default function DuplicateAlertModal({
           <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
             <AlertTriangle size={24} style={{ color: "var(--accent-yellow)" }} />
             <h2 className="modal-title" style={{ color: "var(--accent-yellow)" }}>
-              Potential Duplicate {type === "client" ? "Healthcare Group" : "Vendor"} Detected
+              Potential Duplicate {type === "client" ? "Group" : "Vendor"} Detected
             </h2>
           </div>
           <button

@@ -211,16 +211,16 @@ export default function ClientDetailPage({
   };
 
   if (loading) {
-    return <div style={{ color: "var(--text-muted)", padding: "3rem", textAlign: "center" }}>Loading client profile...</div>;
+    return <div style={{ color: "var(--text-muted)", padding: "3rem", textAlign: "center" }}>Loading group profile...</div>;
   }
 
   if (!client) {
     return (
       <div style={{ padding: "3rem", textAlign: "center" }}>
-        <h2 style={{ marginBottom: "1rem" }}>Client Not Found</h2>
+        <h2 style={{ marginBottom: "1rem" }}>Group Not Found</h2>
         <Link href="/clients" className="btn btn-primary">
           <ArrowLeft size={16} />
-          <span>Back to Clients Directory</span>
+          <span>Back to Groups Directory</span>
         </Link>
       </div>
     );
@@ -236,13 +236,13 @@ export default function ClientDetailPage({
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
         <Link href="/clients" className="btn btn-secondary btn-sm" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
           <ArrowLeft size={16} />
-          <span>Back to Clients</span>
+          <span>Back to Groups</span>
         </Link>
 
         {!isEditing ? (
           <button onClick={() => setIsEditing(true)} className="btn btn-primary">
             <Edit3 size={16} />
-            <span>Edit Client Information</span>
+            <span>Edit Group Information</span>
           </button>
         ) : (
           <div style={{ display: "flex", gap: "0.75rem" }}>
@@ -291,7 +291,7 @@ export default function ClientDetailPage({
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "1.5rem" }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.5rem" }}>
-              <span className="badge badge-pink">Healthcare Client Profile</span>
+              <span className="badge badge-pink">Group Profile</span>
               <span
                 className={`badge ${
                   client.status === "ACTIVE"
@@ -390,7 +390,7 @@ export default function ClientDetailPage({
               {client.notes ? (
                 <p style={{ whiteSpace: "pre-wrap" }}>{client.notes}</p>
               ) : (
-                <span style={{ color: "var(--text-muted)" }}>No internal notes recorded for this client.</span>
+                <span style={{ color: "var(--text-muted)" }}>No internal notes recorded for this group.</span>
               )}
             </div>
 
@@ -411,12 +411,12 @@ export default function ClientDetailPage({
         <form onSubmit={handleSave} className="glass-panel" style={{ padding: "2rem" }}>
           <h2 style={{ fontSize: "1.25rem", fontWeight: "800", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
             <Edit3 size={20} style={{ color: "var(--accent-pink)" }} />
-            <span>Edit Healthcare Client Record</span>
+            <span>Edit Group Record</span>
           </h2>
 
           <div className="grid-cols-2">
             <div className="form-group">
-              <label className="form-label">Client / Group Name *</label>
+              <label className="form-label">Group Name *</label>
               <input
                 type="text"
                 className="form-input"
@@ -577,7 +577,7 @@ export default function ClientDetailPage({
               <span>Associated Vendors ({client.vendors?.length || 0})</span>
             </h2>
             <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-              Vendors linked to this healthcare client with specific operational notes.
+              Vendors linked to this group with specific operational notes.
             </p>
           </div>
         </div>
@@ -615,7 +615,7 @@ export default function ClientDetailPage({
         {/* Vendors Table / Cards */}
         {client.vendors?.length === 0 ? (
           <div style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)" }}>
-            No vendors are currently associated with this healthcare client.
+            No vendors are currently associated with this group.
           </div>
         ) : (
           <div className="table-container">
@@ -623,7 +623,6 @@ export default function ClientDetailPage({
               <thead>
                 <tr>
                   <th>Vendor Name</th>
-                  <th className="nowrap">Tax ID</th>
                   <th className="nowrap">Category</th>
                   <th className="nowrap">Location</th>
                   <th>Association Notes</th>
@@ -641,7 +640,6 @@ export default function ClientDetailPage({
                         {item.vendor.name}
                       </Link>
                     </td>
-                    <td className="text-mono nowrap">{item.vendor.taxId}</td>
                     <td className="nowrap">
                       <span className="badge badge-purple">{item.vendor.vendorType}</span>
                     </td>
@@ -656,7 +654,7 @@ export default function ClientDetailPage({
                           <MarkdownNoteRenderer content={item.notes} />
                         </div>
                       ) : (
-                        <span style={{ color: "var(--text-muted)" }}>No client-specific notes</span>
+                        <span style={{ color: "var(--text-muted)" }}>No group-specific notes</span>
                       )}
                     </td>
                     <td style={{ textAlign: "right" }} className="nowrap">
@@ -665,7 +663,7 @@ export default function ClientDetailPage({
                           onClick={() => setActiveNoteVendor({ vendorId: item.vendorId, name: item.vendor.name, notes: item.notes || "" })}
                           className="btn btn-secondary btn-sm"
                           style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
-                          title="Edit Client-Specific Vendor Notes"
+                          title="Edit Group-Specific Vendor Notes"
                         >
                           <FileText size={14} style={{ color: "var(--accent-blue)" }} />
                           <span>{item.notes ? "Edit Note" : "+ Add Note"}</span>

@@ -47,7 +47,7 @@ export default function ConfirmDeleteModal({
     (itemType === "vendor"
       ? "Remove Vendor Association"
       : itemType === "client"
-      ? "Remove Client Association"
+      ? "Remove Group Association"
       : itemType === "contact"
       ? "Delete Contact"
       : "Remove Association");
@@ -164,7 +164,7 @@ export default function ConfirmDeleteModal({
                   lineHeight: "1.45",
                 }}
               >
-                ℹ️ This will un-link the association and remove any client-specific notes for this pairing. You can re-associate them at any time.
+                ℹ️ This will un-link the association and remove any group-specific notes for this pairing. You can re-associate them at any time.
               </div>
             </div>
           )}
