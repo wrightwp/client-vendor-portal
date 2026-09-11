@@ -13,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="light">
       <body>
         <Navbar />
         <main style={{ padding: "1.75rem 2.5rem", maxWidth: "1800px", margin: "0 auto", width: "100%" }}>

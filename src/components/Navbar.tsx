@@ -18,7 +18,7 @@ import {
 
 export default function Navbar() {
   const pathname = usePathname();
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<"dark" | "light">("light");
   const [mounted, setMounted] = useState(false);
 
   const [searchOpen, setSearchOpen] = useState(false);
@@ -37,7 +37,8 @@ export default function Navbar() {
       setTheme(savedTheme);
       document.documentElement.setAttribute("data-theme", savedTheme);
     } else {
-      document.documentElement.setAttribute("data-theme", "dark");
+      setTheme("light");
+      document.documentElement.setAttribute("data-theme", "light");
     }
   }, []);
 
