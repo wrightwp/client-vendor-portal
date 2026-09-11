@@ -25,6 +25,9 @@ export async function POST(request: Request) {
           ...client,
           matchReason: result.reason,
           matchScore: Math.round(result.score * 100),
+          isExactTaxId: result.isExactTaxId || false,
+          isExactGroupNumber: result.isExactGroupNumber || false,
+          isExactMatch: result.isExactMatch || false,
         });
       }
     }
@@ -32,9 +35,12 @@ export async function POST(request: Request) {
     // Sort by highest match score
     matches.sort((a, b) => b.matchScore - a.matchScore);
 
+    const hasExactMatch = matches.some((m) => m.isExactMatch);
+
     return NextResponse.json({
       success: true,
       isDuplicate: matches.length > 0,
+      hasExactMatch,
       matches,
     });
   } catch (error: any) {

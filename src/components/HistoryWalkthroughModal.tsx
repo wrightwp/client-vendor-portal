@@ -412,7 +412,7 @@ export default function HistoryWalkthroughModal({
 
                     {entityType === "CLIENT" ? (
                       <div>
-                        <span style={{ color: "var(--text-muted)", fontSize: "0.75rem", display: "block" }}>NPI Number</span>
+                        <span style={{ color: "var(--text-muted)", fontSize: "0.75rem", display: "block" }}>Group Number</span>
                         <strong className="text-mono">{parsedSnapshot.npiNumber || "—"}</strong>
                       </div>
                     ) : (

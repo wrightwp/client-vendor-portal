@@ -55,9 +55,33 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { name, taxId, npiNumber, phone, email, address, city, state, zipCode, specialty, notes, status } = body;
 
-    if (!name || !taxId) {
+    if (!name || !taxId || !npiNumber) {
       return NextResponse.json(
-        { success: false, error: "Client Name and Tax ID are required." },
+        { success: false, error: "Group Name, Tax ID, and Group Number are required." },
+        { status: 400 }
+      );
+    }
+
+    const cleanInputTaxId = taxId.trim().replace(/[^a-zA-Z0-9]/g, "");
+    const cleanInputNpi = npiNumber.trim().replace(/[^a-zA-Z0-9]/g, "");
+
+    const existingClients = await db.client.findMany();
+    const exactDuplicate = existingClients.find((c) => {
+      const cTax = (c.taxId || "").replace(/[^a-zA-Z0-9]/g, "");
+      const cNpi = (c.npiNumber || "").replace(/[^a-zA-Z0-9]/g, "");
+      return (
+        (cleanInputTaxId && cTax && cleanInputTaxId === cTax) ||
+        (cleanInputNpi && cNpi && cleanInputNpi === cNpi)
+      );
+    });
+
+    if (exactDuplicate) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "A Group with this exact Tax ID or Group Number already exists. Duplicate creation is not allowed.",
+          existingId: exactDuplicate.id,
+        },
         { status: 400 }
       );
     }

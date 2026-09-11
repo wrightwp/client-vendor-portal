@@ -78,44 +78,68 @@ export function tokenSimilarity(str1: string, str2: string): number {
 export function evaluateFuzzyMatch(
   input: { name: string; taxId: string; npiNumber?: string },
   existing: { name: string; taxId: string; npiNumber?: string }
-): { isMatch: boolean; score: number; reason: string | null } {
+): {
+  isMatch: boolean;
+  score: number;
+  reason: string | null;
+  isExactTaxId?: boolean;
+  isExactGroupNumber?: boolean;
+  isExactMatch?: boolean;
+} {
   const cleanInputTaxId = (input.taxId || "").replace(/[^a-zA-Z0-9]/g, "");
   const cleanExistingTaxId = (existing.taxId || "").replace(/[^a-zA-Z0-9]/g, "");
 
   const cleanInputNpi = (input.npiNumber || "").replace(/[^a-zA-Z0-9]/g, "");
   const cleanExistingNpi = (existing.npiNumber || "").replace(/[^a-zA-Z0-9]/g, "");
 
-  // 1. Check Tax ID
+  // 1. Priority check for 100% Exact Matches
+  if (cleanInputTaxId && cleanExistingTaxId && cleanInputTaxId === cleanExistingTaxId) {
+    return {
+      isMatch: true,
+      score: 1.0,
+      reason: "Exact Tax ID Match",
+      isExactTaxId: true,
+      isExactMatch: true,
+    };
+  }
+
+  if (cleanInputNpi && cleanExistingNpi && cleanInputNpi === cleanExistingNpi) {
+    return {
+      isMatch: true,
+      score: 1.0,
+      reason: "Exact Group Number Match",
+      isExactGroupNumber: true,
+      isExactMatch: true,
+    };
+  }
+
+  // 2. Fuzzy Tax ID Check
   if (cleanInputTaxId && cleanExistingTaxId) {
-    if (cleanInputTaxId === cleanExistingTaxId) {
-      return { isMatch: true, score: 1.0, reason: "Exact Tax ID Match" };
-    }
     const taxSim = stringSimilarity(cleanInputTaxId, cleanExistingTaxId);
     if (taxSim >= 0.8) {
       return {
         isMatch: true,
         score: taxSim,
         reason: `Tax ID Similarity: ${Math.round(taxSim * 100)}% ("${input.taxId}" vs "${existing.taxId}")`,
+        isExactMatch: false,
       };
     }
   }
 
-  // 2. Check NPI Number (if provided)
+  // 3. Fuzzy Group Number Check (if provided)
   if (cleanInputNpi && cleanExistingNpi) {
-    if (cleanInputNpi === cleanExistingNpi) {
-      return { isMatch: true, score: 1.0, reason: "Exact NPI Match" };
-    }
     const npiSim = stringSimilarity(cleanInputNpi, cleanExistingNpi);
     if (npiSim >= 0.8) {
       return {
         isMatch: true,
         score: npiSim,
-        reason: `NPI Similarity: ${Math.round(npiSim * 100)}% ("${input.npiNumber}" vs "${existing.npiNumber}")`,
+        reason: `Group Number Similarity: ${Math.round(npiSim * 100)}% ("${input.npiNumber}" vs "${existing.npiNumber}")`,
+        isExactMatch: false,
       };
     }
   }
 
-  // 3. Check Name Similarity (Levenshtein + Token Similarity)
+  // 4. Fuzzy Name Similarity (Levenshtein + Token Similarity)
   if (input.name && existing.name) {
     const nameStrSim = stringSimilarity(input.name, existing.name);
     const nameTokenSim = tokenSimilarity(input.name, existing.name);
@@ -126,9 +150,10 @@ export function evaluateFuzzyMatch(
         isMatch: true,
         score: bestNameScore,
         reason: `Name Similarity: ${Math.round(bestNameScore * 100)}% ("${input.name}" vs "${existing.name}")`,
+        isExactMatch: false,
       };
     }
   }
 
-  return { isMatch: false, score: 0, reason: null };
+  return { isMatch: false, score: 0, reason: null, isExactMatch: false };
 }

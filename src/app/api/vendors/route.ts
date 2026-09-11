@@ -66,6 +66,25 @@ export async function POST(request: Request) {
       );
     }
 
+    const cleanInputTaxId = taxId.trim().replace(/[^a-zA-Z0-9]/g, "");
+
+    const existingVendors = await db.vendor.findMany();
+    const exactDuplicate = existingVendors.find((v) => {
+      const vTax = (v.taxId || "").replace(/[^a-zA-Z0-9]/g, "");
+      return cleanInputTaxId && vTax && cleanInputTaxId === vTax;
+    });
+
+    if (exactDuplicate) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "A Vendor with this exact Tax ID already exists. Duplicate creation is not allowed.",
+          existingId: exactDuplicate.id,
+        },
+        { status: 400 }
+      );
+    }
+
     const vendor = await db.vendor.create({
       data: {
         name,

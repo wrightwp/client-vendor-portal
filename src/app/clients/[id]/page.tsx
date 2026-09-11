@@ -315,7 +315,7 @@ export default function ClientDetailPage({
               </div>
               {client.npiNumber && (
                 <div>
-                  NPI Number: <strong className="text-mono" style={{ color: "var(--text-primary)" }}>{client.npiNumber}</strong>
+                  Group Number: <strong className="text-mono" style={{ color: "var(--text-primary)" }}>{client.npiNumber}</strong>
                 </div>
               )}
               {client.specialty && (
@@ -440,7 +440,7 @@ export default function ClientDetailPage({
 
           <div className="grid-cols-2">
             <div className="form-group">
-              <label className="form-label">NPI Number</label>
+              <label className="form-label">Group Number</label>
               <input
                 type="text"
                 className="form-input"

@@ -167,7 +167,7 @@ function VendorsContent() {
             <span>Vendors</span>
           </h1>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
-            Directory of medical suppliers, EHR systems, labs, and service providers. Click any row to view & edit details.
+            Directory of vendors and service providers. Click any row to view & edit details.
           </p>
         </div>
 
@@ -278,13 +278,12 @@ function VendorsContent() {
                   </td>
                   <td className="nowrap">
                     <span
-                      className={`badge ${
-                        vendor.status === "ACTIVE"
+                      className={`badge ${vendor.status === "ACTIVE"
                           ? "badge-active"
                           : vendor.status === "INACTIVE"
-                          ? "badge-inactive"
-                          : "badge-pending"
-                      }`}
+                            ? "badge-inactive"
+                            : "badge-pending"
+                        }`}
                     >
                       {vendor.status}
                     </span>

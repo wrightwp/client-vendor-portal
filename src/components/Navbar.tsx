@@ -194,7 +194,7 @@ export default function Navbar() {
                 <Search size={20} style={{ color: "var(--accent-pink)" }} />
                 <input
                   type="text"
-                  placeholder="Search Groups or Vendors by Name, Tax ID, NPI, City, Phone..."
+                  placeholder="Search Groups or Vendors by Name, Tax ID, Group #, City, Phone..."
                   className="form-input"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
@@ -237,7 +237,7 @@ export default function Navbar() {
                         <div>
                           <div style={{ fontWeight: "700" }}>{c.name}</div>
                           <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
-                            Tax ID: {c.taxId} {c.npiNumber && `• NPI: ${c.npiNumber}`} {c.city && `• ${c.city}, ${c.state}`}
+                            Tax ID: {c.taxId} {c.npiNumber && `• Group #: ${c.npiNumber}`} {c.city && `• ${c.city}, ${c.state}`}
                           </div>
                         </div>
                         <span className="badge badge-pink">

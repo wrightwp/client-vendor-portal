@@ -121,8 +121,8 @@ function ClientsContent() {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newClient.name.trim() || !newClient.taxId.trim()) {
-      setFormError("Group Name and Tax ID are required.");
+    if (!newClient.name.trim() || !newClient.taxId.trim() || !newClient.npiNumber.trim()) {
+      setFormError("Group Name, Tax ID, and Group Number are required.");
       return;
     }
 
@@ -170,7 +170,7 @@ function ClientsContent() {
             <span>Groups</span>
           </h1>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
-            Manage medical groups, hospitals, and outpatient networks. Click any row to view & edit details.
+            Manage groups and networks. Click any row to view & edit details.
           </p>
         </div>
 
@@ -186,7 +186,7 @@ function ClientsContent() {
           <Search size={18} style={{ position: "absolute", left: "0.875rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
           <input
             type="text"
-            placeholder="Search by Name, Tax ID, NPI, Specialty, Phone, City, State..."
+            placeholder="Search by Name, Tax ID, Group #, Specialty, Phone, City, State..."
             className="form-input"
             style={{ paddingLeft: "2.5rem" }}
             value={searchQuery}
@@ -215,8 +215,8 @@ function ClientsContent() {
         <table className="custom-table">
           <thead>
             <tr>
-              <th style={{ minWidth: "220px" }}>Group / Practice Name</th>
-              <th className="nowrap">NPI Number</th>
+              <th style={{ minWidth: "220px" }}>Group Name</th>
+              <th className="nowrap">Group Number</th>
               <th style={{ minWidth: "180px" }}>Location & Contact</th>
               <th>Specialty / Group Type</th>
               <th className="nowrap">Status</th>
@@ -264,13 +264,12 @@ function ClientsContent() {
                   <td>{client.specialty || "General"}</td>
                   <td className="nowrap">
                     <span
-                      className={`badge ${
-                        client.status === "ACTIVE"
-                          ? "badge-active"
-                          : client.status === "INACTIVE"
+                      className={`badge ${client.status === "ACTIVE"
+                        ? "badge-active"
+                        : client.status === "INACTIVE"
                           ? "badge-inactive"
                           : "badge-pending"
-                      }`}
+                        }`}
                     >
                       {client.status}
                     </span>
@@ -349,11 +348,12 @@ function ClientsContent() {
 
                 <div className="grid-cols-2">
                   <div className="form-group">
-                    <label className="form-label">NPI Number (National Provider Identifier)</label>
+                    <label className="form-label">Group Number *</label>
                     <input
                       type="text"
                       className="form-input"
-                      placeholder="10-digit NPI"
+                      placeholder="e.g. GRP-99210"
+                      required
                       value={newClient.npiNumber}
                       onChange={(e) => setNewClient({ ...newClient, npiNumber: e.target.value })}
                     />

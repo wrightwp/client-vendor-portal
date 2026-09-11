@@ -610,7 +610,7 @@ export default function VendorDetailPage({
               <thead>
                 <tr>
                   <th>Group</th>
-                  <th className="nowrap">NPI</th>
+                  <th className="nowrap">Group Number</th>
                   <th className="nowrap">Location</th>
                   <th>Association Notes</th>
                   <th style={{ textAlign: "right" }} className="nowrap">Actions</th>

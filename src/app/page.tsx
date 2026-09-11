@@ -58,7 +58,7 @@ export default async function DashboardPage() {
             Group & Vendor Management System
           </h1>
           <p style={{ color: "var(--text-secondary)", maxWidth: "680px", fontSize: "0.95rem" }}>
-            Directory for providers, clinical networks, and vendor partners. Track NPIs, service locations, and many-to-many associations.
+            Directory for providers, clinical networks, and vendor partners. Track group numbers, service locations, and many-to-many associations.
           </p>
         </div>
 

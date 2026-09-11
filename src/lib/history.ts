@@ -8,7 +8,7 @@ export interface FieldDiff {
 export const FIELD_LABELS: Record<string, string> = {
   name: "Name / Title",
   taxId: "Tax ID (EIN)",
-  npiNumber: "NPI Number",
+  npiNumber: "Group Number",
   phone: "Phone Number",
   email: "Email Address",
   address: "Street Address",
