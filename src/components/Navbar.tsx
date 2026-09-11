@@ -211,7 +211,7 @@ export default function Navbar() {
               </button>
             </div>
 
-            <div className="modal-body" style={{ borderTop: "1px solid var(--border)", paddingTop: "1rem" }}>
+            <div className="modal-body search-grid-scroll" style={{ borderTop: "1px solid var(--border)", paddingTop: "1rem", maxHeight: "450px", overflowY: "auto" }}>
               {loading && <div style={{ color: "var(--text-muted)", fontSize: "0.875rem" }}>Searching database...</div>}
 
               {!loading && query.trim() && results.clients.length === 0 && results.vendors.length === 0 && (
@@ -224,10 +224,10 @@ export default function Navbar() {
               {results.clients.length > 0 && (
                 <div style={{ marginBottom: "1.5rem" }}>
                   <div style={{ fontSize: "0.75rem", fontWeight: "800", textTransform: "uppercase", color: "var(--accent-pink)", marginBottom: "0.5rem" }}>
-                    Groups ({results.clients.length})
+                    Groups ({results.clients.length} match{results.clients.length > 1 ? "es" : ""})
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                    {results.clients.map((c) => (
+                    {results.clients.slice(0, 15).map((c) => (
                       <Link
                         key={c.id}
                         href={`/groups/${c.id}`}
@@ -254,10 +254,10 @@ export default function Navbar() {
               {results.vendors.length > 0 && (
                 <div>
                   <div style={{ fontSize: "0.75rem", fontWeight: "800", textTransform: "uppercase", color: "var(--accent-blue)", marginBottom: "0.5rem" }}>
-                    Vendors ({results.vendors.length})
+                    Vendors ({results.vendors.length} match{results.vendors.length > 1 ? "es" : ""})
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                    {results.vendors.map((v) => (
+                    {results.vendors.slice(0, 15).map((v) => (
                       <Link
                         key={v.id}
                         href={`/vendors/${v.id}`}

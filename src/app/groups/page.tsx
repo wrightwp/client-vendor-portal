@@ -207,6 +207,10 @@ function GroupsContent() {
             <option value="INACTIVE">Inactive</option>
             <option value="PENDING">Pending</option>
           </select>
+
+          <span className="badge badge-pink" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }}>
+            {clients.length} Groups {clients.length > 15 ? "(Scroll to view all)" : ""}
+          </span>
         </div>
       </div>
 

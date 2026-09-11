@@ -221,6 +221,10 @@ function VendorsContent() {
             <option value="INACTIVE">Inactive</option>
             <option value="PENDING">Pending</option>
           </select>
+
+          <span className="badge badge-blue" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }}>
+            {vendors.length} Vendors {vendors.length > 15 ? "(Scroll to view all)" : ""}
+          </span>
         </div>
       </div>
 
