@@ -449,6 +449,60 @@ export default function ClientDetailPage({
               </div>
             </div>
           )}
+
+          {/* Compact View when Collapsed */}
+          {!isDetailsExpanded && (
+            <div
+              style={{
+                marginTop: "0.75rem",
+                paddingTop: "0.75rem",
+                borderTop: "1px solid var(--border)",
+                display: "flex",
+                alignItems: "center",
+                gap: "1.25rem",
+                flexWrap: "wrap",
+                fontSize: "0.85rem",
+                color: "var(--text-secondary)",
+              }}
+            >
+              {client.phone && (
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+                  <Phone size={14} style={{ color: "var(--text-muted)" }} />
+                  <span style={{ fontWeight: "600", color: "var(--text-primary)" }}>{client.phone}</span>
+                </span>
+              )}
+              {client.email && (
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+                  <Mail size={14} style={{ color: "var(--text-muted)" }} />
+                  <span style={{ color: "#f472b6", fontWeight: "600" }}>{client.email}</span>
+                </span>
+              )}
+              {(client.city || client.state) && (
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+                  <MapPin size={14} style={{ color: "var(--text-muted)" }} />
+                  <span>{[client.address, client.city, client.state].filter(Boolean).join(", ")}</span>
+                </span>
+              )}
+              {client.notes && (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.35rem",
+                    color: "var(--text-muted)",
+                    maxWidth: "350px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                  title={client.notes}
+                >
+                  <FileText size={14} />
+                  <span>{client.notes}</span>
+                </span>
+              )}
+            </div>
+          )}
         </div>
       ) : (
         /* Edit Mode Form */
@@ -637,6 +691,46 @@ export default function ClientDetailPage({
             {isVendorsExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
           </button>
         </div>
+
+        {/* Compact View when Collapsed */}
+        {!isVendorsExpanded && (
+          <div
+            style={{
+              marginTop: "0.75rem",
+              paddingTop: "0.75rem",
+              borderTop: "1px solid var(--border)",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              flexWrap: "wrap",
+              fontSize: "0.85rem",
+              color: "var(--text-secondary)",
+            }}
+          >
+            {client.vendors && client.vendors.length > 0 ? (
+              <>
+                <span style={{ color: "var(--text-muted)", fontWeight: "600", fontSize: "0.8rem" }}>Linked:</span>
+                {client.vendors.slice(0, 4).map((item: any) => (
+                  <span
+                    key={item.vendorId}
+                    className="badge badge-purple"
+                    style={{ fontSize: "0.75rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                  >
+                    <span>{item.vendor.name}</span>
+                    <span style={{ opacity: 0.7, fontSize: "0.7rem" }}>({item.vendor.vendorType})</span>
+                  </span>
+                ))}
+                {client.vendors.length > 4 && (
+                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: "600" }}>
+                    +{client.vendors.length - 4} more
+                  </span>
+                )}
+              </>
+            ) : (
+              <span style={{ color: "var(--text-muted)", fontStyle: "italic" }}>No vendors linked to this group</span>
+            )}
+          </div>
+        )}
 
         {isVendorsExpanded && (
           <>

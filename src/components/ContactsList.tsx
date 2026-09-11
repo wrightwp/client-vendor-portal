@@ -336,7 +336,77 @@ export default function ContactsList({
           ))}
         </div>
       )}
-      </>
+        </>
+      )}
+
+      {/* Compact Preview when Collapsed */}
+      {!isExpanded && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.75rem",
+            flexWrap: "wrap",
+            paddingTop: "0.25rem",
+            fontSize: "0.85rem",
+            color: "var(--text-secondary)",
+          }}
+        >
+          {contacts && contacts.length > 0 ? (
+            <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexWrap: "wrap" }}>
+              {contacts.slice(0, 4).map((c) => (
+                <div
+                  key={c.id}
+                  style={{
+                    background: "rgba(255, 255, 255, 0.04)",
+                    border: "1px solid var(--border)",
+                    padding: "0.4rem 0.75rem",
+                    borderRadius: "8px",
+                    display: "inline-flex",
+                    flexDirection: "column",
+                    gap: "0.15rem",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                    <strong style={{ color: "var(--text-primary)", fontSize: "0.85rem" }}>{c.name}</strong>
+                    {c.title && <span style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>({c.title})</span>}
+                  </div>
+                  {c.email ? (
+                    <a
+                      href={`mailto:${c.email}`}
+                      style={{
+                        color: themeAccentColor,
+                        fontSize: "0.775rem",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.25rem",
+                        textDecoration: "none",
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Mail size={12} style={{ color: "var(--text-muted)" }} />
+                      <span>{c.email}</span>
+                    </a>
+                  ) : c.phone ? (
+                    <span style={{ color: "var(--text-muted)", fontSize: "0.75rem", display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
+                      <Phone size={12} />
+                      <span>{c.phone}</span>
+                    </span>
+                  ) : (
+                    <span style={{ color: "var(--text-muted)", fontSize: "0.75rem", fontStyle: "italic" }}>No email listed</span>
+                  )}
+                </div>
+              ))}
+              {contacts.length > 4 && (
+                <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: "600" }}>
+                  +{contacts.length - 4} more
+                </span>
+              )}
+            </div>
+          ) : (
+            <span style={{ color: "var(--text-muted)", fontStyle: "italic" }}>No contacts recorded</span>
+          )}
+        </div>
       )}
 
       {/* Add / Edit Contact Modal */}

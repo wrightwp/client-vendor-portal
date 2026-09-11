@@ -45,71 +45,86 @@ export default function BillingEnrollmentSection({
       <div
         style={{
           display: "flex",
-          alignItems: "center",
+          alignItems: "flex-start",
           justifyContent: "space-between",
-          flexWrap: "wrap",
           gap: "1rem",
           marginBottom: isExpanded ? "1.5rem" : "0",
+          cursor: "pointer",
         }}
+        onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <div
-            style={{
-              padding: "0.6rem",
-              borderRadius: "10px",
-              background: "rgba(244, 114, 182, 0.15)",
-              color: "var(--accent-pink)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <FileText size={24} />
-          </div>
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span className="badge badge-pink" style={{ fontSize: "0.7rem" }}>GROUP SPECIFICATION</span>
-              <h2 style={{ fontSize: "1.35rem", fontWeight: "800" }}>
-                B&E (Billing & Enrollment Summary)
-              </h2>
+        <div style={{ flex: 1 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <div
+              style={{
+                padding: "0.6rem",
+                borderRadius: "10px",
+                background: "rgba(244, 114, 182, 0.15)",
+                color: "var(--accent-pink)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <FileText size={24} />
             </div>
-            <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.15rem" }}>
-              Complete stop-loss, administrative fees, PBM network, and census specifications for {clientName}.
-            </p>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+                <span className="badge badge-pink" style={{ fontSize: "0.7rem" }}>GROUP SPECIFICATION</span>
+                <h2 style={{ fontSize: "1.35rem", fontWeight: "800" }}>
+                  B&E (Billing & Enrollment Summary)
+                </h2>
+              </div>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.15rem" }}>
+                Complete stop-loss, administrative fees, PBM network, and census specifications for {clientName}.
+              </p>
+            </div>
+          </div>
+
+          {/* Action Buttons Row */}
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginTop: "0.875rem", flexWrap: "wrap" }}>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsPrintOpen(true);
+              }}
+              className="btn btn-secondary btn-sm"
+              style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}
+            >
+              <Printer size={15} style={{ color: "var(--accent-pink)" }} />
+              <span>Print / Export B&E</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsEditOpen(true);
+              }}
+              className="btn btn-primary btn-sm"
+              style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}
+            >
+              <Edit3 size={15} />
+              <span>Edit B&E Summary</span>
+            </button>
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <button
-            type="button"
-            onClick={() => setIsPrintOpen(true)}
-            className="btn btn-secondary btn-sm"
-            style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}
-          >
-            <Printer size={15} style={{ color: "var(--accent-pink)" }} />
-            <span>Print / Export B&E</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setIsEditOpen(true)}
-            className="btn btn-primary btn-sm"
-            style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}
-          >
-            <Edit3 size={15} />
-            <span>Edit B&E Summary</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="btn btn-secondary btn-sm"
-            style={{ padding: "0.4rem 0.6rem" }}
-            title={isExpanded ? "Collapse Section" : "Expand Section"}
-          >
-            {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-          </button>
-        </div>
+        {/* Expander Button (Top Right Anchor) */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsExpanded(!isExpanded);
+          }}
+          className="btn btn-secondary btn-sm"
+          style={{ padding: "0.4rem 0.6rem", flexShrink: 0 }}
+          title={isExpanded ? "Collapse Section" : "Expand Section"}
+        >
+          {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+        </button>
       </div>
 
       {isExpanded && (

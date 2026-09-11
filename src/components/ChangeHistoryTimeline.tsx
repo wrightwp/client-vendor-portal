@@ -164,26 +164,62 @@ export default function ChangeHistoryTimeline({
                 e.stopPropagation();
                 handleToggleCard();
               }}
-              style={{
-                background: "var(--bg-card-hover)",
-                border: "1px solid var(--border)",
-                color: "var(--text-primary)",
-                padding: "0.25rem 0.6rem",
-                borderRadius: "6px",
-                fontSize: "0.8rem",
-                fontWeight: "600",
-                cursor: "pointer",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.35rem",
-              }}
+              className="btn btn-secondary btn-sm"
+              style={{ padding: "0.4rem 0.6rem" }}
+              title={isCardExpanded ? "Collapse Section" : "Expand Section"}
             >
-              <span>{isCardExpanded ? "Hide Audit Trail" : "Expand Audit Trail"}</span>
-              {isCardExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              {isCardExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
             </button>
           )}
         </div>
       </div>
+
+      {/* Compact Preview when Collapsed */}
+      {!isCardExpanded && history && history.length > 0 && (
+        <div
+          style={{
+            marginTop: "0.75rem",
+            paddingTop: "0.75rem",
+            borderTop: "1px solid var(--border)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: "0.75rem",
+            fontSize: "0.85rem",
+            color: "var(--text-secondary)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexWrap: "wrap" }}>
+            <span style={{ color: "var(--text-muted)", fontWeight: "600" }}>Latest Event:</span>
+            <span
+              style={{
+                fontSize: "0.725rem",
+                fontWeight: "700",
+                padding: "0.15rem 0.5rem",
+                borderRadius: "6px",
+                background: getActionBadge(history[0].action).bg,
+                color: getActionBadge(history[0].action).color,
+                border: `1px solid ${getActionBadge(history[0].action).border}`,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.3rem",
+              }}
+            >
+              {getActionBadge(history[0].action).icon}
+              {getActionBadge(history[0].action).label}
+            </span>
+            <span style={{ fontWeight: "600", color: "var(--text-primary)" }}>
+              {history[0].summary}
+            </span>
+          </div>
+
+          <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "0.35rem" }}>
+            <Clock size={13} />
+            <span>{new Date(history[0].createdAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</span>
+          </div>
+        </div>
+      )}
 
       {/* Expandable Content Area */}
       {isCardExpanded && (
