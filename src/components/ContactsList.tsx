@@ -158,7 +158,7 @@ export default function ContactsList({
   const badgeClass = isPink ? "badge-pink" : "badge-blue";
 
   return (
-    <div className="glass-panel" style={{ padding: "1.75rem" }}>
+    <div className="glass-panel" style={{ padding: "1.25rem 1.5rem" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem", flexWrap: "wrap", gap: "1rem" }}>
         <div>
           <h2 style={{ fontSize: "1.25rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.5rem" }}>

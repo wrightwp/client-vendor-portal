@@ -115,8 +115,8 @@ export default function Navbar() {
             <span>Dashboard</span>
           </Link>
           <Link
-            href="/clients"
-            className={`nav-link ${pathname.startsWith("/clients") ? "active" : ""}`}
+            href="/groups"
+            className={`nav-link ${pathname.startsWith("/groups") ? "active" : ""}`}
           >
             <Users size={18} />
             <span>Groups</span>
@@ -229,7 +229,7 @@ export default function Navbar() {
                     {results.clients.map((c) => (
                       <Link
                         key={c.id}
-                        href={`/clients/${c.id}`}
+                        href={`/groups/${c.id}`}
                         onClick={() => setSearchOpen(false)}
                         className="glass-card"
                         style={{ padding: "0.75rem 1rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}

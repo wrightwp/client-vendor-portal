@@ -42,7 +42,7 @@ export default function BillingEnrollmentSection({
   const bAndE = data || {};
 
   return (
-    <div className="glass-panel" style={{ padding: "1.75rem", border: "1px solid rgba(184, 28, 102, 0.35)" }}>
+    <div className="glass-panel" style={{ padding: "1.25rem 1.5rem", border: "1px solid rgba(184, 28, 102, 0.35)" }}>
       {/* Section Header */}
       <div
         style={{

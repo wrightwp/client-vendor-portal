@@ -63,7 +63,7 @@ export default async function DashboardPage() {
         </div>
 
         <div style={{ display: "flex", gap: "1rem", zIndex: 2 }}>
-          <Link href="/clients?action=new" className="btn btn-primary">
+          <Link href="/groups?action=new" className="btn btn-primary">
             <Plus size={18} />
             <span>Add Group</span>
           </Link>
@@ -134,7 +134,7 @@ export default async function DashboardPage() {
               <Users size={20} style={{ color: "var(--accent-pink)" }} />
               <h2 style={{ fontSize: "1.1rem", fontWeight: "800" }}>Recent Groups</h2>
             </div>
-            <Link href="/clients" className="btn btn-outline btn-sm">
+            <Link href="/groups" className="btn btn-outline btn-sm">
               <span>View All</span>
               <ArrowRight size={14} />
             </Link>
@@ -144,7 +144,7 @@ export default async function DashboardPage() {
             {recentClients.map((client) => (
               <Link
                 key={client.id}
-                href={`/clients/${client.id}`}
+                href={`/groups/${client.id}`}
                 className="glass-card"
                 style={{ padding: "1rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}
               >
