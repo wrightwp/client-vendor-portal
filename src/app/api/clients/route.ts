@@ -62,13 +62,13 @@ export async function POST(request: Request) {
       );
     }
 
-    const cleanInputTaxId = taxId.trim().replace(/[^a-zA-Z0-9]/g, "");
-    const cleanInputNpi = npiNumber.trim().replace(/[^a-zA-Z0-9]/g, "");
+    const cleanInputTaxId = taxId.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+    const cleanInputNpi = npiNumber.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
 
     const existingClients = await db.client.findMany();
     const exactDuplicate = existingClients.find((c) => {
-      const cTax = (c.taxId || "").replace(/[^a-zA-Z0-9]/g, "");
-      const cNpi = (c.npiNumber || "").replace(/[^a-zA-Z0-9]/g, "");
+      const cTax = (c.taxId || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const cNpi = (c.npiNumber || "").toLowerCase().replace(/[^a-z0-9]/g, "");
       return (
         (cleanInputTaxId && cTax && cleanInputTaxId === cTax) ||
         (cleanInputNpi && cNpi && cleanInputNpi === cNpi)

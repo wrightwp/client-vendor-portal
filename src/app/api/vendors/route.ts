@@ -66,11 +66,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const cleanInputTaxId = taxId.trim().replace(/[^a-zA-Z0-9]/g, "");
+    const cleanInputTaxId = taxId.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
 
     const existingVendors = await db.vendor.findMany();
     const exactDuplicate = existingVendors.find((v) => {
-      const vTax = (v.taxId || "").replace(/[^a-zA-Z0-9]/g, "");
+      const vTax = (v.taxId || "").toLowerCase().replace(/[^a-z0-9]/g, "");
       return cleanInputTaxId && vTax && cleanInputTaxId === vTax;
     });
 

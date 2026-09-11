@@ -86,11 +86,11 @@ export function evaluateFuzzyMatch(
   isExactGroupNumber?: boolean;
   isExactMatch?: boolean;
 } {
-  const cleanInputTaxId = (input.taxId || "").replace(/[^a-zA-Z0-9]/g, "");
-  const cleanExistingTaxId = (existing.taxId || "").replace(/[^a-zA-Z0-9]/g, "");
+  const cleanInputTaxId = (input.taxId || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const cleanExistingTaxId = (existing.taxId || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
-  const cleanInputNpi = (input.npiNumber || "").replace(/[^a-zA-Z0-9]/g, "");
-  const cleanExistingNpi = (existing.npiNumber || "").replace(/[^a-zA-Z0-9]/g, "");
+  const cleanInputNpi = (input.npiNumber || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const cleanExistingNpi = (existing.npiNumber || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
   // 1. Priority check for 100% Exact Matches
   if (cleanInputTaxId && cleanExistingTaxId && cleanInputTaxId === cleanExistingTaxId) {
@@ -139,8 +139,49 @@ export function evaluateFuzzyMatch(
     }
   }
 
-  // 4. Fuzzy Name Similarity (Levenshtein + Token Similarity)
+  // 4. Name Similarity (Containment, Levenshtein, and Token Similarity)
   if (input.name && existing.name) {
+    const normInput = input.name.trim().toLowerCase();
+    const normExisting = existing.name.trim().toLowerCase();
+
+    const cleanInput = normInput.replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ").trim();
+    const cleanExisting = normExisting.replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ").trim();
+
+    const tokenize = (s: string) =>
+      s
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, "")
+        .split(/\s+/)
+        .filter((w) => w.length > 1);
+
+    const inputTokens = tokenize(input.name);
+    const existingTokens = tokenize(existing.name);
+
+    // Check if new Group Name is fully within existing name (or token subset)
+    const isSubstrMatch =
+      cleanInput.length >= 3 &&
+      cleanExisting.length >= 3 &&
+      (cleanExisting.includes(cleanInput) || cleanInput.includes(cleanExisting));
+
+    const isTokenSubMatch =
+      inputTokens.length > 0 &&
+      existingTokens.length > 0 &&
+      (inputTokens.every((t) => existingTokens.includes(t)) ||
+        existingTokens.every((t) => inputTokens.includes(t)));
+
+    if (isSubstrMatch || isTokenSubMatch) {
+      const containmentScore = Math.max(
+        0.85,
+        Math.min(0.95, cleanInput.length / Math.max(cleanExisting.length, 1))
+      );
+      return {
+        isMatch: true,
+        score: containmentScore,
+        reason: `Name Substring / Containment Match ("${input.name}" & "${existing.name}")`,
+        isExactMatch: false,
+      };
+    }
+
     const nameStrSim = stringSimilarity(input.name, existing.name);
     const nameTokenSim = tokenSimilarity(input.name, existing.name);
     const bestNameScore = Math.max(nameStrSim, nameTokenSim);
