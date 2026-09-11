@@ -1,6 +1,7 @@
 "use client";
 
-import { X, Printer, Download, FileText, CheckCircle2 } from "lucide-react";
+import { X, Printer, Download, FileText, CheckCircle2, FileSpreadsheet } from "lucide-react";
+import { exportBEToExcel } from "@/lib/exportBEExcel";
 
 interface PrintBillingEnrollmentModalProps {
   clientName: string;
@@ -50,6 +51,27 @@ export default function PrintBillingEnrollmentModal({
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <button
+              type="button"
+              onClick={() => exportBEToExcel(clientName, data)}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.4rem",
+                padding: "0.5rem 1rem",
+                borderRadius: "6px",
+                background: "#10b981",
+                color: "#ffffff",
+                fontWeight: "600",
+                fontSize: "0.85rem",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              <FileSpreadsheet size={16} />
+              <span>Export to Excel (.xlsx)</span>
+            </button>
+
             <button
               type="button"
               onClick={handlePrint}

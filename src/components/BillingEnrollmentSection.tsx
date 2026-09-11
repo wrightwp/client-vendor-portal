@@ -16,9 +16,11 @@ import {
   AlertCircle,
   ChevronDown,
   ChevronUp,
+  FileSpreadsheet,
 } from "lucide-react";
 import EditBillingEnrollmentModal from "./EditBillingEnrollmentModal";
 import PrintBillingEnrollmentModal from "./PrintBillingEnrollmentModal";
+import { exportBEToExcel } from "@/lib/exportBEExcel";
 
 interface BillingEnrollmentSectionProps {
   clientId: string;
@@ -84,6 +86,20 @@ export default function BillingEnrollmentSection({
 
           {/* Action Buttons Row */}
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginTop: "0.875rem", flexWrap: "wrap" }}>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                exportBEToExcel(clientName, bAndE);
+              }}
+              className="btn btn-secondary btn-sm"
+              style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}
+              title="Export B&E specifications as an Excel spreadsheet (.xlsx)"
+            >
+              <FileSpreadsheet size={15} style={{ color: "#10b981" }} />
+              <span>Export to Excel</span>
+            </button>
+
             <button
               type="button"
               onClick={(e) => {
