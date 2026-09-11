@@ -3,9 +3,17 @@ import * as XLSX from "xlsx";
 export function exportBEToExcel(clientName: string, data: any) {
   const bAndE = data || {};
 
+  const effectiveDatesStr =
+    bAndE.startDate || bAndE.endDate
+      ? `${bAndE.startDate || "N/A"} to ${bAndE.endDate || "N/A"}`
+      : "Not specified";
+
   const rows: (string | number)[][] = [
     ["BILLING & ENROLLMENT (B&E) SPECIFICATION SUMMARY"],
     ["Group Name", clientName],
+    ["Plan Year", bAndE.planYear || "2026"],
+    ["Effective Dates", effectiveDatesStr],
+    ["Current Active Plan Year?", bAndE.isCurrent ? "Yes" : "No"],
     ["Export Date", new Date().toLocaleDateString()],
     [""], // blank row
 
@@ -94,11 +102,12 @@ export function exportBEToExcel(clientName: string, data: any) {
   ];
 
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "B&E Specification");
+  XLSX.utils.book_append_sheet(workbook, worksheet, `B&E ${bAndE.planYear || "2026"}`);
 
   // Format output filename
   const sanitizedClientName = clientName.replace(/[^a-zA-Z0-9_-]/g, "_");
-  const fileName = `BE_Summary_${sanitizedClientName}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  const yearStr = bAndE.planYear ? `_${bAndE.planYear}` : "";
+  const fileName = `BE_Summary_${sanitizedClientName}${yearStr}_${new Date().toISOString().slice(0, 10)}.xlsx`;
 
   XLSX.writeFile(workbook, fileName);
 }

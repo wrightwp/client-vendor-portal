@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Printer, Download, FileText, CheckCircle2, FileSpreadsheet } from "lucide-react";
+import { X, Printer, FileText, FileSpreadsheet, Calendar, CheckCircle2 } from "lucide-react";
 import { exportBEToExcel } from "@/lib/exportBEExcel";
 
 interface PrintBillingEnrollmentModalProps {
@@ -47,7 +47,9 @@ export default function PrintBillingEnrollmentModal({
         >
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "#0f172a" }}>
             <FileText size={20} style={{ color: "#b81c66" }} />
-            <h3 style={{ fontSize: "1.1rem", fontWeight: "700" }}>Print / Export B&E Document</h3>
+            <h3 style={{ fontSize: "1.1rem", fontWeight: "700" }}>
+              Print / Export B&E ({bAndE.planYear || "2026"})
+            </h3>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
@@ -107,16 +109,38 @@ export default function PrintBillingEnrollmentModal({
           {/* Header Banner */}
           <div style={{ borderBottom: "3px solid #b81c66", paddingBottom: "1rem", marginBottom: "1.5rem", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
             <div>
-              <div style={{ fontSize: "0.8rem", fontWeight: "700", textTransform: "uppercase", color: "#b81c66", letterSpacing: "0.05em" }}>
-                BILLING AND ENROLLMENT SUMMARY (B&E)
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <span style={{ fontSize: "0.8rem", fontWeight: "700", textTransform: "uppercase", color: "#b81c66", letterSpacing: "0.05em" }}>
+                  BILLING AND ENROLLMENT SUMMARY (B&E)
+                </span>
+                <span
+                  style={{
+                    background: bAndE.isCurrent ? "#fce7f3" : "#f1f5f9",
+                    color: bAndE.isCurrent ? "#be185d" : "#475569",
+                    padding: "0.15rem 0.5rem",
+                    borderRadius: "4px",
+                    fontSize: "0.75rem",
+                    fontWeight: "700",
+                  }}
+                >
+                  Plan Year {bAndE.planYear || "2026"} {bAndE.isCurrent ? "(Current)" : ""}
+                </span>
               </div>
+
               <h1 style={{ fontSize: "1.8rem", fontWeight: "800", color: "#0f172a", margin: "0.2rem 0" }}>
                 {clientName}
               </h1>
-              <div style={{ fontSize: "0.85rem", color: "#64748b" }}>
-                Specification Document • Generated on {new Date().toLocaleDateString()}
+
+              <div style={{ fontSize: "0.85rem", color: "#64748b", display: "flex", alignItems: "center", gap: "1rem", marginTop: "0.2rem" }}>
+                <span>Generated on {new Date().toLocaleDateString()}</span>
+                {(bAndE.startDate || bAndE.endDate) && (
+                  <span>
+                    • Effective: <strong>{bAndE.startDate || "N/A"}</strong> to <strong>{bAndE.endDate || "N/A"}</strong>
+                  </span>
+                )}
               </div>
             </div>
+
             <div style={{ textAlign: "right", fontSize: "0.8rem", color: "#64748b" }}>
               <div>Client-Vendor Portal</div>
               <div style={{ fontWeight: "600", color: "#0f172a" }}>Group Profile Specs</div>

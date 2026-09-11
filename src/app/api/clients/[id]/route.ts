@@ -22,7 +22,9 @@ export async function GET(
         history: {
           orderBy: { createdAt: "desc" },
         },
-        billingEnrollment: true,
+        billingEnrollments: {
+          orderBy: { planYear: "desc" },
+        },
       },
     });
 
@@ -69,7 +71,9 @@ export async function PATCH(
         history: {
           orderBy: { createdAt: "desc" },
         },
-        billingEnrollment: true,
+        billingEnrollments: {
+          orderBy: { planYear: "desc" },
+        },
       },
     });
 
@@ -102,7 +106,9 @@ export async function PATCH(
           history: {
             orderBy: { createdAt: "desc" },
           },
-          billingEnrollment: true,
+          billingEnrollments: {
+          orderBy: { planYear: "desc" },
+        },
         },
       });
 

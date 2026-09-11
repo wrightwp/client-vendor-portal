@@ -17,6 +17,9 @@ import {
   ChevronDown,
   ChevronUp,
   FileSpreadsheet,
+  Plus,
+  Calendar,
+  CheckCircle2,
 } from "lucide-react";
 import EditBillingEnrollmentModal from "./EditBillingEnrollmentModal";
 import PrintBillingEnrollmentModal from "./PrintBillingEnrollmentModal";
@@ -36,10 +39,33 @@ export default function BillingEnrollmentSection({
   onRefresh,
 }: BillingEnrollmentSectionProps) {
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isNewYearMode, setIsNewYearMode] = useState(false);
   const [isPrintOpen, setIsPrintOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const bAndE = data || {};
+  // Normalize data into array of plan year records
+  const enrollmentsList: any[] = Array.isArray(data)
+    ? data
+    : data
+    ? [data]
+    : [];
+
+  // Sort descending by planYear
+  const sortedEnrollments = [...enrollmentsList].sort((a, b) =>
+    (b.planYear || "").localeCompare(a.planYear || "")
+  );
+
+  // Determine active plan year
+  const currentRecord = sortedEnrollments.find((e) => e.isCurrent) || sortedEnrollments[0];
+  const [selectedYear, setSelectedYear] = useState<string | null>(null);
+
+  const activeYear =
+    selectedYear && sortedEnrollments.some((e) => e.planYear === selectedYear)
+      ? selectedYear
+      : currentRecord?.planYear || "2026";
+
+  const activeBAndE =
+    sortedEnrollments.find((e) => e.planYear === activeYear) || currentRecord || {};
 
   return (
     <div className="glass-panel" style={{ padding: "1.25rem 1.5rem", border: "1px solid rgba(184, 28, 102, 0.35)" }}>
@@ -50,7 +76,7 @@ export default function BillingEnrollmentSection({
           alignItems: "flex-start",
           justifyContent: "space-between",
           gap: "1rem",
-          marginBottom: isExpanded ? "1.5rem" : "0",
+          marginBottom: isExpanded ? "1.25rem" : "0",
           cursor: "pointer",
         }}
         onClick={() => setIsExpanded(!isExpanded)}
@@ -90,14 +116,14 @@ export default function BillingEnrollmentSection({
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                exportBEToExcel(clientName, bAndE);
+                exportBEToExcel(clientName, activeBAndE);
               }}
               className="btn btn-secondary btn-sm"
               style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}
-              title="Export B&E specifications as an Excel spreadsheet (.xlsx)"
+              title="Export active B&E specifications as an Excel spreadsheet (.xlsx)"
             >
               <FileSpreadsheet size={15} style={{ color: "#10b981" }} />
-              <span>Export to Excel</span>
+              <span>Export B&E to Excel</span>
             </button>
 
             <button
@@ -117,13 +143,14 @@ export default function BillingEnrollmentSection({
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
+                setIsNewYearMode(false);
                 setIsEditOpen(true);
               }}
               className="btn btn-primary btn-sm"
               style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}
             >
               <Edit3 size={15} />
-              <span>Edit B&E Summary</span>
+              <span>Edit Plan Year ({activeBAndE.planYear || "2026"})</span>
             </button>
           </div>
         </div>
@@ -143,8 +170,103 @@ export default function BillingEnrollmentSection({
         </button>
       </div>
 
+      {/* Expanded Content View */}
       {isExpanded && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          {/* Plan Year Tabs Bar */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "0.75rem",
+              padding: "0.75rem 1rem",
+              background: "rgba(255, 255, 255, 0.025)",
+              border: "1px solid var(--border)",
+              borderRadius: "10px",
+              flexWrap: "wrap",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+              <span style={{ fontSize: "0.8rem", fontWeight: "700", color: "var(--text-muted)", marginRight: "0.25rem", display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                <Calendar size={15} style={{ color: "var(--accent-pink)" }} />
+                Plan Years:
+              </span>
+
+              {sortedEnrollments.map((item) => {
+                const isActive = item.planYear === activeYear;
+                return (
+                  <button
+                    key={item.id || item.planYear}
+                    type="button"
+                    onClick={() => setSelectedYear(item.planYear)}
+                    className={`btn btn-sm ${isActive ? "btn-primary" : "btn-secondary"}`}
+                    style={{
+                      fontSize: "0.8rem",
+                      padding: "0.35rem 0.75rem",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "0.4rem",
+                      border: isActive ? "1px solid var(--accent-pink)" : undefined,
+                    }}
+                  >
+                    <span>{item.planYear}</span>
+                    {item.isCurrent && (
+                      <span
+                        style={{
+                          fontSize: "0.65rem",
+                          background: isActive ? "#ffffff" : "rgba(244, 114, 182, 0.2)",
+                          color: isActive ? "#b81c66" : "#f472b6",
+                          padding: "0.1rem 0.35rem",
+                          borderRadius: "4px",
+                          fontWeight: "800",
+                        }}
+                      >
+                        Current
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsNewYearMode(true);
+                  setIsEditOpen(true);
+                }}
+                className="btn btn-secondary btn-sm"
+                style={{
+                  fontSize: "0.8rem",
+                  padding: "0.35rem 0.65rem",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.3rem",
+                  borderColor: "#38bdf8",
+                  color: "#38bdf8",
+                }}
+                title="Add a new B&E Plan Year for this group"
+              >
+                <Plus size={14} />
+                <span>Add Plan Year</span>
+              </button>
+            </div>
+
+            {/* Effective Dates Badge */}
+            {(activeBAndE.startDate || activeBAndE.endDate) && (
+              <div style={{ fontSize: "0.8rem", color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                <span style={{ color: "var(--text-muted)" }}>Effective Period:</span>
+                <strong style={{ color: "var(--text-primary)" }}>
+                  {activeBAndE.startDate || "N/A"}
+                </strong>
+                <span>to</span>
+                <strong style={{ color: "var(--text-primary)" }}>
+                  {activeBAndE.endDate || "N/A"}
+                </strong>
+              </div>
+            )}
+          </div>
+
           {/* Top Overview Cards Grid */}
           <div className="grid-cols-2" style={{ gap: "1.25rem" }}>
             {/* Carrier & Managing Underwriter */}
@@ -165,28 +287,28 @@ export default function BillingEnrollmentSection({
                 <div>
                   <div style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>Current Carrier</div>
                   <div style={{ fontWeight: "700", marginTop: "0.2rem" }}>
-                    {bAndE.currentStopLossCarrier || "Not specified"}
+                    {activeBAndE.currentStopLossCarrier || "Not specified"}
                   </div>
                 </div>
 
                 <div>
                   <div style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>Current MGU</div>
                   <div style={{ fontWeight: "700", marginTop: "0.2rem" }}>
-                    {bAndE.currentManagingGeneralUnderwriter || "Not specified"}
+                    {activeBAndE.currentManagingGeneralUnderwriter || "Not specified"}
                   </div>
                 </div>
 
                 <div>
                   <div style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>Prior Carrier</div>
                   <div style={{ marginTop: "0.2rem" }}>
-                    {bAndE.priorStopLossCarrier || "—"}
+                    {activeBAndE.priorStopLossCarrier || "—"}
                   </div>
                 </div>
 
                 <div>
                   <div style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>Prior MGU</div>
                   <div style={{ marginTop: "0.2rem" }}>
-                    {bAndE.priorManagingGeneralUnderwriter || "—"}
+                    {activeBAndE.priorManagingGeneralUnderwriter || "—"}
                   </div>
                 </div>
               </div>
@@ -209,28 +331,28 @@ export default function BillingEnrollmentSection({
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.75rem", textAlign: "center" }}>
                 <div style={{ background: "rgba(255, 255, 255, 0.03)", padding: "0.75rem 0.5rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
                   <div style={{ fontSize: "1.25rem", fontWeight: "800", color: "var(--accent-pink)" }}>
-                    {bAndE.figuresSingle || "0"}
+                    {activeBAndE.figuresSingle || "0"}
                   </div>
                   <div style={{ fontSize: "0.725rem", color: "var(--text-muted)" }}>Single</div>
                 </div>
 
                 <div style={{ background: "rgba(255, 255, 255, 0.03)", padding: "0.75rem 0.5rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
                   <div style={{ fontSize: "1.25rem", fontWeight: "800", color: "var(--accent-pink)" }}>
-                    {bAndE.figuresEmployeePlusOne || "0"}
+                    {activeBAndE.figuresEmployeePlusOne || "0"}
                   </div>
                   <div style={{ fontSize: "0.725rem", color: "var(--text-muted)" }}>Employee + 1</div>
                 </div>
 
                 <div style={{ background: "rgba(255, 255, 255, 0.03)", padding: "0.75rem 0.5rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
                   <div style={{ fontSize: "1.25rem", fontWeight: "800", color: "var(--accent-pink)" }}>
-                    {bAndE.figuresFamily || "0"}
+                    {activeBAndE.figuresFamily || "0"}
                   </div>
                   <div style={{ fontSize: "0.725rem", color: "var(--text-muted)" }}>Family</div>
                 </div>
 
                 <div style={{ background: "rgba(244, 114, 182, 0.1)", padding: "0.75rem 0.5rem", borderRadius: "8px", border: "1px solid rgba(244, 114, 182, 0.3)" }}>
                   <div style={{ fontSize: "1.25rem", fontWeight: "800", color: "#f472b6" }}>
-                    {bAndE.figuresTotal || "0"}
+                    {activeBAndE.figuresTotal || "0"}
                   </div>
                   <div style={{ fontSize: "0.725rem", color: "#f472b6", fontWeight: "700" }}>Total Census</div>
                 </div>
@@ -255,39 +377,39 @@ export default function BillingEnrollmentSection({
                   <h3 style={{ fontSize: "1rem", fontWeight: "700" }}>Specific Stop-Loss Specs</h3>
                 </div>
                 <span className="badge badge-blue" style={{ fontSize: "0.7rem" }}>
-                  {bAndE.specificContract || "12/12"}
+                  {activeBAndE.specificContract || "12/12"}
                 </span>
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.85rem" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>Specific Deductible</span>
-                  <strong style={{ color: "var(--text-primary)" }}>{bAndE.specificDeductible || "—"}</strong>
+                  <strong style={{ color: "var(--text-primary)" }}>{activeBAndE.specificDeductible || "—"}</strong>
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>Aggregating Specific Deductible</span>
-                  <span>{bAndE.aggregatingSpecificDeductible || "No"}</span>
+                  <span>{activeBAndE.aggregatingSpecificDeductible || "No"}</span>
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>No-Laser Renewal Guarantee</span>
-                  <span>{bAndE.noLaserRenewalGuarantee || "No"}</span>
+                  <span>{activeBAndE.noLaserRenewalGuarantee || "No"}</span>
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>Max Specific Renewal Increase</span>
-                  <span>{bAndE.maxSpecificPremiumRenewalIncrease || "—"}</span>
+                  <span>{activeBAndE.maxSpecificPremiumRenewalIncrease || "—"}</span>
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>Lasered Individuals</span>
-                  <span>{bAndE.laseredIndividuals || "No"}</span>
+                  <span>{activeBAndE.laseredIndividuals || "No"}</span>
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>Benefits Covered</span>
-                  <span>{bAndE.specificBenefitsCovered || "Med/Rx"}</span>
+                  <span>{activeBAndE.specificBenefitsCovered || "Med/Rx"}</span>
                 </div>
 
                 <div style={{ marginTop: "0.5rem", background: "rgba(56, 189, 248, 0.05)", padding: "0.75rem", borderRadius: "8px", border: "1px solid rgba(56, 189, 248, 0.2)" }}>
@@ -297,15 +419,15 @@ export default function BillingEnrollmentSection({
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.5rem", fontSize: "0.8rem", textAlign: "center" }}>
                     <div>
                       <div style={{ color: "var(--text-muted)", fontSize: "0.7rem" }}>Single</div>
-                      <div style={{ fontWeight: "700" }}>{bAndE.specificPremiumSingle || "—"}</div>
+                      <div style={{ fontWeight: "700" }}>{activeBAndE.specificPremiumSingle || "—"}</div>
                     </div>
                     <div>
                       <div style={{ color: "var(--text-muted)", fontSize: "0.7rem" }}>Emp + 1</div>
-                      <div style={{ fontWeight: "700" }}>{bAndE.specificPremiumEmployeePlusOne || "—"}</div>
+                      <div style={{ fontWeight: "700" }}>{activeBAndE.specificPremiumEmployeePlusOne || "—"}</div>
                     </div>
                     <div>
                       <div style={{ color: "var(--text-muted)", fontSize: "0.7rem" }}>Family</div>
-                      <div style={{ fontWeight: "700" }}>{bAndE.specificPremiumFamily || "—"}</div>
+                      <div style={{ fontWeight: "700" }}>{activeBAndE.specificPremiumFamily || "—"}</div>
                     </div>
                   </div>
                 </div>
@@ -327,34 +449,34 @@ export default function BillingEnrollmentSection({
                   <h3 style={{ fontSize: "1rem", fontWeight: "700" }}>Aggregate Stop-Loss Specs</h3>
                 </div>
                 <span className="badge badge-purple" style={{ fontSize: "0.7rem" }}>
-                  {bAndE.aggregateContract || "12/12"}
+                  {activeBAndE.aggregateContract || "12/12"}
                 </span>
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.85rem" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>Aggregate Premium</span>
-                  <strong style={{ color: "var(--text-primary)" }}>{bAndE.aggregatePremium || "—"}</strong>
+                  <strong style={{ color: "var(--text-primary)" }}>{activeBAndE.aggregatePremium || "—"}</strong>
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>Monthly Accommodation</span>
-                  <span>{bAndE.monthlyAggregateAccommodation || "—"}</span>
+                  <span>{activeBAndE.monthlyAggregateAccommodation || "—"}</span>
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>Min Attachment Point</span>
-                  <strong style={{ color: "#c084fc" }}>{bAndE.aggregateMinAttachmentPoint || "—"}</strong>
+                  <strong style={{ color: "#c084fc" }}>{activeBAndE.aggregateMinAttachmentPoint || "—"}</strong>
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>Run-in Limit</span>
-                  <span>{bAndE.aggregateRunInLimit || "No"}</span>
+                  <span>{activeBAndE.aggregateRunInLimit || "No"}</span>
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>Benefits Covered</span>
-                  <span>{bAndE.aggregateBenefitsCovered || "Med/Rx"}</span>
+                  <span>{activeBAndE.aggregateBenefitsCovered || "Med/Rx"}</span>
                 </div>
 
                 <div style={{ marginTop: "0.5rem", background: "rgba(192, 132, 252, 0.05)", padding: "0.75rem", borderRadius: "8px", border: "1px solid rgba(192, 132, 252, 0.2)" }}>
@@ -364,15 +486,15 @@ export default function BillingEnrollmentSection({
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.5rem", fontSize: "0.8rem", textAlign: "center" }}>
                     <div>
                       <div style={{ color: "var(--text-muted)", fontSize: "0.7rem" }}>Single</div>
-                      <div style={{ fontWeight: "700" }}>{bAndE.aggregateFactorSingle || "—"}</div>
+                      <div style={{ fontWeight: "700" }}>{activeBAndE.aggregateFactorSingle || "—"}</div>
                     </div>
                     <div>
                       <div style={{ color: "var(--text-muted)", fontSize: "0.7rem" }}>Emp + 1</div>
-                      <div style={{ fontWeight: "700" }}>{bAndE.aggregateFactorEmployeePlusOne || "—"}</div>
+                      <div style={{ fontWeight: "700" }}>{activeBAndE.aggregateFactorEmployeePlusOne || "—"}</div>
                     </div>
                     <div>
                       <div style={{ color: "var(--text-muted)", fontSize: "0.7rem" }}>Family</div>
-                      <div style={{ fontWeight: "700" }}>{bAndE.aggregateFactorFamily || "—"}</div>
+                      <div style={{ fontWeight: "700" }}>{activeBAndE.aggregateFactorFamily || "—"}</div>
                     </div>
                   </div>
                 </div>
@@ -400,67 +522,67 @@ export default function BillingEnrollmentSection({
               <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>Composite Admin Fee</span>
-                  <strong style={{ color: "#ffc20e" }}>{bAndE.compositeAdminFee || "—"}</strong>
+                  <strong style={{ color: "#ffc20e" }}>{activeBAndE.compositeAdminFee || "—"}</strong>
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>Medical Administration</span>
-                  <span>{bAndE.medicalFee || "—"}</span>
+                  <span>{activeBAndE.medicalFee || "—"}</span>
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>UR (Utilization Review)</span>
-                  <span>{bAndE.urFee || "—"}</span>
+                  <span>{activeBAndE.urFee || "—"}</span>
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>Amwell Telehealth</span>
-                  <span>{bAndE.amwellFee || "—"}</span>
+                  <span>{activeBAndE.amwellFee || "—"}</span>
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>Physicians Care / HAP</span>
-                  <span>{bAndE.physiciansCareHapFee || "—"}</span>
+                  <span>{activeBAndE.physiciansCareHapFee || "—"}</span>
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>Aetna Signature Admin</span>
-                  <span>{bAndE.aetnaSignatureAdminFee || "—"}</span>
+                  <span>{activeBAndE.aetnaSignatureAdminFee || "—"}</span>
                 </div>
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>Network Access Fee</span>
-                  <span>{bAndE.networkAccessFee || "—"}</span>
+                  <span>{activeBAndE.networkAccessFee || "—"}</span>
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>Reinsurance Fee</span>
-                  <span>{bAndE.reinsuranceFee || "—"}</span>
+                  <span>{activeBAndE.reinsuranceFee || "—"}</span>
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>LCM / SPA (AHH)</span>
-                  <span>{bAndE.lcmSpaFee || "—"}</span>
+                  <span>{activeBAndE.lcmSpaFee || "—"}</span>
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <span style={{ color: "var(--text-muted)" }}>Agent Fee</span>
-                  <span>{bAndE.agentFee || "—"}</span>
+                  <span>{activeBAndE.agentFee || "—"}</span>
                 </div>
 
                 <div style={{ borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                   <div style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>Wrap Networks</div>
                   <div style={{ fontWeight: "600", color: "var(--text-primary)", marginTop: "0.15rem" }}>
-                    {bAndE.wrapNetwork || "—"}
+                    {activeBAndE.wrapNetwork || "—"}
                   </div>
                 </div>
 
                 <div style={{ paddingBottom: "0.4rem" }}>
                   <div style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>PPO Fee Notes</div>
                   <div style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginTop: "0.15rem", lineHeight: "1.4" }}>
-                    {bAndE.ppoFee || "—"}
+                    {activeBAndE.ppoFee || "—"}
                   </div>
                 </div>
               </div>
@@ -486,19 +608,19 @@ export default function BillingEnrollmentSection({
               <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem" }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ color: "var(--text-muted)" }}>PBM Provider</span>
-                  <strong style={{ color: "#34d399" }}>{bAndE.pbmRx || "—"}</strong>
+                  <strong style={{ color: "#34d399" }}>{activeBAndE.pbmRx || "—"}</strong>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ color: "var(--text-muted)" }}>Rx in ASR Reporting?</span>
-                  <span>{bAndE.rxIncludedInAsrReporting || "No"}</span>
+                  <span>{activeBAndE.rxIncludedInAsrReporting || "No"}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ color: "var(--text-muted)" }}>Rx ASR Contract?</span>
-                  <span>{bAndE.isRxAsrContract || "No"}</span>
+                  <span>{activeBAndE.isRxAsrContract || "No"}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ color: "var(--text-muted)" }}>Agent Comp</span>
-                  <span>{bAndE.pbmAgentCompensation || "No"}</span>
+                  <span>{activeBAndE.pbmAgentCompensation || "No"}</span>
                 </div>
               </div>
             </div>
@@ -520,15 +642,15 @@ export default function BillingEnrollmentSection({
               <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem" }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ color: "var(--text-muted)" }}>Stop-Loss Commission</span>
-                  <span>{bAndE.stopLossCommission || "0%"}</span>
+                  <span>{activeBAndE.stopLossCommission || "0%"}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ color: "var(--text-muted)" }}>Stop-Loss Other Comp</span>
-                  <span>{bAndE.stopLossOtherCompensation || "—"}</span>
+                  <span>{activeBAndE.stopLossOtherCompensation || "—"}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ color: "var(--text-muted)" }}>Agent Compensation</span>
-                  <span>{bAndE.commissionAgentCompensation || "No"}</span>
+                  <span>{activeBAndE.commissionAgentCompensation || "No"}</span>
                 </div>
               </div>
             </div>
@@ -550,18 +672,18 @@ export default function BillingEnrollmentSection({
               <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem" }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ color: "var(--text-muted)" }}>Transplant Policy</span>
-                  <span>{bAndE.organTransplantPolicy || "No"}</span>
+                  <span>{activeBAndE.organTransplantPolicy || "No"}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ color: "var(--text-muted)" }}>Domestic Claims?</span>
-                  <span>{bAndE.domesticClaims || "No"}</span>
+                  <span>{activeBAndE.domesticClaims || "No"}</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Operational Notes */}
-          {bAndE.notes && (
+          {activeBAndE.notes && (
             <div
               className="glass-card"
               style={{
@@ -573,10 +695,10 @@ export default function BillingEnrollmentSection({
             >
               <div style={{ fontSize: "0.8rem", fontWeight: "700", color: "#ffc20e", marginBottom: "0.25rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
                 <AlertCircle size={15} />
-                <span>B&E Specification Notes</span>
+                <span>B&E Specification Notes ({activeBAndE.planYear || "2026"})</span>
               </div>
               <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", whiteSpace: "pre-wrap" }}>
-                {bAndE.notes}
+                {activeBAndE.notes}
               </p>
             </div>
           )}
@@ -588,7 +710,9 @@ export default function BillingEnrollmentSection({
         <EditBillingEnrollmentModal
           clientId={clientId}
           clientName={clientName}
-          initialData={bAndE}
+          initialData={isNewYearMode ? null : activeBAndE}
+          allEnrollments={sortedEnrollments}
+          isNewPlanYear={isNewYearMode}
           onClose={() => setIsEditOpen(false)}
           onSuccess={() => {
             setIsEditOpen(false);
@@ -601,7 +725,7 @@ export default function BillingEnrollmentSection({
       {isPrintOpen && (
         <PrintBillingEnrollmentModal
           clientName={clientName}
-          data={bAndE}
+          data={activeBAndE}
           onClose={() => setIsPrintOpen(false)}
         />
       )}

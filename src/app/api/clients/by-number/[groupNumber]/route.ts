@@ -28,7 +28,9 @@ export async function GET(
         history: {
           orderBy: { createdAt: "desc" },
         },
-        billingEnrollment: true,
+        billingEnrollments: {
+          orderBy: { planYear: "desc" },
+        },
       },
     });
 

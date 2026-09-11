@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { X, Save, FileText } from "lucide-react";
+import { X, Save, FileText, Copy, Calendar, CheckCircle2 } from "lucide-react";
 
 interface EditBillingEnrollmentModalProps {
   clientId: string;
   clientName: string;
   initialData: any;
+  allEnrollments?: any[];
+  isNewPlanYear?: boolean;
   onClose: () => void;
   onSuccess: () => void;
 }
@@ -15,9 +17,25 @@ export default function EditBillingEnrollmentModal({
   clientId,
   clientName,
   initialData,
+  allEnrollments = [],
+  isNewPlanYear = false,
   onClose,
   onSuccess,
 }: EditBillingEnrollmentModalProps) {
+  const [recordId, setRecordId] = useState<string | undefined>(
+    isNewPlanYear ? undefined : initialData?.id
+  );
+  const [planYear, setPlanYear] = useState<string>(
+    isNewPlanYear
+      ? String(new Date().getFullYear() + 1)
+      : initialData?.planYear || "2026"
+  );
+  const [startDate, setStartDate] = useState<string>(initialData?.startDate || "");
+  const [endDate, setEndDate] = useState<string>(initialData?.endDate || "");
+  const [isCurrent, setIsCurrent] = useState<boolean>(
+    isNewPlanYear ? false : initialData?.isCurrent ?? true
+  );
+
   const [formData, setFormData] = useState({
     currentStopLossCarrier: initialData?.currentStopLossCarrier || "",
     currentManagingGeneralUnderwriter: initialData?.currentManagingGeneralUnderwriter || "",
@@ -79,28 +97,109 @@ export default function EditBillingEnrollmentModal({
   });
 
   const [saving, setSaving] = useState(false);
+  const [copySourceYear, setCopySourceYear] = useState<string>("");
   const [activeTab, setActiveTab] = useState<
-    "CARRIER" | "SPECIFIC" | "AGGREGATE" | "ADMIN" | "PBM" | "CENSUS"
-  >("CARRIER");
+    "YEAR_DATES" | "CARRIER" | "SPECIFIC" | "AGGREGATE" | "ADMIN" | "PBM" | "CENSUS"
+  >("YEAR_DATES");
   const [error, setError] = useState("");
+
+  const handleCopyFromPriorYear = (sourceYear: string) => {
+    const sourceRecord = allEnrollments.find((e) => e.planYear === sourceYear);
+    if (!sourceRecord) return;
+
+    setFormData({
+      currentStopLossCarrier: sourceRecord.currentStopLossCarrier || "",
+      currentManagingGeneralUnderwriter: sourceRecord.currentManagingGeneralUnderwriter || "",
+      priorStopLossCarrier: sourceRecord.priorStopLossCarrier || "",
+      priorManagingGeneralUnderwriter: sourceRecord.priorManagingGeneralUnderwriter || "",
+
+      specificDeductible: sourceRecord.specificDeductible || "",
+      aggregatingSpecificDeductible: sourceRecord.aggregatingSpecificDeductible || "",
+      noLaserRenewalGuarantee: sourceRecord.noLaserRenewalGuarantee || "",
+      maxSpecificPremiumRenewalIncrease: sourceRecord.maxSpecificPremiumRenewalIncrease || "",
+      laseredIndividuals: sourceRecord.laseredIndividuals || "",
+      specificPremiumSingle: sourceRecord.specificPremiumSingle || "",
+      specificPremiumEmployeePlusOne: sourceRecord.specificPremiumEmployeePlusOne || "",
+      specificPremiumFamily: sourceRecord.specificPremiumFamily || "",
+      specificBenefitsCovered: sourceRecord.specificBenefitsCovered || "",
+      specificContract: sourceRecord.specificContract || "",
+
+      aggregatePremium: sourceRecord.aggregatePremium || "",
+      monthlyAggregateAccommodation: sourceRecord.monthlyAggregateAccommodation || "",
+      aggregateFactorSingle: sourceRecord.aggregateFactorSingle || "",
+      aggregateFactorEmployeePlusOne: sourceRecord.aggregateFactorEmployeePlusOne || "",
+      aggregateFactorFamily: sourceRecord.aggregateFactorFamily || "",
+      aggregateMinAttachmentPoint: sourceRecord.aggregateMinAttachmentPoint || "",
+      aggregateBenefitsCovered: sourceRecord.aggregateBenefitsCovered || "",
+      aggregateContract: sourceRecord.aggregateContract || "",
+      aggregateRunInLimit: sourceRecord.aggregateRunInLimit || "",
+
+      organTransplantPolicy: sourceRecord.organTransplantPolicy || "",
+
+      compositeAdminFee: sourceRecord.compositeAdminFee || "",
+      medicalFee: sourceRecord.medicalFee || "",
+      urFee: sourceRecord.urFee || "",
+      amwellFee: sourceRecord.amwellFee || "",
+      physiciansCareHapFee: sourceRecord.physiciansCareHapFee || "",
+      wrapNetwork: sourceRecord.wrapNetwork || "",
+      aetnaSignatureAdminFee: sourceRecord.aetnaSignatureAdminFee || "",
+      networkAccessFee: sourceRecord.networkAccessFee || "",
+      reinsuranceFee: sourceRecord.reinsuranceFee || "",
+      lcmSpaFee: sourceRecord.lcmSpaFee || "",
+      agentFee: sourceRecord.agentFee || "",
+      ppoFee: sourceRecord.ppoFee || "",
+
+      pbmRx: sourceRecord.pbmRx || "",
+      rxIncludedInAsrReporting: sourceRecord.rxIncludedInAsrReporting || "",
+      isRxAsrContract: sourceRecord.isRxAsrContract || "",
+      pbmAgentCompensation: sourceRecord.pbmAgentCompensation || "",
+
+      stopLossCommission: sourceRecord.stopLossCommission || "",
+      stopLossOtherCompensation: sourceRecord.stopLossOtherCompensation || "",
+      commissionAgentCompensation: sourceRecord.commissionAgentCompensation || "",
+
+      figuresSingle: sourceRecord.figuresSingle || "",
+      figuresEmployeePlusOne: sourceRecord.figuresEmployeePlusOne || "",
+      figuresFamily: sourceRecord.figuresFamily || "",
+      figuresTotal: sourceRecord.figuresTotal || "",
+
+      domesticClaims: sourceRecord.domesticClaims || "",
+      notes: sourceRecord.notes || "",
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!planYear.trim()) {
+      setError("Plan Year label is required (e.g. '2026' or '2025-2026').");
+      setActiveTab("YEAR_DATES");
+      return;
+    }
+
     setSaving(true);
     setError("");
 
     try {
+      const payload = {
+        id: recordId,
+        planYear: planYear.trim(),
+        startDate: startDate.trim() || null,
+        endDate: endDate.trim() || null,
+        isCurrent,
+        ...formData,
+      };
+
       const res = await fetch(`/api/clients/${clientId}/billing-enrollment`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
       if (data.success) {
         onSuccess();
       } else {
-        setError(data.error || "Failed to update B&E summary.");
+        setError(data.error || "Failed to save B&E summary.");
       }
     } catch (err: any) {
       setError(err.message || "Failed to submit.");
@@ -113,13 +212,15 @@ export default function EditBillingEnrollmentModal({
     <div className="modal-overlay" onClick={onClose}>
       <div
         className="modal-content"
-        style={{ maxWidth: "850px", border: "1px solid var(--accent-pink)" }}
+        style={{ maxWidth: "880px", border: "1px solid var(--accent-pink)" }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
             <FileText size={22} style={{ color: "var(--accent-pink)" }} />
-            <h2 className="modal-title">Edit B&E Summary — {clientName}</h2>
+            <h2 className="modal-title">
+              {isNewPlanYear ? "Add New B&E Plan Year" : "Edit B&E Summary"} — {clientName}
+            </h2>
           </div>
           <button
             type="button"
@@ -142,6 +243,7 @@ export default function EditBillingEnrollmentModal({
           }}
         >
           {[
+            { id: "YEAR_DATES", label: "Plan Year & Dates" },
             { id: "CARRIER", label: "Carrier & Underwriter" },
             { id: "SPECIFIC", label: "Specific Stop-Loss" },
             { id: "AGGREGATE", label: "Aggregate Stop-Loss" },
@@ -166,6 +268,114 @@ export default function EditBillingEnrollmentModal({
             {error && (
               <div style={{ padding: "0.75rem", background: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.3)", borderRadius: "8px", color: "#ef4444", fontSize: "0.85rem", marginBottom: "1rem" }}>
                 {error}
+              </div>
+            )}
+
+            {/* TAB 0: Plan Year & Dates */}
+            {activeTab === "YEAR_DATES" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                <div style={{ background: "rgba(244, 114, 182, 0.05)", border: "1px solid rgba(244, 114, 182, 0.3)", borderRadius: "10px", padding: "1.25rem" }}>
+                  <h3 style={{ fontSize: "1rem", fontWeight: "700", color: "#f472b6", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                    <Calendar size={18} />
+                    <span>Plan Year Specifications</span>
+                  </h3>
+
+                  <div className="grid-cols-2" style={{ gap: "1rem" }}>
+                    <div className="form-group">
+                      <label className="form-label">Plan Year Label *</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        required
+                        placeholder="e.g. 2026, 2025, or 2025-2026"
+                        value={planYear}
+                        onChange={(e) => setPlanYear(e.target.value)}
+                      />
+                      <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.2rem" }}>
+                        Unique identifier label for this plan year (e.g. 2026).
+                      </span>
+                    </div>
+
+                    <div className="form-group" style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                      <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer", fontWeight: "600", color: "var(--text-primary)" }}>
+                        <input
+                          type="checkbox"
+                          checked={isCurrent}
+                          onChange={(e) => setIsCurrent(e.target.checked)}
+                          style={{ width: "18px", height: "18px", accentColor: "#f472b6" }}
+                        />
+                        <span>Set as Current Active Plan Year</span>
+                      </label>
+                      <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.3rem" }}>
+                        If checked, this plan year will be displayed by default on group profile pages.
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid-cols-2" style={{ gap: "1rem", marginTop: "0.75rem" }}>
+                    <div className="form-group">
+                      <label className="form-label">Effective Start Date</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="e.g. 01/01/2026"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Effective End Date</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="e.g. 12/31/2026"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Shortcut to Copy Specifications from Prior Year */}
+                {allEnrollments.length > 0 && (
+                  <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid var(--border)", borderRadius: "10px", padding: "1.25rem" }}>
+                    <h3 style={{ fontSize: "0.95rem", fontWeight: "700", marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                      <Copy size={16} style={{ color: "#38bdf8" }} />
+                      <span>Copy Specifications from Existing Plan Year</span>
+                    </h3>
+                    <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginBottom: "0.75rem" }}>
+                      Pre-fill stop-loss rates, carrier details, admin fees, and census from an existing plan year record to save time.
+                    </p>
+
+                    <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+                      <select
+                        className="form-select"
+                        style={{ flex: 1 }}
+                        value={copySourceYear}
+                        onChange={(e) => setCopySourceYear(e.target.value)}
+                      >
+                        <option value="">-- Select a Plan Year to Copy From --</option>
+                        {allEnrollments.map((e) => (
+                          <option key={e.id} value={e.planYear}>
+                            Plan Year {e.planYear} {e.isCurrent ? "(Current Active)" : ""}
+                          </option>
+                        ))}
+                      </select>
+
+                      <button
+                        type="button"
+                        disabled={!copySourceYear}
+                        onClick={() => handleCopyFromPriorYear(copySourceYear)}
+                        className="btn btn-blue btn-sm"
+                        style={{ whiteSpace: "nowrap" }}
+                      >
+                        <Copy size={14} />
+                        <span>Copy All Specs</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -793,7 +1003,7 @@ export default function EditBillingEnrollmentModal({
             </button>
             <button type="submit" disabled={saving} className="btn btn-primary">
               <Save size={16} />
-              <span>{saving ? "Saving Changes..." : "Save B&E Summary"}</span>
+              <span>{saving ? "Saving Changes..." : `Save Plan Year (${planYear})`}</span>
             </button>
           </div>
         </form>

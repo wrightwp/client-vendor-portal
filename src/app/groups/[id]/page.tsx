@@ -888,7 +888,7 @@ export default function GroupDetailPage({
       <BillingEnrollmentSection
         clientId={client.id}
         clientName={client.name}
-        data={client.billingEnrollment}
+        data={client.billingEnrollments || client.billingEnrollment}
         onRefresh={fetchClientDetails}
       />
 

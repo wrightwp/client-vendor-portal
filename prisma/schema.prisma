@@ -26,7 +26,7 @@ model Client {
   vendors     ClientVendor[]
   history     ChangeHistory[]
   contacts    Contact[]
-  billingEnrollment ClientBillingEnrollment?
+  billingEnrollments ClientBillingEnrollment[]
 }
 
 model Vendor {
@@ -105,8 +105,14 @@ model Contact {
 
 model ClientBillingEnrollment {
   id                                  String   @id @default(uuid())
-  clientId                            String   @unique
+  clientId                            String
   client                              Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  // Plan Year & Dates
+  planYear                            String   @default("2026")
+  startDate                           String?
+  endDate                             String?
+  isCurrent                           Boolean  @default(true)
 
   // Carrier & Underwriter Info
   currentStopLossCarrier              String?
