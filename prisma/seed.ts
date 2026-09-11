@@ -9,6 +9,7 @@ async function main() {
   await prisma.contact.deleteMany();
   await prisma.changeHistory.deleteMany();
   await prisma.clientVendor.deleteMany();
+  await prisma.clientBillingEnrollment.deleteMany();
   await prisma.client.deleteMany();
   await prisma.vendor.deleteMany();
 
@@ -27,6 +28,62 @@ async function main() {
       status: "ACTIVE",
       specialty: "Multi-Specialty Hospital System",
       notes: "Primary regional hospital system with 4 outpatient clinics.",
+    },
+  });
+
+  // Create B&E Summary for Client 1
+  await prisma.clientBillingEnrollment.create({
+    data: {
+      clientId: client1.id,
+      currentStopLossCarrier: "HCC Life",
+      currentManagingGeneralUnderwriter: "HCC Life Insurance",
+      priorStopLossCarrier: "",
+      priorManagingGeneralUnderwriter: "",
+      specificDeductible: "$75,000.00 per individual",
+      aggregatingSpecificDeductible: "No",
+      noLaserRenewalGuarantee: "Yes",
+      maxSpecificPremiumRenewalIncrease: "45%",
+      laseredIndividuals: "No",
+      specificPremiumSingle: "$161.65",
+      specificPremiumEmployeePlusOne: "$301.31",
+      specificPremiumFamily: "$457.63",
+      specificBenefitsCovered: "Med/Rx",
+      specificContract: "pi (paid & incurred) 12/12",
+      aggregatePremium: "$7.54",
+      monthlyAggregateAccommodation: "$1.50 (not included in aggregate premium)",
+      aggregateFactorSingle: "$425.84",
+      aggregateFactorEmployeePlusOne: "$793.78",
+      aggregateFactorFamily: "$1,205.57",
+      aggregateMinAttachmentPoint: "$1,439,838.96",
+      aggregateBenefitsCovered: "Med/Rx",
+      aggregateContract: "pi (paid & incurred) 12/12",
+      aggregateRunInLimit: "No",
+      organTransplantPolicy: "No",
+      compositeAdminFee: "$53.00 per employee per month",
+      medicalFee: "Included ($52.55 per employee per month)",
+      urFee: "Included ($2.85 per employee per month; $0.10 to ASR)",
+      amwellFee: "Included ($0.45 per employee per month)",
+      physiciansCareHapFee: "Included ($10.00 per employee per month)",
+      wrapNetwork: "Aetna 25% | Valenz Open Access Wrap 25% | Fair Cost 25%",
+      aetnaSignatureAdminFee: "Included ($17.00 per employee per month)",
+      networkAccessFee: "Included ($16.25 per employee per month)",
+      reinsuranceFee: "Included ($0.75 per employee per month)",
+      lcmSpaFee: "$149.00 per hour ($18.00 to ASR)",
+      agentFee: "$32.00 per employee per month",
+      ppoFee: "$9.00 per employee per month for Traditional Plan option enrollees enrolled in a HAP/PCN primary network option only + 3% of allowed claim amount for Nomi Health Network Providers",
+      pbmRx: "Liviniti",
+      rxIncludedInAsrReporting: "Yes",
+      isRxAsrContract: "No",
+      pbmAgentCompensation: "No",
+      stopLossCommission: "0% of stop-loss premium",
+      stopLossOtherCompensation: "3% of stop-loss premium",
+      commissionAgentCompensation: "No",
+      figuresSingle: "126",
+      figuresEmployeePlusOne: "38",
+      figuresFamily: "30",
+      figuresTotal: "194",
+      domesticClaims: "No",
+      notes: "ASR’s core medical administration fee is guaranteed for 12 months; however, utilization management, large-case management, and network access fees are subject to change annually.",
     },
   });
 

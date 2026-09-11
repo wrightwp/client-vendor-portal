@@ -48,6 +48,12 @@ export default function VendorDetailPage({
   // Audit Trail Expander State (starts closed by default)
   const [isAuditOpen, setIsAuditOpen] = useState(false);
 
+  // Vendor Details & Notes Expandable State (defaults to closed)
+  const [isDetailsExpanded, setIsDetailsExpanded] = useState(false);
+
+  // Associated Groups Expandable State (defaults to closed)
+  const [isClientsExpanded, setIsClientsExpanded] = useState(false);
+
   // Walkthrough Modal State
   const [isWalkthroughOpen, setIsWalkthroughOpen] = useState(false);
   const [walkthroughIndex, setWalkthroughIndex] = useState(0);
@@ -329,73 +335,110 @@ export default function VendorDetailPage({
 
       {/* VIEW or EDIT Section */}
       {!isEditing ? (
-        /* View Mode */
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
-          {/* Contact & Location Info */}
-          <div className="glass-panel" style={{ padding: "1.5rem" }}>
-            <h2 style={{ fontSize: "1.1rem", fontWeight: "800", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <Store size={20} style={{ color: "var(--accent-blue)" }} />
-              <span>Contact & Location Details</span>
-            </h2>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "1rem", fontSize: "0.9rem" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                <Phone size={18} style={{ color: "var(--text-muted)" }} />
-                <div>
-                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Phone Number</div>
-                  <div>{vendor.phone || "Not provided"}</div>
-                </div>
+        /* View Mode: Combined Contact, Location & Vendor Notes */
+        <div className="glass-panel" style={{ padding: "1.75rem" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: isDetailsExpanded ? "1.5rem" : "0",
+              flexWrap: "wrap",
+              gap: "1rem",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <Store size={22} style={{ color: "var(--accent-blue)" }} />
+              <div>
+                <h2 style={{ fontSize: "1.25rem", fontWeight: "800" }}>
+                  Contact, Location & Vendor Notes
+                </h2>
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.1rem" }}>
+                  Primary phone, email, physical location, and capability notes for {vendor.name}.
+                </p>
               </div>
+            </div>
 
-              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                <Mail size={18} style={{ color: "var(--text-muted)" }} />
-                <div>
-                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Email Address</div>
-                  <div>{vendor.email || "Not provided"}</div>
-                </div>
-              </div>
+            <button
+              type="button"
+              onClick={() => setIsDetailsExpanded(!isDetailsExpanded)}
+              className="btn btn-secondary btn-sm"
+              style={{ padding: "0.4rem 0.6rem" }}
+              title={isDetailsExpanded ? "Collapse Section" : "Expand Section"}
+            >
+              {isDetailsExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+            </button>
+          </div>
 
-              <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem" }}>
-                <MapPin size={18} style={{ color: "var(--text-muted)", marginTop: "0.2rem" }} />
-                <div>
-                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Physical Address</div>
-                  <div>{vendor.address || "No street address"}</div>
+          {isDetailsExpanded && (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.75rem", paddingTop: "0.5rem" }}>
+              {/* Left Column: Contact & Location Info */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "1rem", fontSize: "0.9rem" }}>
+                <h3 style={{ fontSize: "0.95rem", fontWeight: "700", color: "var(--accent-blue)", marginBottom: "0.25rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                  <MapPin size={16} />
+                  <span>Contact & Physical Address</span>
+                </h3>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                  <Phone size={18} style={{ color: "var(--text-muted)" }} />
                   <div>
-                    {vendor.city && vendor.state
-                      ? `${vendor.city}, ${vendor.state} ${vendor.zipCode || ""}`
-                      : vendor.city || vendor.state || "—"}
+                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Phone Number</div>
+                    <div style={{ fontWeight: "600" }}>{vendor.phone || "Not provided"}</div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                  <Mail size={18} style={{ color: "var(--text-muted)" }} />
+                  <div>
+                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Email Address</div>
+                    <div style={{ fontWeight: "600", color: "#38bdf8" }}>{vendor.email || "Not provided"}</div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem" }}>
+                  <MapPin size={18} style={{ color: "var(--text-muted)", marginTop: "0.2rem" }} />
+                  <div>
+                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Physical Address</div>
+                    <div style={{ fontWeight: "600" }}>{vendor.address || "No street address"}</div>
+                    <div style={{ color: "var(--text-secondary)" }}>
+                      {vendor.city && vendor.state
+                        ? `${vendor.city}, ${vendor.state} ${vendor.zipCode || ""}`
+                        : vendor.city || vendor.state || "—"}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Operational Notes & Record Info */}
+              <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", fontSize: "0.9rem" }}>
+                <div>
+                  <h3 style={{ fontSize: "0.95rem", fontWeight: "700", color: "var(--accent-blue)", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                    <FileText size={16} />
+                    <span>Vendor Capabilities & Notes</span>
+                  </h3>
+
+                  <div style={{ color: "var(--text-secondary)", lineHeight: "1.6" }}>
+                    {vendor.notes ? (
+                      <p style={{ whiteSpace: "pre-wrap" }}>{vendor.notes}</p>
+                    ) : (
+                      <span style={{ color: "var(--text-muted)" }}>No notes recorded for this vendor.</span>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ marginTop: "1.5rem", paddingTop: "1rem", borderTop: "1px solid var(--border)", display: "flex", gap: "1.5rem", fontSize: "0.8rem", color: "var(--text-muted)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                    <Calendar size={14} />
+                    <span>Created: {new Date(vendor.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                    <Calendar size={14} />
+                    <span>Last Updated: {new Date(vendor.updatedAt).toLocaleDateString()}</span>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Operational Notes & Metadata */}
-          <div className="glass-panel" style={{ padding: "1.5rem" }}>
-            <h2 style={{ fontSize: "1.1rem", fontWeight: "800", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <FileText size={20} style={{ color: "var(--accent-blue)" }} />
-              <span>Vendor Capabilities & Notes</span>
-            </h2>
-
-            <div style={{ fontSize: "0.9rem", color: "var(--text-secondary)", lineHeight: "1.6" }}>
-              {vendor.notes ? (
-                <p style={{ whiteSpace: "pre-wrap" }}>{vendor.notes}</p>
-              ) : (
-                <span style={{ color: "var(--text-muted)" }}>No notes recorded for this vendor.</span>
-              )}
-            </div>
-
-            <div style={{ marginTop: "1.5rem", paddingTop: "1rem", borderTop: "1px solid var(--border)", display: "flex", gap: "1.5rem", fontSize: "0.8rem", color: "var(--text-muted)" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                <Calendar size={14} />
-                <span>Created: {new Date(vendor.createdAt).toLocaleDateString()}</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                <Calendar size={14} />
-                <span>Last Updated: {new Date(vendor.updatedAt).toLocaleDateString()}</span>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       ) : (
         /* Edit Mode Form */
@@ -546,18 +589,20 @@ export default function VendorDetailPage({
         </form>
       )}
 
-      {/* Key Contacts List Section */}
+      {/* 1. Key Contacts List Section */}
       <ContactsList
         contacts={vendor.contacts || []}
         entityId={id}
         entityType="VENDOR"
         onRefresh={fetchVendorDetails}
         accentColor="blue"
+        collapsible={true}
+        defaultOpen={false}
       />
 
-      {/* Associated Groups Section */}
+      {/* 2. Associated Groups Section */}
       <div className="glass-panel" style={{ padding: "1.75rem" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem", flexWrap: "wrap", gap: "1rem" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: isClientsExpanded ? "1.25rem" : "0", flexWrap: "wrap", gap: "1rem" }}>
           <div>
             <h2 style={{ fontSize: "1.25rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <Users size={22} style={{ color: "var(--accent-pink)" }} />
@@ -567,109 +612,123 @@ export default function VendorDetailPage({
               Groups and practices associated with this vendor.
             </p>
           </div>
+
+          <button
+            type="button"
+            onClick={() => setIsClientsExpanded(!isClientsExpanded)}
+            className="btn btn-secondary btn-sm"
+            style={{ padding: "0.4rem 0.6rem" }}
+            title={isClientsExpanded ? "Collapse Section" : "Expand Section"}
+          >
+            {isClientsExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+          </button>
         </div>
 
-        {/* Interactive Search-Based Client Linking Form */}
-        <form onSubmit={handleAddAssociation} className="glass-panel" style={{ padding: "1.25rem", marginBottom: "1.5rem", border: "1px dashed var(--accent-pink)" }}>
-          <h3 style={{ fontSize: "0.9rem", fontWeight: "800", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
-            <LinkIcon size={16} style={{ color: "var(--accent-pink)" }} />
-            <span>Search & Link a Group</span>
-          </h3>
+        {isClientsExpanded && (
+          <>
+            {/* Interactive Search-Based Client Linking Form */}
+            <form onSubmit={handleAddAssociation} className="glass-panel" style={{ padding: "1.25rem", marginBottom: "1.5rem", border: "1px dashed var(--accent-pink)" }}>
+              <h3 style={{ fontSize: "0.9rem", fontWeight: "800", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                <LinkIcon size={16} style={{ color: "var(--accent-pink)" }} />
+                <span>Search & Link a Group</span>
+              </h3>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: "0.75rem", alignItems: "center" }}>
-            <SearchSelect
-              items={unlinkedClients}
-              selectedId={newAssociation.clientId}
-              onSelect={(item) => setNewAssociation({ ...newAssociation, clientId: item ? item.id : "" })}
-              placeholder="Search group by name, specialty, tax ID..."
-              type="client"
-            />
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: "0.75rem", alignItems: "center" }}>
+                <SearchSelect
+                  items={unlinkedClients}
+                  selectedId={newAssociation.clientId}
+                  onSelect={(item) => setNewAssociation({ ...newAssociation, clientId: item ? item.id : "" })}
+                  placeholder="Search group by name, specialty, tax ID..."
+                  type="client"
+                />
 
-            <input
-              type="text"
-              className="form-input"
-              placeholder="Association notes (e.g. Primary PPE contract)"
-              value={newAssociation.notes}
-              onChange={(e) => setNewAssociation({ ...newAssociation, notes: e.target.value })}
-            />
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Association notes (e.g. Primary PPE contract)"
+                  value={newAssociation.notes}
+                  onChange={(e) => setNewAssociation({ ...newAssociation, notes: e.target.value })}
+                />
 
-            <button type="submit" disabled={associating || !newAssociation.clientId} className="btn btn-primary btn-sm">
-              {associating ? "Linking..." : "Link Group"}
-            </button>
-          </div>
-        </form>
+                <button type="submit" disabled={associating || !newAssociation.clientId} className="btn btn-primary btn-sm">
+                  {associating ? "Linking..." : "Link Group"}
+                </button>
+              </div>
+            </form>
 
-        {/* Clients Table */}
-        {vendor.clients?.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)" }}>
-            No groups are currently associated with this vendor.
-          </div>
-        ) : (
-          <div className="table-container">
-            <table className="custom-table">
-              <thead>
-                <tr>
-                  <th>Group</th>
-                  <th className="nowrap">Group Number</th>
-                  <th className="nowrap">Location</th>
-                  <th>Association Notes</th>
-                  <th style={{ textAlign: "right" }} className="nowrap">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {vendor.clients?.map((item: any) => (
-                  <tr key={item.clientId}>
-                    <td>
-                      <Link
-                        href={`/clients/${item.client.id}`}
-                        style={{ fontWeight: "700", color: "#f472b6" }}
-                      >
-                        {item.client.name}
-                      </Link>
-                    </td>
-                    <td className="text-mono nowrap">{item.client.npiNumber || "—"}</td>
-                    <td className="nowrap">
-                      {item.client.city && item.client.state
-                        ? `${item.client.city}, ${item.client.state}`
-                        : "—"}
-                    </td>
-                    <td style={{ color: "var(--text-secondary)", fontStyle: item.notes ? "normal" : "italic", minWidth: "260px" }}>
-                      {item.notes ? (
-                        <div style={{ background: "rgba(255, 255, 255, 0.025)", border: "1px solid var(--border)", padding: "0.4rem 0.75rem", borderRadius: "8px" }}>
-                          <MarkdownNoteRenderer content={item.notes} />
-                        </div>
-                      ) : (
-                        <span style={{ color: "var(--text-muted)" }}>No group-specific notes</span>
-                      )}
-                    </td>
-                    <td style={{ textAlign: "right" }} className="nowrap">
-                      <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
-                        <button
-                          onClick={() => setActiveNoteClient({ clientId: item.clientId, name: item.client.name, notes: item.notes || "" })}
-                          className="btn btn-secondary btn-sm"
-                          style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
-                          title="Edit Group-Specific Vendor Notes"
-                        >
-                          <FileText size={14} style={{ color: "var(--accent-blue)" }} />
-                          <span>{item.notes ? "Edit Note" : "+ Add Note"}</span>
-                        </button>
-                        <Link href={`/clients/${item.client.id}`} className="btn btn-secondary btn-sm">
-                          View Group
-                        </Link>
-                        <button
-                          onClick={() => setDeleteClientTarget({ id: item.clientId, name: item.client.name })}
-                          className="btn btn-danger btn-sm"
-                          title="Unlink Group"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+            {/* Clients Table */}
+            {vendor.clients?.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)" }}>
+                No groups are currently associated with this vendor.
+              </div>
+            ) : (
+              <div className="table-container">
+                <table className="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Group</th>
+                      <th className="nowrap">Group Number</th>
+                      <th className="nowrap">Location</th>
+                      <th>Association Notes</th>
+                      <th style={{ textAlign: "right" }} className="nowrap">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {vendor.clients?.map((item: any) => (
+                      <tr key={item.clientId}>
+                        <td>
+                          <Link
+                            href={`/clients/${item.client.id}`}
+                            style={{ fontWeight: "700", color: "#f472b6" }}
+                          >
+                            {item.client.name}
+                          </Link>
+                        </td>
+                        <td className="text-mono nowrap">{item.client.npiNumber || "—"}</td>
+                        <td className="nowrap">
+                          {item.client.city && item.client.state
+                            ? `${item.client.city}, ${item.client.state}`
+                            : "—"}
+                        </td>
+                        <td style={{ color: "var(--text-secondary)", fontStyle: item.notes ? "normal" : "italic", minWidth: "260px" }}>
+                          {item.notes ? (
+                            <div style={{ background: "rgba(255, 255, 255, 0.025)", border: "1px solid var(--border)", padding: "0.4rem 0.75rem", borderRadius: "8px" }}>
+                              <MarkdownNoteRenderer content={item.notes} />
+                            </div>
+                          ) : (
+                            <span style={{ color: "var(--text-muted)" }}>No group-specific notes</span>
+                          )}
+                        </td>
+                        <td style={{ textAlign: "right" }} className="nowrap">
+                          <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
+                            <button
+                              onClick={() => setActiveNoteClient({ clientId: item.clientId, name: item.client.name, notes: item.notes || "" })}
+                              className="btn btn-secondary btn-sm"
+                              style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                              title="Edit Group-Specific Vendor Notes"
+                            >
+                              <FileText size={14} style={{ color: "var(--accent-blue)" }} />
+                              <span>{item.notes ? "Edit Note" : "+ Add Note"}</span>
+                            </button>
+                            <Link href={`/clients/${item.client.id}`} className="btn btn-secondary btn-sm">
+                              View Group
+                            </Link>
+                            <button
+                              onClick={() => setDeleteClientTarget({ id: item.clientId, name: item.client.name })}
+                              className="btn btn-danger btn-sm"
+                              title="Unlink Group"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
         )}
       </div>
 

@@ -26,6 +26,7 @@ model Client {
   vendors     ClientVendor[]
   history     ChangeHistory[]
   contacts    Contact[]
+  billingEnrollment ClientBillingEnrollment?
 }
 
 model Vendor {
@@ -100,5 +101,83 @@ model Contact {
 
   @@index([clientId])
   @@index([vendorId])
+}
+
+model ClientBillingEnrollment {
+  id                                  String   @id @default(uuid())
+  clientId                            String   @unique
+  client                              Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  // Carrier & Underwriter Info
+  currentStopLossCarrier              String?
+  currentManagingGeneralUnderwriter   String?
+  priorStopLossCarrier                String?
+  priorManagingGeneralUnderwriter     String?
+
+  // Specific Stop-Loss Information
+  specificDeductible                  String?
+  aggregatingSpecificDeductible       String?
+  noLaserRenewalGuarantee            String?
+  maxSpecificPremiumRenewalIncrease   String?
+  laseredIndividuals                  String?
+  specificPremiumSingle               String?
+  specificPremiumEmployeePlusOne      String?
+  specificPremiumFamily               String?
+  specificBenefitsCovered             String?
+  specificContract                    String?
+
+  // Aggregate Stop-Loss Information
+  aggregatePremium                    String?
+  monthlyAggregateAccommodation       String?
+  aggregateFactorSingle               String?
+  aggregateFactorEmployeePlusOne      String?
+  aggregateFactorFamily               String?
+  aggregateMinAttachmentPoint         String?
+  aggregateBenefitsCovered            String?
+  aggregateContract                   String?
+  aggregateRunInLimit                 String?
+
+  // Organ Transplant Policy Information
+  organTransplantPolicy               String?
+
+  // Composite Administration & PPO Network Information
+  compositeAdminFee                   String?
+  medicalFee                          String?
+  urFee                               String?
+  amwellFee                           String?
+  physiciansCareHapFee                String?
+  wrapNetwork                         String?
+  aetnaSignatureAdminFee              String?
+  networkAccessFee                    String?
+  reinsuranceFee                      String?
+  lcmSpaFee                           String?
+  agentFee                            String?
+  ppoFee                              String?
+
+  // PBM Information
+  pbmRx                               String?
+  rxIncludedInAsrReporting            String?
+  isRxAsrContract                     String?
+  pbmAgentCompensation                String?
+
+  // Commission Information
+  stopLossCommission                  String?
+  stopLossOtherCompensation           String?
+  commissionAgentCompensation         String?
+
+  // Enrollment Figures / Census
+  figuresSingle                       String?
+  figuresEmployeePlusOne              String?
+  figuresFamily                       String?
+  figuresTotal                        String?
+
+  // General Notes & Domestic Claims
+  domesticClaims                      String?
+  notes                               String?
+
+  createdAt                           DateTime @default(now())
+  updatedAt                           DateTime @updatedAt
+
+  @@index([clientId])
 }
 

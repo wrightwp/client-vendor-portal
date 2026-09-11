@@ -15,6 +15,8 @@ import {
   Building2,
   Users,
   Briefcase,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 
@@ -33,6 +35,8 @@ interface ContactsListProps {
   entityType: "CLIENT" | "VENDOR";
   onRefresh: () => void;
   accentColor?: "pink" | "blue";
+  collapsible?: boolean;
+  defaultOpen?: boolean;
 }
 
 export default function ContactsList({
@@ -41,7 +45,10 @@ export default function ContactsList({
   entityType,
   onRefresh,
   accentColor = "pink",
+  collapsible = true,
+  defaultOpen = false,
 }: ContactsListProps) {
+  const [isExpanded, setIsExpanded] = useState(defaultOpen);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<ContactItem | null>(null);
   const [deleteContactTarget, setDeleteContactTarget] = useState<{ id: string; name: string } | null>(null);
@@ -163,17 +170,33 @@ export default function ContactsList({
           </p>
         </div>
 
-        <button
-          onClick={handleOpenAddModal}
-          className={`btn ${btnClass}`}
-          style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}
-        >
-          <Plus size={16} />
-          <span>Add New Contact</span>
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <button
+            onClick={handleOpenAddModal}
+            className={`btn ${btnClass}`}
+            style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}
+          >
+            <Plus size={16} />
+            <span>Add New Contact</span>
+          </button>
+
+          {collapsible && (
+            <button
+              type="button"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="btn btn-secondary btn-sm"
+              style={{ padding: "0.4rem 0.6rem" }}
+              title={isExpanded ? "Collapse Section" : "Expand Section"}
+            >
+              {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Contacts List / Grid */}
+      {isExpanded && (
+        <>
       {!contacts || contacts.length === 0 ? (
         <div
           style={{
@@ -312,6 +335,8 @@ export default function ContactsList({
             </div>
           ))}
         </div>
+      )}
+      </>
       )}
 
       {/* Add / Edit Contact Modal */}
