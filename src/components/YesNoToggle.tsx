@@ -91,9 +91,9 @@ export function YesNoToggle({
         disabled={disabled}
         onClick={() => onChange("Yes")}
         style={{
-          border: isYes ? "1px solid rgba(16, 185, 129, 0.45)" : "1px solid transparent",
-          background: isYes ? "var(--status-active-bg)" : "transparent",
-          color: isYes ? "var(--status-active)" : "var(--text-muted)",
+          border: isYes ? "1px solid #059669" : "1px solid transparent",
+          background: isYes ? "linear-gradient(135deg, #10b981 0%, #059669 100%)" : "transparent",
+          color: isYes ? "#ffffff" : "var(--text-muted)",
           fontWeight: isYes ? "700" : "500",
           fontSize: isSmall ? "0.72rem" : "0.82rem",
           padding: isSmall ? "0.2rem 0.6rem" : "0.3rem 0.85rem",
@@ -101,7 +101,7 @@ export function YesNoToggle({
           cursor: disabled ? "not-allowed" : "pointer",
           transition: "all 0.15s ease",
           lineHeight: "1.2",
-          boxShadow: isYes ? "0 0 8px rgba(16, 185, 129, 0.2)" : "none",
+          boxShadow: isYes ? "0 2px 6px rgba(16, 185, 129, 0.4)" : "none",
         }}
       >
         {yesLabel}

@@ -47,24 +47,26 @@ export function BenefitsCoveredSelect({
   };
 
   return (
-    <div style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", width: style.width || "auto" }}>
-      <select
-        value={isCustom ? "CUSTOM" : value || "Med/Rx"}
-        onChange={handleSelect}
-        className={className}
-        style={{
-          fontSize: "0.78rem",
-          padding: "0.2rem 0.4rem",
-          width: isCustom ? "90px" : style.width || "110px",
-          ...style,
-        }}
-      >
-        <option value="Med/Rx">Med/Rx</option>
-        <option value="Medical Only">Medical Only</option>
-        <option value="Rx Only">Rx Only</option>
-        <option value="All Lines (Med/Rx/Dent/Vis)">All Lines</option>
-        <option value="CUSTOM">Custom...</option>
-      </select>
+    <div style={{ display: "flex", flexDirection: "column", width: "100%", alignItems: "flex-end", gap: "0.35rem" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", width: "100%" }}>
+        <select
+          value={isCustom ? "CUSTOM" : value || "Med/Rx"}
+          onChange={handleSelect}
+          className={className}
+          style={{
+            fontSize: "0.78rem",
+            padding: "0.2rem 0.4rem",
+            width: style.width || "160px",
+            ...style,
+          }}
+        >
+          <option value="Med/Rx">Med/Rx</option>
+          <option value="Medical Only">Medical Only</option>
+          <option value="Rx Only">Rx Only</option>
+          <option value="All Lines (Med/Rx/Dent/Vis)">All Lines</option>
+          <option value="CUSTOM">Custom...</option>
+        </select>
+      </div>
 
       {isCustom && (
         <input
@@ -74,9 +76,9 @@ export function BenefitsCoveredSelect({
             setCustomText(e.target.value);
             onChange(e.target.value);
           }}
-          placeholder="Custom benefits"
+          placeholder="Custom benefits details..."
           className="form-input"
-          style={{ fontSize: "0.75rem", padding: "0.2rem 0.4rem", width: "90px" }}
+          style={{ fontSize: "0.75rem", padding: "0.2rem 0.45rem", width: "100%", marginTop: "0.15rem" }}
         />
       )}
     </div>

@@ -10,6 +10,7 @@ import PercentInput from "./PercentInput";
 import ContractSelect from "./ContractSelect";
 import LaseredIndividualsInput from "./LaseredIndividualsInput";
 import MonthlyAccommodationInput from "./MonthlyAccommodationInput";
+import AggregatingSpecificInput from "./AggregatingSpecificInput";
 import BenefitsCoveredSelect from "./BenefitsCoveredSelect";
 
 interface EditBillingEnrollmentModalProps {
@@ -474,12 +475,10 @@ export default function EditBillingEnrollmentModal({
 
                   <div className="form-group">
                     <label className="form-label">Aggregating Specific Deductible</label>
-                    <CurrencyInput
-                      align="left"
-                      style={{ width: "100%" }}
-                      placeholder="0.00"
+                    <AggregatingSpecificInput
                       value={formData.aggregatingSpecificDeductible}
                       onChange={(val) => setFormData({ ...formData, aggregatingSpecificDeductible: val })}
+                      compact={false}
                     />
                   </div>
                 </div>

@@ -37,8 +37,9 @@ import YesNoToggle from "./YesNoToggle";
 import CurrencyInput from "./CurrencyInput";
 import PercentInput from "./PercentInput";
 import ContractSelect from "./ContractSelect";
-import LaseredIndividualsInput from "./LaseredIndividualsInput";
+import LaseredIndividualsInput, { LaseredIndividualsView, parseLaserString } from "./LaseredIndividualsInput";
 import MonthlyAccommodationInput from "./MonthlyAccommodationInput";
+import AggregatingSpecificInput from "./AggregatingSpecificInput";
 import BenefitsCoveredSelect from "./BenefitsCoveredSelect";
 
 interface BillingEnrollmentSectionProps {
@@ -943,17 +944,19 @@ export default function BillingEnrollmentSection({
                       )}
                     </div>
 
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <span style={{ color: "var(--text-muted)" }}>Aggregating Specific Deductible</span>
-                      {isInlineEditing ? (
-                        <CurrencyInput
-                          style={{ width: "160px" }}
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ color: "var(--text-muted)" }}>Aggregating Specific Deductible</span>
+                        {!isInlineEditing && (
+                          <span>{activeBAndE.aggregatingSpecificDeductible || "No"}</span>
+                        )}
+                      </div>
+                      {isInlineEditing && (
+                        <AggregatingSpecificInput
                           value={editFormData.aggregatingSpecificDeductible}
                           onChange={(val) => setEditFormData({ ...editFormData, aggregatingSpecificDeductible: val })}
-                          placeholder="0.00"
+                          compact={true}
                         />
-                      ) : (
-                        <span>{activeBAndE.aggregatingSpecificDeductible || "No"}</span>
                       )}
                     </div>
 
@@ -984,29 +987,38 @@ export default function BillingEnrollmentSection({
                       )}
                     </div>
 
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <span style={{ color: "var(--text-muted)", marginTop: "0.2rem" }}>Lasered Individuals</span>
-                      {isInlineEditing ? (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ color: "var(--text-muted)" }}>Lasered Individuals</span>
+                        {!isInlineEditing && (
+                          <span>{parseLaserString(activeBAndE.laseredIndividuals).isYes ? "Yes" : "No"}</span>
+                        )}
+                      </div>
+                      {!isInlineEditing && (
+                        <LaseredIndividualsView value={activeBAndE.laseredIndividuals} />
+                      )}
+                      {isInlineEditing && (
                         <LaseredIndividualsInput
                           value={editFormData.laseredIndividuals}
                           onChange={(val) => setEditFormData({ ...editFormData, laseredIndividuals: val })}
                           compact={true}
                         />
-                      ) : (
-                        <span>{activeBAndE.laseredIndividuals || "No"}</span>
                       )}
                     </div>
 
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <span style={{ color: "var(--text-muted)" }}>Benefits Covered</span>
-                      {isInlineEditing ? (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ color: "var(--text-muted)" }}>Benefits Covered</span>
+                        {!isInlineEditing && (
+                          <span>{activeBAndE.specificBenefitsCovered || "Med/Rx"}</span>
+                        )}
+                      </div>
+                      {isInlineEditing && (
                         <BenefitsCoveredSelect
                           style={{ width: "160px" }}
                           value={editFormData.specificBenefitsCovered}
                           onChange={(val) => setEditFormData({ ...editFormData, specificBenefitsCovered: val })}
                         />
-                      ) : (
-                        <span>{activeBAndE.specificBenefitsCovered || "Med/Rx"}</span>
                       )}
                     </div>
 
@@ -1106,16 +1118,19 @@ export default function BillingEnrollmentSection({
                       )}
                     </div>
 
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <span style={{ color: "var(--text-muted)" }}>Monthly Accommodation</span>
-                      {isInlineEditing ? (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ color: "var(--text-muted)" }}>Monthly Accommodation</span>
+                        {!isInlineEditing && (
+                          <span>{activeBAndE.monthlyAggregateAccommodation || "—"}</span>
+                        )}
+                      </div>
+                      {isInlineEditing && (
                         <MonthlyAccommodationInput
                           value={editFormData.monthlyAggregateAccommodation}
                           onChange={(val) => setEditFormData({ ...editFormData, monthlyAggregateAccommodation: val })}
                           compact={true}
                         />
-                      ) : (
-                        <span>{activeBAndE.monthlyAggregateAccommodation || "—"}</span>
                       )}
                     </div>
 
@@ -1146,16 +1161,19 @@ export default function BillingEnrollmentSection({
                       )}
                     </div>
 
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <span style={{ color: "var(--text-muted)" }}>Benefits Covered</span>
-                      {isInlineEditing ? (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ color: "var(--text-muted)" }}>Benefits Covered</span>
+                        {!isInlineEditing && (
+                          <span>{activeBAndE.aggregateBenefitsCovered || "Med/Rx"}</span>
+                        )}
+                      </div>
+                      {isInlineEditing && (
                         <BenefitsCoveredSelect
                           style={{ width: "160px" }}
                           value={editFormData.aggregateBenefitsCovered}
                           onChange={(val) => setEditFormData({ ...editFormData, aggregateBenefitsCovered: val })}
                         />
-                      ) : (
-                        <span>{activeBAndE.aggregateBenefitsCovered || "Med/Rx"}</span>
                       )}
                     </div>
 

@@ -2,27 +2,30 @@
 
 import React, { useState, useEffect } from "react";
 import YesNoToggle from "./YesNoToggle";
+import CurrencyInput from "./CurrencyInput";
 
-interface MonthlyAccommodationInputProps {
+interface AggregatingSpecificInputProps {
   value: string;
   onChange: (value: string) => void;
   compact?: boolean;
 }
 
-export function MonthlyAccommodationInput({
+export function AggregatingSpecificInput({
   value,
   onChange,
   compact = false,
-}: MonthlyAccommodationInputProps) {
+}: AggregatingSpecificInputProps) {
   const isNo =
     !value ||
     value.trim().toLowerCase() === "no" ||
     value.trim().toLowerCase() === "false" ||
-    value.trim().toLowerCase() === "none";
+    value.trim().toLowerCase() === "none" ||
+    value.trim() === "$0" ||
+    value.trim() === "0";
 
   const [isYes, setIsYes] = useState(!isNo);
-  const [feeText, setFeeText] = useState(
-    !isNo && value.trim().toLowerCase() !== "yes" ? value : "$1.50 (not included in aggregate premium)"
+  const [amountText, setAmountText] = useState(
+    !isNo && value.trim().toLowerCase() !== "yes" ? value : "$10,000.00"
   );
 
   useEffect(() => {
@@ -30,10 +33,12 @@ export function MonthlyAccommodationInput({
       !value ||
       value.trim().toLowerCase() === "no" ||
       value.trim().toLowerCase() === "false" ||
-      value.trim().toLowerCase() === "none";
+      value.trim().toLowerCase() === "none" ||
+      value.trim() === "$0" ||
+      value.trim() === "0";
     setIsYes(!no);
     if (!no && value.trim().toLowerCase() !== "yes") {
-      setFeeText(value);
+      setAmountText(value);
     }
   }, [value]);
 
@@ -43,15 +48,14 @@ export function MonthlyAccommodationInput({
       onChange("No");
     } else {
       setIsYes(true);
-      const text = feeText.trim() || "$1.50 (not included in aggregate premium)";
+      const text = amountText.trim() || "$10,000.00";
       onChange(text);
     }
   };
 
-  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const text = e.target.value;
-    setFeeText(text);
-    onChange(text);
+  const handleAmountChange = (val: string) => {
+    setAmountText(val);
+    onChange(val);
   };
 
   if (compact) {
@@ -61,12 +65,10 @@ export function MonthlyAccommodationInput({
           <YesNoToggle value={isYes ? "Yes" : "No"} onChange={handleToggle} size="sm" />
         </div>
         {isYes && (
-          <input
-            type="text"
-            value={feeText}
-            onChange={handleTextChange}
-            placeholder="e.g. $1.50 (not included in aggregate premium)"
-            className="form-input"
+          <CurrencyInput
+            value={amountText}
+            onChange={handleAmountChange}
+            placeholder="10,000.00"
             style={{ width: "100%", fontSize: "0.75rem", padding: "0.2rem 0.4rem", marginTop: "0.15rem" }}
           />
         )}
@@ -83,14 +85,11 @@ export function MonthlyAccommodationInput({
 
       {isYes && (
         <div style={{ marginTop: "0.2rem" }}>
-          <label className="form-label" style={{ fontSize: "0.78rem" }}>Accommodation Surcharge / Note</label>
-          <input
-            type="text"
-            value={feeText}
-            onChange={handleTextChange}
-            placeholder="e.g. $1.50 (not included in aggregate premium)"
-            className="form-input"
-            style={{ fontSize: "0.8rem" }}
+          <label className="form-label" style={{ fontSize: "0.78rem" }}>Deductible Amount ($)</label>
+          <CurrencyInput
+            value={amountText}
+            onChange={handleAmountChange}
+            placeholder="10,000.00"
           />
         </div>
       )}
@@ -98,4 +97,4 @@ export function MonthlyAccommodationInput({
   );
 }
 
-export default MonthlyAccommodationInput;
+export default AggregatingSpecificInput;
