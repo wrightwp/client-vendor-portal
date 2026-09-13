@@ -15,6 +15,7 @@ import {
   Eye,
 } from "lucide-react";
 import { FIELD_LABELS } from "@/lib/history";
+import { formatDisplayDateTime } from "@/lib/dateUtils";
 
 interface ChangeHistoryTimelineProps {
   history: any[];
@@ -216,7 +217,7 @@ export default function ChangeHistoryTimeline({
 
           <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "0.35rem" }}>
             <Clock size={13} />
-            <span>{new Date(history[0].createdAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</span>
+            <span>{formatDisplayDateTime(history[0].createdAt)}</span>
           </div>
         </div>
       )}
@@ -300,7 +301,7 @@ export default function ChangeHistoryTimeline({
                   <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
                     <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "0.35rem" }}>
                       <Clock size={13} />
-                      <span>{new Date(item.createdAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</span>
+                      <span>{formatDisplayDateTime(item.createdAt)}</span>
                     </div>
 
                     {onSelectVersion && (

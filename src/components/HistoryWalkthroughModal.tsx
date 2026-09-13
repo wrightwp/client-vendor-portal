@@ -22,6 +22,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { FIELD_LABELS } from "@/lib/history";
+import { formatDisplayDateTime } from "@/lib/dateUtils";
 
 interface HistoryWalkthroughModalProps {
   isOpen: boolean;
@@ -221,10 +222,7 @@ export default function HistoryWalkthroughModal({
                 )}
               </div>
               <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.1rem" }}>
-                {new Date(currentStep.createdAt).toLocaleString(undefined, {
-                  dateStyle: "full",
-                  timeStyle: "medium",
-                })}
+                {formatDisplayDateTime(currentStep.createdAt)}
               </div>
             </div>
 

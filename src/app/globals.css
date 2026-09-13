@@ -703,7 +703,9 @@ a {
   border-bottom: none !important;
 }
 
-.theme-vendors-page .custom-table th {
+.theme-clients-page .theme-vendors-page .custom-table th,
+.theme-vendors-page .custom-table th,
+.vendor-table th {
   background: #00aedb !important;
   color: #ffffff !important;
   border-bottom: none !important;
@@ -722,6 +724,12 @@ a {
 
 .custom-table tbody tr:hover {
   background: rgba(184, 28, 102, 0.04);
+}
+
+.theme-clients-page .theme-vendors-page .custom-table tbody tr:hover,
+.theme-vendors-page .custom-table tbody tr:hover,
+.vendor-table tbody tr:hover {
+  background: rgba(0, 174, 219, 0.06);
 }
 
 /* Modal Overlay */

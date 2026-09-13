@@ -3,6 +3,7 @@
 import React from "react";
 import { History, Clock, ArrowRight, Sparkles, CheckCircle2, AlertCircle } from "lucide-react";
 import { FIELD_LABELS } from "@/lib/history";
+import { formatDisplayDateTime } from "@/lib/dateUtils";
 
 interface LastChangeHighlightProps {
   lastChange: any | null;
@@ -59,7 +60,7 @@ export default function LastChangeHighlight({
     if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? "s" : ""} ago`;
     if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
     if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
-    return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    return formatDisplayDateTime(date);
   };
 
   const isPink = accentColor === "pink";

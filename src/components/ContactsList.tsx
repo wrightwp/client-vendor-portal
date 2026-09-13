@@ -173,10 +173,10 @@ export default function ContactsList({
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
           <button
             onClick={handleOpenAddModal}
-            className={`btn ${btnClass}`}
-            style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}
+            className={`btn ${btnClass} btn-sm`}
+            style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}
           >
-            <Plus size={16} />
+            <Plus size={15} />
             <span>Add New Contact</span>
           </button>
 

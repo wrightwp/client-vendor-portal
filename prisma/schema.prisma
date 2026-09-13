@@ -55,6 +55,7 @@ model ClientVendor {
   vendorId   String
   assignedAt DateTime @default(now())
   notes      String?
+  fee        String?
 
   client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
   vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
@@ -180,6 +181,7 @@ model ClientBillingEnrollment {
   // General Notes & Domestic Claims
   domesticClaims                      String?
   notes                               String?
+  stopLossNotes                       String?
 
   createdAt                           DateTime @default(now())
   updatedAt                           DateTime @updatedAt

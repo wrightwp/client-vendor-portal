@@ -1,11 +1,12 @@
 import * as XLSX from "xlsx";
+import { formatDisplayDate } from "./dateUtils";
 
 export function exportBEToExcel(clientName: string, data: any) {
   const bAndE = data || {};
 
   const effectiveDatesStr =
     bAndE.startDate || bAndE.endDate
-      ? `${bAndE.startDate || "N/A"} to ${bAndE.endDate || "N/A"}`
+      ? `${formatDisplayDate(bAndE.startDate) || "N/A"} to ${formatDisplayDate(bAndE.endDate) || "N/A"}`
       : "Not specified";
 
   const rows: (string | number)[][] = [
@@ -14,7 +15,7 @@ export function exportBEToExcel(clientName: string, data: any) {
     ["Plan Year", bAndE.planYear || "2026"],
     ["Effective Dates", effectiveDatesStr],
     ["Current Active Plan Year?", bAndE.isCurrent ? "Yes" : "No"],
-    ["Export Date", new Date().toLocaleDateString()],
+    ["Export Date", formatDisplayDate(new Date())],
     [""], // blank row
 
     ["1. STOP-LOSS CARRIER & MANAGING GENERAL UNDERWRITER"],
@@ -90,7 +91,8 @@ export function exportBEToExcel(clientName: string, data: any) {
     [""],
 
     ["9. SPECIFICATION NOTES"],
-    ["Operational Notes", bAndE.notes || "None"],
+    ["Stop-Loss Notes & Guarantees", bAndE.stopLossNotes || "None"],
+    ["B&E Operational Notes", bAndE.notes || "None"],
   ];
 
   const worksheet = XLSX.utils.aoa_to_sheet(rows);

@@ -11,6 +11,7 @@ import BillingEnrollmentSection from "@/components/BillingEnrollmentSection";
 import EditAssociationNoteModal from "@/components/EditAssociationNoteModal";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
 import { MarkdownNoteRenderer } from "@/components/MarkdownNotes";
+import { formatDisplayDate } from "@/lib/dateUtils";
 import {
   ArrowLeft,
   Building2,
@@ -69,6 +70,7 @@ export default function GroupDetailPage({
     vendorId: string;
     name: string;
     notes: string;
+    fee?: string;
   } | null>(null);
 
   // Confirm Delete Vendor Association Modal State
@@ -94,7 +96,7 @@ export default function GroupDetailPage({
   });
 
   // Association Form State
-  const [newAssociation, setNewAssociation] = useState({ vendorId: "", notes: "" });
+  const [newAssociation, setNewAssociation] = useState({ vendorId: "", notes: "", fee: "" });
   const [associating, setAssociating] = useState(false);
 
   const fetchClientDetails = async () => {
@@ -195,13 +197,14 @@ export default function GroupDetailPage({
         body: JSON.stringify({
           clientId: targetId,
           vendorId: newAssociation.vendorId,
+          fee: newAssociation.fee,
           notes: newAssociation.notes,
         }),
       });
 
       const data = await res.json();
       if (data.success) {
-        setNewAssociation({ vendorId: "", notes: "" });
+        setNewAssociation({ vendorId: "", notes: "", fee: "" });
         await fetchClientDetails();
         setMessage({ text: "Vendor associated successfully!", type: "success" });
       } else {
@@ -454,11 +457,11 @@ export default function GroupDetailPage({
                 <div style={{ marginTop: "1.5rem", paddingTop: "1rem", borderTop: "1px solid var(--border)", display: "flex", gap: "1.5rem", fontSize: "0.8rem", color: "var(--text-muted)" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
                     <Calendar size={14} />
-                    <span>Created: {new Date(client.createdAt).toLocaleDateString()}</span>
+                    <span>Created: {formatDisplayDate(client.createdAt)}</span>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
                     <Calendar size={14} />
-                    <span>Last Updated: {new Date(client.updatedAt).toLocaleDateString()}</span>
+                    <span>Last Updated: {formatDisplayDate(client.updatedAt)}</span>
                   </div>
                 </div>
               </div>
@@ -685,7 +688,7 @@ export default function GroupDetailPage({
       />
 
       {/* 2. Associated Vendors Section */}
-      <div className="glass-panel" style={{ padding: "1.25rem 1.5rem" }}>
+      <div className="glass-panel theme-vendors-page" style={{ padding: "1.25rem 1.5rem" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: isVendorsExpanded ? "1.25rem" : "0", flexWrap: "wrap", gap: "1rem" }}>
           <div>
             <h2 style={{ fontSize: "1.25rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.5rem" }}>
@@ -746,7 +749,7 @@ export default function GroupDetailPage({
                     key={item.vendorId}
                     href={`/vendors/${item.vendor.id}`}
                     onClick={(e) => e.stopPropagation()}
-                    className="badge badge-purple"
+                    className="badge badge-blue"
                     style={{
                       fontSize: "0.75rem",
                       display: "inline-flex",
@@ -759,7 +762,7 @@ export default function GroupDetailPage({
                     title={`View ${item.vendor.name} vendor profile`}
                   >
                     <span style={{ fontWeight: "700" }}>{item.vendor.name}</span>
-                    <span style={{ opacity: 0.75, fontSize: "0.7rem" }}>({item.vendor.vendorType})</span>
+                    <span style={{ opacity: 0.8, fontSize: "0.7rem" }}>({item.vendor.vendorType})</span>
                   </Link>
                 ))}
                 {client.vendors.length > 4 && (
@@ -783,13 +786,21 @@ export default function GroupDetailPage({
                 <span>Search & Link a Vendor</span>
               </h3>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: "0.75rem", alignItems: "center" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1.2fr auto", gap: "0.75rem", alignItems: "center" }}>
                 <SearchSelect
                   items={unlinkedVendors}
                   selectedId={newAssociation.vendorId}
                   onSelect={(item) => setNewAssociation({ ...newAssociation, vendorId: item ? item.id : "" })}
                   placeholder="Search vendor by name, category, tax ID, city..."
                   type="vendor"
+                />
+
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Group fee (e.g. $2.50 PEPM, $500/mo)"
+                  value={newAssociation.fee}
+                  onChange={(e) => setNewAssociation({ ...newAssociation, fee: e.target.value })}
                 />
 
                 <input
@@ -812,13 +823,14 @@ export default function GroupDetailPage({
                 No vendors are currently associated with this group.
               </div>
             ) : (
-              <div className="table-container">
-                <table className="custom-table">
+              <div className="table-container theme-vendors-page">
+                <table className="custom-table vendor-table">
                   <thead>
                     <tr>
                       <th>Vendor Name</th>
                       <th className="nowrap">Category</th>
                       <th className="nowrap">Location</th>
+                      <th className="nowrap">Group Fee</th>
                       <th>Association Notes</th>
                       <th style={{ textAlign: "right" }} className="nowrap">Actions</th>
                     </tr>
@@ -835,12 +847,31 @@ export default function GroupDetailPage({
                           </Link>
                         </td>
                         <td className="nowrap">
-                          <span className="badge badge-purple">{item.vendor.vendorType}</span>
+                          <span className="badge badge-blue">{item.vendor.vendorType}</span>
                         </td>
                         <td className="nowrap">
                           {item.vendor.city && item.vendor.state
                             ? `${item.vendor.city}, ${item.vendor.state}`
                             : "—"}
+                        </td>
+                        <td className="nowrap">
+                          {item.fee ? (
+                            <span
+                              style={{
+                                color: "#38bdf8",
+                                fontWeight: "700",
+                                background: "rgba(56, 189, 248, 0.1)",
+                                border: "1px solid rgba(56, 189, 248, 0.25)",
+                                padding: "0.2rem 0.5rem",
+                                borderRadius: "6px",
+                                fontSize: "0.8rem",
+                              }}
+                            >
+                              {item.fee}
+                            </span>
+                          ) : (
+                            <span style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}>—</span>
+                          )}
                         </td>
                         <td style={{ color: "var(--text-secondary)", fontStyle: item.notes ? "normal" : "italic", minWidth: "260px" }}>
                           {item.notes ? (
@@ -854,13 +885,13 @@ export default function GroupDetailPage({
                         <td style={{ textAlign: "right" }} className="nowrap">
                           <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
                             <button
-                              onClick={() => setActiveNoteVendor({ vendorId: item.vendorId, name: item.vendor.name, notes: item.notes || "" })}
+                              onClick={() => setActiveNoteVendor({ vendorId: item.vendorId, name: item.vendor.name, notes: item.notes || "", fee: item.fee || "" })}
                               className="btn btn-secondary btn-sm"
                               style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
-                              title="Edit Group-Specific Vendor Notes"
+                              title="Edit Group-Specific Vendor Fee & Notes"
                             >
                               <FileText size={14} style={{ color: "var(--accent-blue)" }} />
-                              <span>{item.notes ? "Edit Note" : "+ Add Note"}</span>
+                              <span>{item.notes || item.fee ? "Edit Details" : "+ Add Note"}</span>
                             </button>
                             <Link href={`/vendors/${item.vendor.id}`} className="btn btn-secondary btn-sm">
                               View Vendor
@@ -889,6 +920,8 @@ export default function GroupDetailPage({
         clientId={client.id}
         clientName={client.name}
         data={client.billingEnrollments || client.billingEnrollment}
+        vendors={client.vendors || []}
+        allVendors={vendorsList || []}
         onRefresh={fetchClientDetails}
       />
 
@@ -915,7 +948,7 @@ export default function GroupDetailPage({
         accentColor="pink"
       />
 
-      {/* Edit Client-Specific Vendor Note Modal */}
+      {/* Edit Client-Specific Vendor Note & Fee Modal */}
       {activeNoteVendor && (
         <EditAssociationNoteModal
           isOpen={!!activeNoteVendor}
@@ -924,6 +957,7 @@ export default function GroupDetailPage({
           vendorId={activeNoteVendor.vendorId}
           vendorName={activeNoteVendor.name}
           currentNotes={activeNoteVendor.notes}
+          currentFee={activeNoteVendor.fee}
           onSaveSuccess={fetchClientDetails}
         />
       )}

@@ -13,6 +13,7 @@ interface EditAssociationNoteModalProps {
   vendorName?: string;
   clientName?: string;
   currentNotes: string;
+  currentFee?: string;
   onSaveSuccess: () => void;
 }
 
@@ -24,9 +25,11 @@ export default function EditAssociationNoteModal({
   vendorName,
   clientName,
   currentNotes,
+  currentFee = "",
   onSaveSuccess,
 }: EditAssociationNoteModalProps) {
   const [notes, setNotes] = useState(currentNotes || "");
+  const [fee, setFee] = useState(currentFee || "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,6 +48,7 @@ export default function EditAssociationNoteModal({
           clientId,
           vendorId,
           notes: notes.trim(),
+          fee: fee.trim(),
         }),
       });
 
@@ -53,7 +57,7 @@ export default function EditAssociationNoteModal({
         onSaveSuccess();
         onClose();
       } else {
-        setError(data.error || "Failed to update vendor notes.");
+        setError(data.error || "Failed to update vendor details.");
       }
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
@@ -144,6 +148,22 @@ export default function EditAssociationNoteModal({
         )}
 
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div className="form-group">
+            <label className="form-label">
+              Associated Fee for this Group (e.g. $2.50 PEPM, $500/mo, Included)
+            </label>
+            <input
+              type="text"
+              className="form-input"
+              placeholder="e.g. $2.50 PEPM, $500/mo, or Admin Included"
+              value={fee}
+              onChange={(e) => setFee(e.target.value)}
+            />
+            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.2rem" }}>
+              The billing/fee arrangement for this vendor with this specific group.
+            </span>
+          </div>
+
           <div className="form-group">
             <label className="form-label" style={{ display: "flex", justifyContent: "space-between" }}>
               <span>Notes for {vendorName}</span>

@@ -1,17 +1,19 @@
 import * as XLSX from "xlsx";
+import { formatDisplayDate } from "./dateUtils";
 
 export function exportGroupVendorsToExcel(groupName: string, vendors: any[]) {
   const list = vendors || [];
 
   const rows: (string | number)[][] = [
     [`ASSOCIATED VENDORS FOR GROUP: ${groupName.toUpperCase()}`],
-    [`Export Date`, new Date().toLocaleDateString()],
+    [`Export Date`, formatDisplayDate(new Date())],
     [`Total Linked Vendors`, list.length],
     [""], // blank row
 
     [
       "Vendor Name",
       "Category",
+      "Group-Specific Fee",
       "Tax ID (EIN)",
       "Phone",
       "Email",
@@ -30,6 +32,7 @@ export function exportGroupVendorsToExcel(groupName: string, vendors: any[]) {
     rows.push([
       v.name || "—",
       v.vendorType || "—",
+      item.fee || "—",
       v.taxId || "—",
       v.phone || "—",
       v.email || "—",
@@ -49,6 +52,7 @@ export function exportGroupVendorsToExcel(groupName: string, vendors: any[]) {
   worksheet["!cols"] = [
     { wch: 32 }, // Vendor Name
     { wch: 24 }, // Category
+    { wch: 22 }, // Group-Specific Fee
     { wch: 18 }, // Tax ID
     { wch: 18 }, // Phone
     { wch: 28 }, // Email

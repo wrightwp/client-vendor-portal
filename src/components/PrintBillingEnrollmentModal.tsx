@@ -2,6 +2,7 @@
 
 import { X, Printer, FileText, FileSpreadsheet, Calendar, CheckCircle2 } from "lucide-react";
 import { exportBEToExcel } from "@/lib/exportBEExcel";
+import { formatDisplayDate } from "@/lib/dateUtils";
 
 interface PrintBillingEnrollmentModalProps {
   clientName: string;
@@ -132,10 +133,10 @@ export default function PrintBillingEnrollmentModal({
               </h1>
 
               <div style={{ fontSize: "0.85rem", color: "#64748b", display: "flex", alignItems: "center", gap: "1rem", marginTop: "0.2rem" }}>
-                <span>Generated on {new Date().toLocaleDateString()}</span>
+                <span>Generated on {formatDisplayDate(new Date())}</span>
                 {(bAndE.startDate || bAndE.endDate) && (
                   <span>
-                    • Effective: <strong>{bAndE.startDate || "N/A"}</strong> to <strong>{bAndE.endDate || "N/A"}</strong>
+                    • Effective: <strong>{formatDisplayDate(bAndE.startDate) || "N/A"}</strong> to <strong>{formatDisplayDate(bAndE.endDate) || "N/A"}</strong>
                   </span>
                 )}
               </div>
@@ -270,10 +271,21 @@ export default function PrintBillingEnrollmentModal({
             </div>
           </div>
 
-          {/* Section 7: Specification Notes */}
-          {bAndE.notes && (
-            <div style={{ marginTop: "1.5rem", background: "#fffbeb", border: "1px solid #fef3c7", padding: "1rem", borderRadius: "6px", fontSize: "0.85rem" }}>
-              <strong>NOTES:</strong> {bAndE.notes}
+          {/* Section 7: Specification & Stop-Loss Notes */}
+          {(bAndE.stopLossNotes || bAndE.notes) && (
+            <div style={{ marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+              {bAndE.stopLossNotes && (
+                <div style={{ background: "#f5f3ff", border: "1px solid #ddd6fe", padding: "0.85rem 1rem", borderRadius: "6px", fontSize: "0.85rem" }}>
+                  <strong style={{ color: "#6d28d9" }}>STOP-LOSS NOTES & CONTRACT TERMS:</strong>
+                  <div style={{ marginTop: "0.25rem", whiteSpace: "pre-wrap" }}>{bAndE.stopLossNotes}</div>
+                </div>
+              )}
+              {bAndE.notes && (
+                <div style={{ background: "#fffbeb", border: "1px solid #fef3c7", padding: "0.85rem 1rem", borderRadius: "6px", fontSize: "0.85rem" }}>
+                  <strong style={{ color: "#b45309" }}>B&E OPERATIONAL NOTES:</strong>
+                  <div style={{ marginTop: "0.25rem", whiteSpace: "pre-wrap" }}>{bAndE.notes}</div>
+                </div>
+              )}
             </div>
           )}
         </div>

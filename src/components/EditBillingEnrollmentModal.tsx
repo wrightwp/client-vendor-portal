@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { X, Save, FileText, Copy, Calendar, CheckCircle2 } from "lucide-react";
+import DateInput from "./DateInput";
+import { formatDisplayDate, normalizeDate } from "@/lib/dateUtils";
 
 interface EditBillingEnrollmentModalProps {
   clientId: string;
@@ -30,8 +32,8 @@ export default function EditBillingEnrollmentModal({
       ? String(new Date().getFullYear() + 1)
       : initialData?.planYear || "2026"
   );
-  const [startDate, setStartDate] = useState<string>(initialData?.startDate || "");
-  const [endDate, setEndDate] = useState<string>(initialData?.endDate || "");
+  const [startDate, setStartDate] = useState<string>(formatDisplayDate(initialData?.startDate));
+  const [endDate, setEndDate] = useState<string>(formatDisplayDate(initialData?.endDate));
   const [isCurrent, setIsCurrent] = useState<boolean>(
     isNewPlanYear ? false : initialData?.isCurrent ?? true
   );
@@ -94,6 +96,7 @@ export default function EditBillingEnrollmentModal({
 
     domesticClaims: initialData?.domesticClaims || "",
     notes: initialData?.notes || "",
+    stopLossNotes: initialData?.stopLossNotes || "",
   });
 
   const [saving, setSaving] = useState(false);
@@ -165,6 +168,7 @@ export default function EditBillingEnrollmentModal({
 
       domesticClaims: sourceRecord.domesticClaims || "",
       notes: sourceRecord.notes || "",
+      stopLossNotes: sourceRecord.stopLossNotes || "",
     });
   };
 
@@ -183,8 +187,8 @@ export default function EditBillingEnrollmentModal({
       const payload = {
         id: recordId,
         planYear: planYear.trim(),
-        startDate: startDate.trim() || null,
-        endDate: endDate.trim() || null,
+        startDate: normalizeDate(startDate) || null,
+        endDate: normalizeDate(endDate) || null,
         isCurrent,
         ...formData,
       };
@@ -231,37 +235,39 @@ export default function EditBillingEnrollmentModal({
           </button>
         </div>
 
-        {/* Tab Navigation */}
-        <div
-          style={{
-            display: "flex",
-            gap: "0.5rem",
-            padding: "0.75rem 1.5rem",
-            borderBottom: "1px solid var(--border)",
-            background: "rgba(255, 255, 255, 0.02)",
-            overflowX: "auto",
-          }}
-        >
-          {[
-            { id: "YEAR_DATES", label: "Plan Year & Dates" },
-            { id: "CARRIER", label: "Carrier & Underwriter" },
-            { id: "SPECIFIC", label: "Specific Stop-Loss" },
-            { id: "AGGREGATE", label: "Aggregate Stop-Loss" },
-            { id: "ADMIN", label: "Admin Fees & Networks" },
-            { id: "PBM", label: "PBM & Commissions" },
-            { id: "CENSUS", label: "Census & Notes" },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`btn btn-sm ${activeTab === tab.id ? "btn-primary" : "btn-secondary"}`}
-              style={{ fontSize: "0.8rem", whiteSpace: "nowrap" }}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+        {/* Tab Navigation - Only shown when editing full modal, hidden for new plan year creation */}
+        {!isNewPlanYear && (
+          <div
+            style={{
+              display: "flex",
+              gap: "0.5rem",
+              padding: "0.75rem 1.5rem",
+              borderBottom: "1px solid var(--border)",
+              background: "rgba(255, 255, 255, 0.02)",
+              overflowX: "auto",
+            }}
+          >
+            {[
+              { id: "YEAR_DATES", label: "Plan Year & Dates" },
+              { id: "CARRIER", label: "Carrier & Underwriter" },
+              { id: "SPECIFIC", label: "Specific Stop-Loss" },
+              { id: "AGGREGATE", label: "Aggregate Stop-Loss" },
+              { id: "ADMIN", label: "Admin Fees & Networks" },
+              { id: "PBM", label: "PBM & Commissions" },
+              { id: "CENSUS", label: "Census & Notes" },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`btn btn-sm ${activeTab === tab.id ? "btn-primary" : "btn-secondary"}`}
+                style={{ fontSize: "0.8rem", whiteSpace: "nowrap" }}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className="modal-body" style={{ maxHeight: "60vh", overflowY: "auto" }}>
@@ -271,8 +277,8 @@ export default function EditBillingEnrollmentModal({
               </div>
             )}
 
-            {/* TAB 0: Plan Year & Dates */}
-            {activeTab === "YEAR_DATES" && (
+            {/* TAB 0: Plan Year & Dates (always rendered if isNewPlanYear or activeTab is YEAR_DATES) */}
+            {(isNewPlanYear || activeTab === "YEAR_DATES") && (
               <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
                 <div style={{ background: "rgba(244, 114, 182, 0.05)", border: "1px solid rgba(244, 114, 182, 0.3)", borderRadius: "10px", padding: "1.25rem" }}>
                   <h3 style={{ fontSize: "1rem", fontWeight: "700", color: "#f472b6", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
@@ -315,23 +321,21 @@ export default function EditBillingEnrollmentModal({
                   <div className="grid-cols-2" style={{ gap: "1rem", marginTop: "0.75rem" }}>
                     <div className="form-group">
                       <label className="form-label">Effective Start Date</label>
-                      <input
-                        type="text"
+                      <DateInput
                         className="form-input"
-                        placeholder="e.g. 01/01/2026"
+                        placeholder="01/01/2026"
                         value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
+                        onChange={setStartDate}
                       />
                     </div>
 
                     <div className="form-group">
                       <label className="form-label">Effective End Date</label>
-                      <input
-                        type="text"
+                      <DateInput
                         className="form-input"
-                        placeholder="e.g. 12/31/2026"
+                        placeholder="12/31/2026"
                         value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
+                        onChange={setEndDate}
                       />
                     </div>
                   </div>
@@ -1003,7 +1007,15 @@ export default function EditBillingEnrollmentModal({
             </button>
             <button type="submit" disabled={saving} className="btn btn-primary">
               <Save size={16} />
-              <span>{saving ? "Saving Changes..." : `Save Plan Year (${planYear})`}</span>
+              <span>
+                {saving
+                  ? isNewPlanYear
+                    ? "Creating Plan Year..."
+                    : "Saving Changes..."
+                  : isNewPlanYear
+                  ? `Create Plan Year (${planYear})`
+                  : `Save Plan Year (${planYear})`}
+              </span>
             </button>
           </div>
         </form>

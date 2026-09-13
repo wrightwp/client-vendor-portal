@@ -5,7 +5,7 @@ import { createSnapshot } from "@/lib/history";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { clientId, vendorId, notes } = body;
+    const { clientId, vendorId, notes, fee } = body;
 
     if (!clientId || !vendorId) {
       return NextResponse.json(
@@ -19,6 +19,7 @@ export async function POST(request: Request) {
         clientId,
         vendorId,
         notes: notes || null,
+        fee: fee || null,
       },
       include: {
         client: true,
@@ -151,7 +152,7 @@ export async function DELETE(request: Request) {
 export async function PATCH(request: Request) {
   try {
     const body = await request.json();
-    const { clientId, vendorId, notes } = body;
+    const { clientId, vendorId, notes, fee } = body;
 
     if (!clientId || !vendorId) {
       return NextResponse.json(
@@ -183,6 +184,9 @@ export async function PATCH(request: Request) {
     const oldNotes = existingAssociation.notes || null;
     const newNotes = notes !== undefined ? (notes ? notes.trim() : null) : oldNotes;
 
+    const oldFee = existingAssociation.fee || null;
+    const newFee = fee !== undefined ? (fee ? fee.trim() : null) : oldFee;
+
     const updatedAssociation = await db.clientVendor.update({
       where: {
         clientId_vendorId: {
@@ -192,6 +196,7 @@ export async function PATCH(request: Request) {
       },
       data: {
         notes: newNotes,
+        fee: newFee,
       },
       include: {
         client: true,
@@ -199,22 +204,33 @@ export async function PATCH(request: Request) {
       },
     });
 
+    const changes: any[] = [];
     if (oldNotes !== newNotes) {
+      changes.push({
+        field: "associationNotes",
+        label: `Vendor Note (${existingAssociation.vendor.name})`,
+        oldValue: oldNotes,
+        newValue: newNotes,
+      });
+    }
+    if (oldFee !== newFee) {
+      changes.push({
+        field: "associationFee",
+        label: `Vendor Fee (${existingAssociation.vendor.name})`,
+        oldValue: oldFee,
+        newValue: newFee,
+      });
+    }
+
+    if (changes.length > 0) {
       await db.changeHistory.create({
         data: {
           entityType: "CLIENT",
           entityId: clientId,
           clientId: clientId,
-          action: "ASSOCIATION_NOTES_UPDATED",
-          summary: `Updated Notes for Vendor: ${existingAssociation.vendor.name}`,
-          changes: JSON.stringify([
-            {
-              field: "associationNotes",
-              label: `Vendor Note (${existingAssociation.vendor.name})`,
-              oldValue: oldNotes,
-              newValue: newNotes,
-            },
-          ]),
+          action: "ASSOCIATION_UPDATED",
+          summary: `Updated Details for Vendor: ${existingAssociation.vendor.name}`,
+          changes: JSON.stringify(changes),
           snapshot: createSnapshot(existingAssociation.client),
         },
       });
@@ -222,9 +238,9 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json({ success: true, association: updatedAssociation });
   } catch (error: any) {
-    console.error("Error updating association notes:", error);
+    console.error("Error updating association:", error);
     return NextResponse.json(
-      { success: false, error: error.message || "Failed to update association notes" },
+      { success: false, error: error.message || "Failed to update association" },
       { status: 500 }
     );
   }

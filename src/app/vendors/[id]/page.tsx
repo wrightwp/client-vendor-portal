@@ -10,6 +10,7 @@ import ContactsList from "@/components/ContactsList";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
 import EditAssociationNoteModal from "@/components/EditAssociationNoteModal";
 import { MarkdownNoteRenderer } from "@/components/MarkdownNotes";
+import { formatDisplayDate } from "@/lib/dateUtils";
 import {
   ArrowLeft,
   Store,
@@ -429,11 +430,11 @@ export default function VendorDetailPage({
                 <div style={{ marginTop: "1.5rem", paddingTop: "1rem", borderTop: "1px solid var(--border)", display: "flex", gap: "1.5rem", fontSize: "0.8rem", color: "var(--text-muted)" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
                     <Calendar size={14} />
-                    <span>Created: {new Date(vendor.createdAt).toLocaleDateString()}</span>
+                    <span>Created: {formatDisplayDate(vendor.createdAt)}</span>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
                     <Calendar size={14} />
-                    <span>Last Updated: {new Date(vendor.updatedAt).toLocaleDateString()}</span>
+                    <span>Last Updated: {formatDisplayDate(vendor.updatedAt)}</span>
                   </div>
                 </div>
               </div>
