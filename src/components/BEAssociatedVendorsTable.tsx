@@ -194,7 +194,7 @@ export default function BEAssociatedVendorsTable({
             <div
               style={{
                 display: "inline-flex",
-                background: "rgba(0, 0, 0, 0.25)",
+                background: "rgba(0, 0, 0, 0.06)",
                 borderRadius: "6px",
                 padding: "2px",
                 border: "1px solid var(--border)",
@@ -205,20 +205,23 @@ export default function BEAssociatedVendorsTable({
                 onClick={() => setDisplayMode("CARDS")}
                 className="btn btn-sm"
                 style={{
-                  padding: "0.18rem 0.45rem",
-                  fontSize: "0.72rem",
-                  background: displayMode === "CARDS" ? "rgba(0, 174, 219, 0.22)" : "transparent",
-                  color: displayMode === "CARDS" ? "var(--accent-blue)" : "var(--text-muted)",
-                  border: displayMode === "CARDS" ? "1px solid rgba(0, 174, 219, 0.4)" : "1px solid transparent",
+                  padding: "0.22rem 0.6rem",
+                  fontSize: "0.75rem",
+                  background: displayMode === "CARDS" ? "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)" : "transparent",
+                  color: displayMode === "CARDS" ? "#ffffff" : "var(--text-primary)",
+                  border: displayMode === "CARDS" ? "1px solid #0284c7" : "1px solid transparent",
                   borderRadius: "4px",
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "0.25rem",
-                  fontWeight: displayMode === "CARDS" ? "700" : "500",
+                  gap: "0.3rem",
+                  fontWeight: displayMode === "CARDS" ? "700" : "600",
+                  boxShadow: displayMode === "CARDS" ? "0 2px 6px rgba(2, 132, 199, 0.4)" : "none",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
                 }}
                 title="Compact Grid Cards View"
               >
-                <LayoutGrid size={13} />
+                <LayoutGrid size={13} style={{ color: displayMode === "CARDS" ? "#ffffff" : "var(--text-secondary)" }} />
                 <span>Cards</span>
               </button>
               <button
@@ -226,20 +229,23 @@ export default function BEAssociatedVendorsTable({
                 onClick={() => setDisplayMode("ROWS")}
                 className="btn btn-sm"
                 style={{
-                  padding: "0.18rem 0.45rem",
-                  fontSize: "0.72rem",
-                  background: displayMode === "ROWS" ? "rgba(0, 174, 219, 0.22)" : "transparent",
-                  color: displayMode === "ROWS" ? "var(--accent-blue)" : "var(--text-muted)",
-                  border: displayMode === "ROWS" ? "1px solid rgba(0, 174, 219, 0.4)" : "1px solid transparent",
+                  padding: "0.22rem 0.6rem",
+                  fontSize: "0.75rem",
+                  background: displayMode === "ROWS" ? "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)" : "transparent",
+                  color: displayMode === "ROWS" ? "#ffffff" : "var(--text-primary)",
+                  border: displayMode === "ROWS" ? "1px solid #0284c7" : "1px solid transparent",
                   borderRadius: "4px",
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "0.25rem",
-                  fontWeight: displayMode === "ROWS" ? "700" : "500",
+                  gap: "0.3rem",
+                  fontWeight: displayMode === "ROWS" ? "700" : "600",
+                  boxShadow: displayMode === "ROWS" ? "0 2px 6px rgba(2, 132, 199, 0.4)" : "none",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
                 }}
                 title="Compact Row Strip View"
               >
-                <List size={13} />
+                <List size={13} style={{ color: displayMode === "ROWS" ? "#ffffff" : "var(--text-secondary)" }} />
                 <span>Rows</span>
               </button>
             </div>

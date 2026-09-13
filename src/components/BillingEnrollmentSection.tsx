@@ -33,6 +33,13 @@ import { MarkdownNoteRenderer } from "./MarkdownNotes";
 import { exportBEToExcel } from "@/lib/exportBEExcel";
 import DateInput from "./DateInput";
 import { formatDisplayDate, normalizeDate } from "@/lib/dateUtils";
+import YesNoToggle from "./YesNoToggle";
+import CurrencyInput from "./CurrencyInput";
+import PercentInput from "./PercentInput";
+import ContractSelect from "./ContractSelect";
+import LaseredIndividualsInput from "./LaseredIndividualsInput";
+import MonthlyAccommodationInput from "./MonthlyAccommodationInput";
+import BenefitsCoveredSelect from "./BenefitsCoveredSelect";
 
 interface BillingEnrollmentSectionProps {
   clientId: string;
@@ -226,6 +233,21 @@ export default function BillingEnrollmentSection({
     });
   }, [activeBAndE]);
 
+  // Live auto-calculation of Census Total: Single + Emp+1 + Family
+  const handleUpdateCensusTier = (
+    field: "figuresSingle" | "figuresEmployeePlusOne" | "figuresFamily",
+    val: string
+  ) => {
+    const s = parseInt(field === "figuresSingle" ? val : editFormData.figuresSingle, 10) || 0;
+    const e1 = parseInt(field === "figuresEmployeePlusOne" ? val : editFormData.figuresEmployeePlusOne, 10) || 0;
+    const f = parseInt(field === "figuresFamily" ? val : editFormData.figuresFamily, 10) || 0;
+    setEditFormData({
+      ...editFormData,
+      [field]: val,
+      figuresTotal: String(s + e1 + f),
+    });
+  };
+
   // Handle Copy from Prior Year into inline edit form
   const handleCopyFromPriorYear = (sourceYear: string) => {
     const sourceRecord = sortedEnrollments.find((e) => e.planYear === sourceYear);
@@ -349,33 +371,15 @@ export default function BillingEnrollmentSection({
         }}
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        {/* Left: Icon, Badge, Title, Description */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <div
-            style={{
-              padding: "0.6rem",
-              borderRadius: "10px",
-              background: "rgba(244, 114, 182, 0.15)",
-              color: "var(--accent-pink)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
-          >
-            <FileText size={24} />
-          </div>
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
-              <span className="badge badge-pink" style={{ fontSize: "0.7rem" }}>GROUP SPECIFICATION</span>
-              <h2 style={{ fontSize: "1.35rem", fontWeight: "800" }}>
-                B&E (Billing & Enrollment Summary)
-              </h2>
-            </div>
-            <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.15rem" }}>
-              Complete stop-loss, administrative fees, PBM network, and census specifications for {clientName}.
-            </p>
-          </div>
+        {/* Left: Icon, Title, Description (Standardized with Contacts and Associated Vendors) */}
+        <div>
+          <h2 style={{ fontSize: "1.25rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <FileText size={22} style={{ color: "var(--accent-pink)" }} />
+            <span>B&E (Billing & Enrollment Summary)</span>
+          </h2>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.1rem" }}>
+            Complete stop-loss, administrative fees, PBM network, and census specifications for {clientName}.
+          </p>
         </div>
 
         {/* Right Actions: Export, Print, Edit next to Expander */}
@@ -815,11 +819,12 @@ export default function BillingEnrollmentSection({
                 <div style={{ background: "rgba(255, 255, 255, 0.03)", padding: "0.75rem 0.5rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
                   {isInlineEditing ? (
                     <input
-                      type="text"
+                      type="number"
+                      min="0"
                       className="form-input"
                       style={{ textAlign: "center", fontWeight: "800", fontSize: "1.1rem", padding: "0.2rem", color: "var(--accent-pink)" }}
                       value={editFormData.figuresSingle}
-                      onChange={(e) => setEditFormData({ ...editFormData, figuresSingle: e.target.value })}
+                      onChange={(e) => handleUpdateCensusTier("figuresSingle", e.target.value)}
                       placeholder="0"
                     />
                   ) : (
@@ -833,11 +838,12 @@ export default function BillingEnrollmentSection({
                 <div style={{ background: "rgba(255, 255, 255, 0.03)", padding: "0.75rem 0.5rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
                   {isInlineEditing ? (
                     <input
-                      type="text"
+                      type="number"
+                      min="0"
                       className="form-input"
                       style={{ textAlign: "center", fontWeight: "800", fontSize: "1.1rem", padding: "0.2rem", color: "var(--accent-pink)" }}
                       value={editFormData.figuresEmployeePlusOne}
-                      onChange={(e) => setEditFormData({ ...editFormData, figuresEmployeePlusOne: e.target.value })}
+                      onChange={(e) => handleUpdateCensusTier("figuresEmployeePlusOne", e.target.value)}
                       placeholder="0"
                     />
                   ) : (
@@ -851,11 +857,12 @@ export default function BillingEnrollmentSection({
                 <div style={{ background: "rgba(255, 255, 255, 0.03)", padding: "0.75rem 0.5rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
                   {isInlineEditing ? (
                     <input
-                      type="text"
+                      type="number"
+                      min="0"
                       className="form-input"
                       style={{ textAlign: "center", fontWeight: "800", fontSize: "1.1rem", padding: "0.2rem", color: "var(--accent-pink)" }}
                       value={editFormData.figuresFamily}
-                      onChange={(e) => setEditFormData({ ...editFormData, figuresFamily: e.target.value })}
+                      onChange={(e) => handleUpdateCensusTier("figuresFamily", e.target.value)}
                       placeholder="0"
                     />
                   ) : (
@@ -869,12 +876,14 @@ export default function BillingEnrollmentSection({
                 <div style={{ background: "rgba(244, 114, 182, 0.1)", padding: "0.75rem 0.5rem", borderRadius: "8px", border: "1px solid rgba(244, 114, 182, 0.3)" }}>
                   {isInlineEditing ? (
                     <input
-                      type="text"
+                      type="number"
+                      min="0"
                       className="form-input"
                       style={{ textAlign: "center", fontWeight: "800", fontSize: "1.1rem", padding: "0.2rem", color: "#f472b6" }}
                       value={editFormData.figuresTotal}
                       onChange={(e) => setEditFormData({ ...editFormData, figuresTotal: e.target.value })}
                       placeholder="0"
+                      title="Calculated Total (can be adjusted if needed)"
                     />
                   ) : (
                     <div style={{ fontSize: "1.25rem", fontWeight: "800", color: "#f472b6" }}>
@@ -908,13 +917,9 @@ export default function BillingEnrollmentSection({
                       <h3 style={{ fontSize: "1rem", fontWeight: "700" }}>Specific Stop-Loss Specs</h3>
                     </div>
                     {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
-                        style={{ width: "80px", padding: "0.2rem 0.4rem", fontSize: "0.75rem" }}
+                      <ContractSelect
                         value={editFormData.specificContract}
-                        onChange={(e) => setEditFormData({ ...editFormData, specificContract: e.target.value })}
-                        placeholder="12/12"
+                        onChange={(val) => setEditFormData({ ...editFormData, specificContract: val })}
                       />
                     ) : (
                       <span className="badge badge-blue" style={{ fontSize: "0.7rem" }}>
@@ -927,13 +932,11 @@ export default function BillingEnrollmentSection({
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                       <span style={{ color: "var(--text-muted)" }}>Specific Deductible</span>
                       {isInlineEditing ? (
-                        <input
-                          type="text"
-                          className="form-input"
-                          style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                        <CurrencyInput
+                          style={{ width: "160px" }}
                           value={editFormData.specificDeductible}
-                          onChange={(e) => setEditFormData({ ...editFormData, specificDeductible: e.target.value })}
-                          placeholder="$50,000"
+                          onChange={(val) => setEditFormData({ ...editFormData, specificDeductible: val })}
+                          placeholder="50,000"
                         />
                       ) : (
                         <strong style={{ color: "var(--text-primary)" }}>{activeBAndE.specificDeductible || "—"}</strong>
@@ -943,13 +946,11 @@ export default function BillingEnrollmentSection({
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                       <span style={{ color: "var(--text-muted)" }}>Aggregating Specific Deductible</span>
                       {isInlineEditing ? (
-                        <input
-                          type="text"
-                          className="form-input"
-                          style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                        <CurrencyInput
+                          style={{ width: "160px" }}
                           value={editFormData.aggregatingSpecificDeductible}
-                          onChange={(e) => setEditFormData({ ...editFormData, aggregatingSpecificDeductible: e.target.value })}
-                          placeholder="No or $ amount"
+                          onChange={(val) => setEditFormData({ ...editFormData, aggregatingSpecificDeductible: val })}
+                          placeholder="0.00"
                         />
                       ) : (
                         <span>{activeBAndE.aggregatingSpecificDeductible || "No"}</span>
@@ -959,13 +960,10 @@ export default function BillingEnrollmentSection({
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                       <span style={{ color: "var(--text-muted)" }}>No-Laser Renewal Guarantee</span>
                       {isInlineEditing ? (
-                        <input
-                          type="text"
-                          className="form-input"
-                          style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                        <YesNoToggle
                           value={editFormData.noLaserRenewalGuarantee}
-                          onChange={(e) => setEditFormData({ ...editFormData, noLaserRenewalGuarantee: e.target.value })}
-                          placeholder="No or Yes"
+                          onChange={(val) => setEditFormData({ ...editFormData, noLaserRenewalGuarantee: val })}
+                          size="sm"
                         />
                       ) : (
                         <span>{activeBAndE.noLaserRenewalGuarantee || "No"}</span>
@@ -975,29 +973,24 @@ export default function BillingEnrollmentSection({
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                       <span style={{ color: "var(--text-muted)" }}>Max Specific Renewal Increase</span>
                       {isInlineEditing ? (
-                        <input
-                          type="text"
-                          className="form-input"
-                          style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                        <PercentInput
+                          style={{ width: "110px" }}
                           value={editFormData.maxSpecificPremiumRenewalIncrease}
-                          onChange={(e) => setEditFormData({ ...editFormData, maxSpecificPremiumRenewalIncrease: e.target.value })}
-                          placeholder="e.g. 40%"
+                          onChange={(val) => setEditFormData({ ...editFormData, maxSpecificPremiumRenewalIncrease: val })}
+                          placeholder="30"
                         />
                       ) : (
                         <span>{activeBAndE.maxSpecificPremiumRenewalIncrease || "—"}</span>
                       )}
                     </div>
 
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <span style={{ color: "var(--text-muted)" }}>Lasered Individuals</span>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                      <span style={{ color: "var(--text-muted)", marginTop: "0.2rem" }}>Lasered Individuals</span>
                       {isInlineEditing ? (
-                        <input
-                          type="text"
-                          className="form-input"
-                          style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                        <LaseredIndividualsInput
                           value={editFormData.laseredIndividuals}
-                          onChange={(e) => setEditFormData({ ...editFormData, laseredIndividuals: e.target.value })}
-                          placeholder="No or details"
+                          onChange={(val) => setEditFormData({ ...editFormData, laseredIndividuals: val })}
+                          compact={true}
                         />
                       ) : (
                         <span>{activeBAndE.laseredIndividuals || "No"}</span>
@@ -1007,13 +1000,10 @@ export default function BillingEnrollmentSection({
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                       <span style={{ color: "var(--text-muted)" }}>Benefits Covered</span>
                       {isInlineEditing ? (
-                        <input
-                          type="text"
-                          className="form-input"
-                          style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                        <BenefitsCoveredSelect
+                          style={{ width: "160px" }}
                           value={editFormData.specificBenefitsCovered}
-                          onChange={(e) => setEditFormData({ ...editFormData, specificBenefitsCovered: e.target.value })}
-                          placeholder="Med/Rx"
+                          onChange={(val) => setEditFormData({ ...editFormData, specificBenefitsCovered: val })}
                         />
                       ) : (
                         <span>{activeBAndE.specificBenefitsCovered || "Med/Rx"}</span>
@@ -1029,13 +1019,12 @@ export default function BillingEnrollmentSection({
                         <div>
                           <div style={{ color: "var(--text-muted)", fontSize: "0.7rem" }}>Single</div>
                           {isInlineEditing ? (
-                            <input
-                              type="text"
-                              className="form-input"
-                              style={{ textAlign: "center", fontSize: "0.75rem", padding: "0.2rem" }}
+                            <CurrencyInput
+                              style={{ width: "100%" }}
+                              align="center"
                               value={editFormData.specificPremiumSingle}
-                              onChange={(e) => setEditFormData({ ...editFormData, specificPremiumSingle: e.target.value })}
-                              placeholder="$120.00"
+                              onChange={(val) => setEditFormData({ ...editFormData, specificPremiumSingle: val })}
+                              placeholder="140.00"
                             />
                           ) : (
                             <div style={{ fontWeight: "700" }}>{activeBAndE.specificPremiumSingle || "—"}</div>
@@ -1044,13 +1033,12 @@ export default function BillingEnrollmentSection({
                         <div>
                           <div style={{ color: "var(--text-muted)", fontSize: "0.7rem" }}>Emp + 1</div>
                           {isInlineEditing ? (
-                            <input
-                              type="text"
-                              className="form-input"
-                              style={{ textAlign: "center", fontSize: "0.75rem", padding: "0.2rem" }}
+                            <CurrencyInput
+                              style={{ width: "100%" }}
+                              align="center"
                               value={editFormData.specificPremiumEmployeePlusOne}
-                              onChange={(e) => setEditFormData({ ...editFormData, specificPremiumEmployeePlusOne: e.target.value })}
-                              placeholder="$240.00"
+                              onChange={(val) => setEditFormData({ ...editFormData, specificPremiumEmployeePlusOne: val })}
+                              placeholder="260.00"
                             />
                           ) : (
                             <div style={{ fontWeight: "700" }}>{activeBAndE.specificPremiumEmployeePlusOne || "—"}</div>
@@ -1059,13 +1047,12 @@ export default function BillingEnrollmentSection({
                         <div>
                           <div style={{ color: "var(--text-muted)", fontSize: "0.7rem" }}>Family</div>
                           {isInlineEditing ? (
-                            <input
-                              type="text"
-                              className="form-input"
-                              style={{ textAlign: "center", fontSize: "0.75rem", padding: "0.2rem" }}
+                            <CurrencyInput
+                              style={{ width: "100%" }}
+                              align="center"
                               value={editFormData.specificPremiumFamily}
-                              onChange={(e) => setEditFormData({ ...editFormData, specificPremiumFamily: e.target.value })}
-                              placeholder="$360.00"
+                              onChange={(val) => setEditFormData({ ...editFormData, specificPremiumFamily: val })}
+                              placeholder="400.00"
                             />
                           ) : (
                             <div style={{ fontWeight: "700" }}>{activeBAndE.specificPremiumFamily || "—"}</div>
@@ -1093,13 +1080,9 @@ export default function BillingEnrollmentSection({
                       <h3 style={{ fontSize: "1rem", fontWeight: "700" }}>Aggregate Stop-Loss Specs</h3>
                     </div>
                     {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
-                        style={{ width: "80px", padding: "0.2rem 0.4rem", fontSize: "0.75rem" }}
+                      <ContractSelect
                         value={editFormData.aggregateContract}
-                        onChange={(e) => setEditFormData({ ...editFormData, aggregateContract: e.target.value })}
-                        placeholder="12/12"
+                        onChange={(val) => setEditFormData({ ...editFormData, aggregateContract: val })}
                       />
                     ) : (
                       <span className="badge badge-purple" style={{ fontSize: "0.7rem" }}>
@@ -1112,13 +1095,11 @@ export default function BillingEnrollmentSection({
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                       <span style={{ color: "var(--text-muted)" }}>Aggregate Premium</span>
                       {isInlineEditing ? (
-                        <input
-                          type="text"
-                          className="form-input"
-                          style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                        <CurrencyInput
+                          style={{ width: "160px" }}
                           value={editFormData.aggregatePremium}
-                          onChange={(e) => setEditFormData({ ...editFormData, aggregatePremium: e.target.value })}
-                          placeholder="$15.00"
+                          onChange={(val) => setEditFormData({ ...editFormData, aggregatePremium: val })}
+                          placeholder="15.00"
                         />
                       ) : (
                         <strong style={{ color: "var(--text-primary)" }}>{activeBAndE.aggregatePremium || "—"}</strong>
@@ -1128,13 +1109,10 @@ export default function BillingEnrollmentSection({
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                       <span style={{ color: "var(--text-muted)" }}>Monthly Accommodation</span>
                       {isInlineEditing ? (
-                        <input
-                          type="text"
-                          className="form-input"
-                          style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                        <MonthlyAccommodationInput
                           value={editFormData.monthlyAggregateAccommodation}
-                          onChange={(e) => setEditFormData({ ...editFormData, monthlyAggregateAccommodation: e.target.value })}
-                          placeholder="Yes or No"
+                          onChange={(val) => setEditFormData({ ...editFormData, monthlyAggregateAccommodation: val })}
+                          compact={true}
                         />
                       ) : (
                         <span>{activeBAndE.monthlyAggregateAccommodation || "—"}</span>
@@ -1144,13 +1122,11 @@ export default function BillingEnrollmentSection({
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                       <span style={{ color: "var(--text-muted)" }}>Min Attachment Point</span>
                       {isInlineEditing ? (
-                        <input
-                          type="text"
-                          className="form-input"
-                          style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                        <CurrencyInput
+                          style={{ width: "160px" }}
                           value={editFormData.aggregateMinAttachmentPoint}
-                          onChange={(e) => setEditFormData({ ...editFormData, aggregateMinAttachmentPoint: e.target.value })}
-                          placeholder="$1,000,000"
+                          onChange={(val) => setEditFormData({ ...editFormData, aggregateMinAttachmentPoint: val })}
+                          placeholder="1,000,000"
                         />
                       ) : (
                         <strong style={{ color: "#c084fc" }}>{activeBAndE.aggregateMinAttachmentPoint || "—"}</strong>
@@ -1160,13 +1136,10 @@ export default function BillingEnrollmentSection({
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                       <span style={{ color: "var(--text-muted)" }}>Run-in Limit</span>
                       {isInlineEditing ? (
-                        <input
-                          type="text"
-                          className="form-input"
-                          style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                        <YesNoToggle
                           value={editFormData.aggregateRunInLimit}
-                          onChange={(e) => setEditFormData({ ...editFormData, aggregateRunInLimit: e.target.value })}
-                          placeholder="No or details"
+                          onChange={(val) => setEditFormData({ ...editFormData, aggregateRunInLimit: val })}
+                          size="sm"
                         />
                       ) : (
                         <span>{activeBAndE.aggregateRunInLimit || "No"}</span>
@@ -1176,13 +1149,10 @@ export default function BillingEnrollmentSection({
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                       <span style={{ color: "var(--text-muted)" }}>Benefits Covered</span>
                       {isInlineEditing ? (
-                        <input
-                          type="text"
-                          className="form-input"
-                          style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                        <BenefitsCoveredSelect
+                          style={{ width: "160px" }}
                           value={editFormData.aggregateBenefitsCovered}
-                          onChange={(e) => setEditFormData({ ...editFormData, aggregateBenefitsCovered: e.target.value })}
-                          placeholder="Med/Rx"
+                          onChange={(val) => setEditFormData({ ...editFormData, aggregateBenefitsCovered: val })}
                         />
                       ) : (
                         <span>{activeBAndE.aggregateBenefitsCovered || "Med/Rx"}</span>
@@ -1198,13 +1168,12 @@ export default function BillingEnrollmentSection({
                         <div>
                           <div style={{ color: "var(--text-muted)", fontSize: "0.7rem" }}>Single</div>
                           {isInlineEditing ? (
-                            <input
-                              type="text"
-                              className="form-input"
-                              style={{ textAlign: "center", fontSize: "0.75rem", padding: "0.2rem" }}
+                            <CurrencyInput
+                              style={{ width: "100%" }}
+                              align="center"
                               value={editFormData.aggregateFactorSingle}
-                              onChange={(e) => setEditFormData({ ...editFormData, aggregateFactorSingle: e.target.value })}
-                              placeholder="$650.00"
+                              onChange={(val) => setEditFormData({ ...editFormData, aggregateFactorSingle: val })}
+                              placeholder="380.00"
                             />
                           ) : (
                             <div style={{ fontWeight: "700" }}>{activeBAndE.aggregateFactorSingle || "—"}</div>
@@ -1213,13 +1182,12 @@ export default function BillingEnrollmentSection({
                         <div>
                           <div style={{ color: "var(--text-muted)", fontSize: "0.7rem" }}>Emp + 1</div>
                           {isInlineEditing ? (
-                            <input
-                              type="text"
-                              className="form-input"
-                              style={{ textAlign: "center", fontSize: "0.75rem", padding: "0.2rem" }}
+                            <CurrencyInput
+                              style={{ width: "100%" }}
+                              align="center"
                               value={editFormData.aggregateFactorEmployeePlusOne}
-                              onChange={(e) => setEditFormData({ ...editFormData, aggregateFactorEmployeePlusOne: e.target.value })}
-                              placeholder="$1,300.00"
+                              onChange={(val) => setEditFormData({ ...editFormData, aggregateFactorEmployeePlusOne: val })}
+                              placeholder="720.00"
                             />
                           ) : (
                             <div style={{ fontWeight: "700" }}>{activeBAndE.aggregateFactorEmployeePlusOne || "—"}</div>
@@ -1228,13 +1196,12 @@ export default function BillingEnrollmentSection({
                         <div>
                           <div style={{ color: "var(--text-muted)", fontSize: "0.7rem" }}>Family</div>
                           {isInlineEditing ? (
-                            <input
-                              type="text"
-                              className="form-input"
-                              style={{ textAlign: "center", fontSize: "0.75rem", padding: "0.2rem" }}
+                            <CurrencyInput
+                              style={{ width: "100%" }}
+                              align="center"
                               value={editFormData.aggregateFactorFamily}
-                              onChange={(e) => setEditFormData({ ...editFormData, aggregateFactorFamily: e.target.value })}
-                              placeholder="$1,950.00"
+                              onChange={(val) => setEditFormData({ ...editFormData, aggregateFactorFamily: val })}
+                              placeholder="1,100.00"
                             />
                           ) : (
                             <div style={{ fontWeight: "700" }}>{activeBAndE.aggregateFactorFamily || "—"}</div>
@@ -1328,13 +1295,12 @@ export default function BillingEnrollmentSection({
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                     <span style={{ color: "var(--text-muted)" }}>Composite Admin Fee</span>
                     {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
-                        style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                      <CurrencyInput
+                        style={{ width: "170px" }}
                         value={editFormData.compositeAdminFee}
-                        onChange={(e) => setEditFormData({ ...editFormData, compositeAdminFee: e.target.value })}
-                        placeholder="$45.00 PEPM"
+                        onChange={(val) => setEditFormData({ ...editFormData, compositeAdminFee: val })}
+                        placeholder="45.00"
+                        suffix="PEPM"
                       />
                     ) : (
                       <strong style={{ color: "#ffc20e" }}>{activeBAndE.compositeAdminFee || "—"}</strong>
@@ -1344,13 +1310,12 @@ export default function BillingEnrollmentSection({
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                     <span style={{ color: "var(--text-muted)" }}>Medical Administration</span>
                     {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
-                        style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                      <CurrencyInput
+                        style={{ width: "170px" }}
                         value={editFormData.medicalFee}
-                        onChange={(e) => setEditFormData({ ...editFormData, medicalFee: e.target.value })}
-                        placeholder="$35.00"
+                        onChange={(val) => setEditFormData({ ...editFormData, medicalFee: val })}
+                        placeholder="35.00"
+                        suffix="PEPM"
                       />
                     ) : (
                       <span>{activeBAndE.medicalFee || "—"}</span>
@@ -1360,13 +1325,12 @@ export default function BillingEnrollmentSection({
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                     <span style={{ color: "var(--text-muted)" }}>UR (Utilization Review)</span>
                     {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
-                        style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                      <CurrencyInput
+                        style={{ width: "170px" }}
                         value={editFormData.urFee}
-                        onChange={(e) => setEditFormData({ ...editFormData, urFee: e.target.value })}
-                        placeholder="$4.50"
+                        onChange={(val) => setEditFormData({ ...editFormData, urFee: val })}
+                        placeholder="4.50"
+                        suffix="PEPM"
                       />
                     ) : (
                       <span>{activeBAndE.urFee || "—"}</span>
@@ -1376,13 +1340,12 @@ export default function BillingEnrollmentSection({
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                     <span style={{ color: "var(--text-muted)" }}>Amwell Telehealth</span>
                     {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
-                        style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                      <CurrencyInput
+                        style={{ width: "170px" }}
                         value={editFormData.amwellFee}
-                        onChange={(e) => setEditFormData({ ...editFormData, amwellFee: e.target.value })}
-                        placeholder="$1.25"
+                        onChange={(val) => setEditFormData({ ...editFormData, amwellFee: val })}
+                        placeholder="1.25"
+                        suffix="PEPM"
                       />
                     ) : (
                       <span>{activeBAndE.amwellFee || "—"}</span>
@@ -1392,13 +1355,12 @@ export default function BillingEnrollmentSection({
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                     <span style={{ color: "var(--text-muted)" }}>Physicians Care / HAP</span>
                     {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
-                        style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                      <CurrencyInput
+                        style={{ width: "170px" }}
                         value={editFormData.physiciansCareHapFee}
-                        onChange={(e) => setEditFormData({ ...editFormData, physiciansCareHapFee: e.target.value })}
-                        placeholder="$2.00"
+                        onChange={(val) => setEditFormData({ ...editFormData, physiciansCareHapFee: val })}
+                        placeholder="2.00"
+                        suffix="PEPM"
                       />
                     ) : (
                       <span>{activeBAndE.physiciansCareHapFee || "—"}</span>
@@ -1408,13 +1370,12 @@ export default function BillingEnrollmentSection({
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                     <span style={{ color: "var(--text-muted)" }}>Aetna Signature Admin</span>
                     {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
-                        style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                      <CurrencyInput
+                        style={{ width: "170px" }}
                         value={editFormData.aetnaSignatureAdminFee}
-                        onChange={(e) => setEditFormData({ ...editFormData, aetnaSignatureAdminFee: e.target.value })}
-                        placeholder="$8.50"
+                        onChange={(val) => setEditFormData({ ...editFormData, aetnaSignatureAdminFee: val })}
+                        placeholder="8.50"
+                        suffix="PEPM"
                       />
                     ) : (
                       <span>{activeBAndE.aetnaSignatureAdminFee || "—"}</span>
@@ -1426,13 +1387,12 @@ export default function BillingEnrollmentSection({
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                     <span style={{ color: "var(--text-muted)" }}>Network Access Fee</span>
                     {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
-                        style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                      <CurrencyInput
+                        style={{ width: "170px" }}
                         value={editFormData.networkAccessFee}
-                        onChange={(e) => setEditFormData({ ...editFormData, networkAccessFee: e.target.value })}
-                        placeholder="$5.00"
+                        onChange={(val) => setEditFormData({ ...editFormData, networkAccessFee: val })}
+                        placeholder="5.00"
+                        suffix="PEPM"
                       />
                     ) : (
                       <span>{activeBAndE.networkAccessFee || "—"}</span>
@@ -1442,13 +1402,12 @@ export default function BillingEnrollmentSection({
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                     <span style={{ color: "var(--text-muted)" }}>Reinsurance Fee</span>
                     {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
-                        style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                      <CurrencyInput
+                        style={{ width: "170px" }}
                         value={editFormData.reinsuranceFee}
-                        onChange={(e) => setEditFormData({ ...editFormData, reinsuranceFee: e.target.value })}
-                        placeholder="$1.00"
+                        onChange={(val) => setEditFormData({ ...editFormData, reinsuranceFee: val })}
+                        placeholder="1.00"
+                        suffix="PEPM"
                       />
                     ) : (
                       <span>{activeBAndE.reinsuranceFee || "—"}</span>
@@ -1458,13 +1417,12 @@ export default function BillingEnrollmentSection({
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                     <span style={{ color: "var(--text-muted)" }}>LCM / SPA (AHH)</span>
                     {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
-                        style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                      <CurrencyInput
+                        style={{ width: "170px" }}
                         value={editFormData.lcmSpaFee}
-                        onChange={(e) => setEditFormData({ ...editFormData, lcmSpaFee: e.target.value })}
-                        placeholder="$0.75"
+                        onChange={(val) => setEditFormData({ ...editFormData, lcmSpaFee: val })}
+                        placeholder="149.00"
+                        suffix="hr"
                       />
                     ) : (
                       <span>{activeBAndE.lcmSpaFee || "—"}</span>
@@ -1474,13 +1432,12 @@ export default function BillingEnrollmentSection({
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                     <span style={{ color: "var(--text-muted)" }}>Agent Fee</span>
                     {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
-                        style={{ width: "160px", padding: "0.25rem 0.5rem", fontSize: "0.8rem", textAlign: "right" }}
+                      <CurrencyInput
+                        style={{ width: "170px" }}
                         value={editFormData.agentFee}
-                        onChange={(e) => setEditFormData({ ...editFormData, agentFee: e.target.value })}
-                        placeholder="$10.00"
+                        onChange={(val) => setEditFormData({ ...editFormData, agentFee: val })}
+                        placeholder="10.00"
+                        suffix="PEPM"
                       />
                     ) : (
                       <span>{activeBAndE.agentFee || "—"}</span>
@@ -1528,7 +1485,15 @@ export default function BillingEnrollmentSection({
           )}
 
           {/* PBM, Commission & Additional Policies Grid */}
-          <div className="grid-cols-3" style={{ gap: "1.25rem" }}>
+          <div
+            className="grid-cols-3"
+            style={{
+              display: "grid",
+              gridTemplateColumns: showBilling && showStopLoss ? "repeat(3, 1fr)" : showBilling ? "repeat(2, 1fr)" : "1fr",
+              gap: "1.25rem",
+              alignItems: "stretch",
+            }}
+          >
             {/* PBM Specs (Shown in BOTH and BILLING) */}
             {showBilling && (
               <div
@@ -1537,6 +1502,9 @@ export default function BillingEnrollmentSection({
                   padding: "1.25rem",
                   background: "rgba(255, 255, 255, 0.02)",
                   border: "1px solid var(--border)",
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
@@ -1544,7 +1512,7 @@ export default function BillingEnrollmentSection({
                   <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>PBM Information</h3>
                 </div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem", flex: 1 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ color: "var(--text-muted)" }}>PBM Provider</span>
                     {isInlineEditing ? (
@@ -1563,15 +1531,10 @@ export default function BillingEnrollmentSection({
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ color: "var(--text-muted)" }}>Rx in ASR Reporting?</span>
                     {isInlineEditing ? (
-                      <select
-                        className="form-select"
-                        style={{ width: "90px", padding: "0.2rem", fontSize: "0.75rem" }}
+                      <YesNoToggle
                         value={editFormData.rxIncludedInAsrReporting}
-                        onChange={(e) => setEditFormData({ ...editFormData, rxIncludedInAsrReporting: e.target.value })}
-                      >
-                        <option value="No">No</option>
-                        <option value="Yes">Yes</option>
-                      </select>
+                        onChange={(val) => setEditFormData({ ...editFormData, rxIncludedInAsrReporting: val })}
+                      />
                     ) : (
                       <span>{activeBAndE.rxIncludedInAsrReporting || "No"}</span>
                     )}
@@ -1579,15 +1542,10 @@ export default function BillingEnrollmentSection({
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ color: "var(--text-muted)" }}>Rx ASR Contract?</span>
                     {isInlineEditing ? (
-                      <select
-                        className="form-select"
-                        style={{ width: "90px", padding: "0.2rem", fontSize: "0.75rem" }}
+                      <YesNoToggle
                         value={editFormData.isRxAsrContract}
-                        onChange={(e) => setEditFormData({ ...editFormData, isRxAsrContract: e.target.value })}
-                      >
-                        <option value="No">No</option>
-                        <option value="Yes">Yes</option>
-                      </select>
+                        onChange={(val) => setEditFormData({ ...editFormData, isRxAsrContract: val })}
+                      />
                     ) : (
                       <span>{activeBAndE.isRxAsrContract || "No"}</span>
                     )}
@@ -1595,15 +1553,10 @@ export default function BillingEnrollmentSection({
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ color: "var(--text-muted)" }}>Agent Comp</span>
                     {isInlineEditing ? (
-                      <select
-                        className="form-select"
-                        style={{ width: "90px", padding: "0.2rem", fontSize: "0.75rem" }}
+                      <YesNoToggle
                         value={editFormData.pbmAgentCompensation}
-                        onChange={(e) => setEditFormData({ ...editFormData, pbmAgentCompensation: e.target.value })}
-                      >
-                        <option value="No">No</option>
-                        <option value="Yes">Yes</option>
-                      </select>
+                        onChange={(val) => setEditFormData({ ...editFormData, pbmAgentCompensation: val })}
+                      />
                     ) : (
                       <span>{activeBAndE.pbmAgentCompensation || "No"}</span>
                     )}
@@ -1620,6 +1573,9 @@ export default function BillingEnrollmentSection({
                   padding: "1.25rem",
                   background: "rgba(255, 255, 255, 0.02)",
                   border: "1px solid var(--border)",
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
@@ -1627,17 +1583,15 @@ export default function BillingEnrollmentSection({
                   <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>Commission Info</h3>
                 </div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem", flex: 1 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ color: "var(--text-muted)" }}>Stop-Loss Commission</span>
                     {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
-                        style={{ width: "100px", padding: "0.2rem 0.4rem", fontSize: "0.75rem", textAlign: "right" }}
+                      <PercentInput
+                        style={{ width: "110px", fontSize: "0.75rem", padding: "0.2rem 0.4rem" }}
                         value={editFormData.stopLossCommission}
-                        onChange={(e) => setEditFormData({ ...editFormData, stopLossCommission: e.target.value })}
-                        placeholder="10%"
+                        onChange={(val) => setEditFormData({ ...editFormData, stopLossCommission: val })}
+                        placeholder="10"
                       />
                     ) : (
                       <span>{activeBAndE.stopLossCommission || "0%"}</span>
@@ -1646,13 +1600,11 @@ export default function BillingEnrollmentSection({
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ color: "var(--text-muted)" }}>Stop-Loss Other Comp</span>
                     {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
-                        style={{ width: "100px", padding: "0.2rem 0.4rem", fontSize: "0.75rem", textAlign: "right" }}
+                      <PercentInput
+                        style={{ width: "110px", fontSize: "0.75rem", padding: "0.2rem 0.4rem" }}
                         value={editFormData.stopLossOtherCompensation}
-                        onChange={(e) => setEditFormData({ ...editFormData, stopLossOtherCompensation: e.target.value })}
-                        placeholder="—"
+                        onChange={(val) => setEditFormData({ ...editFormData, stopLossOtherCompensation: val })}
+                        placeholder="3"
                       />
                     ) : (
                       <span>{activeBAndE.stopLossOtherCompensation || "—"}</span>
@@ -1661,15 +1613,10 @@ export default function BillingEnrollmentSection({
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ color: "var(--text-muted)" }}>Agent Compensation</span>
                     {isInlineEditing ? (
-                      <select
-                        className="form-select"
-                        style={{ width: "90px", padding: "0.2rem", fontSize: "0.75rem" }}
+                      <YesNoToggle
                         value={editFormData.commissionAgentCompensation}
-                        onChange={(e) => setEditFormData({ ...editFormData, commissionAgentCompensation: e.target.value })}
-                      >
-                        <option value="No">No</option>
-                        <option value="Yes">Yes</option>
-                      </select>
+                        onChange={(val) => setEditFormData({ ...editFormData, commissionAgentCompensation: val })}
+                      />
                     ) : (
                       <span>{activeBAndE.commissionAgentCompensation || "No"}</span>
                     )}
@@ -1686,6 +1633,9 @@ export default function BillingEnrollmentSection({
                   padding: "1.25rem",
                   background: "rgba(255, 255, 255, 0.02)",
                   border: "1px solid var(--border)",
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
                   gridColumn: !showBilling ? "span 3" : undefined,
                 }}
               >
@@ -1694,19 +1644,14 @@ export default function BillingEnrollmentSection({
                   <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>Transplant & Domestic</h3>
                 </div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem", flex: 1 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ color: "var(--text-muted)" }}>Transplant Policy</span>
                     {isInlineEditing ? (
-                      <select
-                        className="form-select"
-                        style={{ width: "90px", padding: "0.2rem", fontSize: "0.75rem" }}
+                      <YesNoToggle
                         value={editFormData.organTransplantPolicy}
-                        onChange={(e) => setEditFormData({ ...editFormData, organTransplantPolicy: e.target.value })}
-                      >
-                        <option value="No">No</option>
-                        <option value="Yes">Yes</option>
-                      </select>
+                        onChange={(val) => setEditFormData({ ...editFormData, organTransplantPolicy: val })}
+                      />
                     ) : (
                       <span>{activeBAndE.organTransplantPolicy || "No"}</span>
                     )}
@@ -1714,15 +1659,10 @@ export default function BillingEnrollmentSection({
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ color: "var(--text-muted)" }}>Domestic Claims?</span>
                     {isInlineEditing ? (
-                      <select
-                        className="form-select"
-                        style={{ width: "90px", padding: "0.2rem", fontSize: "0.75rem" }}
+                      <YesNoToggle
                         value={editFormData.domesticClaims}
-                        onChange={(e) => setEditFormData({ ...editFormData, domesticClaims: e.target.value })}
-                      >
-                        <option value="No">No</option>
-                        <option value="Yes">Yes</option>
-                      </select>
+                        onChange={(val) => setEditFormData({ ...editFormData, domesticClaims: val })}
+                      />
                     ) : (
                       <span>{activeBAndE.domesticClaims || "No"}</span>
                     )}
