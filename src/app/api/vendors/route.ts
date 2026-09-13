@@ -16,7 +16,7 @@ export async function GET(request: Request) {
     }
 
     if (vendorType && vendorType !== "ALL") {
-      where.vendorType = vendorType;
+      where.vendorType = { contains: vendorType };
     }
 
     if (search.trim()) {
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
         city: city || null,
         state: state || null,
         zipCode: zipCode || null,
-        vendorType: vendorType || "GENERAL",
+        vendorType: vendorType || "General Services",
         notes: notes || null,
         status: status || "ACTIVE",
       },

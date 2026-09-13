@@ -4,6 +4,8 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import DuplicateAlertModal from "@/components/DuplicateAlertModal";
+import VendorCategoryTagsInput from "@/components/VendorCategoryTagsInput";
+import { parseVendorCategories, PRESET_CATEGORIES } from "@/lib/vendorCategories";
 import {
   Store,
   Search,
@@ -42,7 +44,7 @@ function VendorsContent() {
     city: "",
     state: "",
     zipCode: "",
-    vendorType: "MEDICAL_SUPPLIES",
+    vendorType: "",
     notes: "",
     status: "ACTIVE",
   });
@@ -101,7 +103,7 @@ function VendorsContent() {
           city: "",
           state: "",
           zipCode: "",
-          vendorType: "MEDICAL_SUPPLIES",
+          vendorType: "",
           notes: "",
           status: "ACTIVE",
         });
@@ -198,15 +200,12 @@ function VendorsContent() {
               className="form-select"
               value={vendorTypeFilter}
               onChange={(e) => setVendorTypeFilter(e.target.value)}
-              style={{ width: "180px" }}
+              style={{ width: "220px" }}
             >
               <option value="ALL">All Categories</option>
-              <option value="MEDICAL_SUPPLIES">Medical Supplies</option>
-              <option value="IT_SERVICES">IT & EHR Systems</option>
-              <option value="LAB_SERVICES">Lab & Pathology</option>
-              <option value="BILLING">Billing & RCM</option>
-              <option value="PHARMACY">Pharmacy</option>
-              <option value="GENERAL">General Vendor</option>
+              {PRESET_CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
             </select>
           </div>
 
@@ -269,8 +268,12 @@ function VendorsContent() {
                       <div style={{ fontSize: "0.775rem", color: "var(--text-muted)" }}>{vendor.email}</div>
                     )}
                   </td>
-                  <td className="nowrap">
-                    <span className="badge badge-purple">{vendor.vendorType}</span>
+                  <td>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
+                      {parseVendorCategories(vendor.vendorType).map((cat: string, i: number) => (
+                        <span key={i} className="badge badge-purple" style={{ fontSize: "0.72rem" }}>{cat}</span>
+                      ))}
+                    </div>
                   </td>
                   <td className="nowrap">
                     <div style={{ fontSize: "0.85rem" }}>
@@ -366,19 +369,11 @@ function VendorsContent() {
 
                 <div className="grid-cols-2">
                   <div className="form-group">
-                    <label className="form-label">Vendor Category</label>
-                    <select
-                      className="form-select"
+                    <label className="form-label">Vendor Categories</label>
+                    <VendorCategoryTagsInput
                       value={newVendor.vendorType}
-                      onChange={(e) => setNewVendor({ ...newVendor, vendorType: e.target.value })}
-                    >
-                      <option value="MEDICAL_SUPPLIES">Medical Supplies & Equipment</option>
-                      <option value="IT_SERVICES">IT & EHR Telehealth</option>
-                      <option value="LAB_SERVICES">Lab & Pathology Services</option>
-                      <option value="BILLING">Medical Billing & Revenue Cycle</option>
-                      <option value="PHARMACY">Pharmaceutical Distribution</option>
-                      <option value="GENERAL">General Services</option>
-                    </select>
+                      onChange={(v) => setNewVendor({ ...newVendor, vendorType: v })}
+                    />
                   </div>
 
                   <div className="form-group">

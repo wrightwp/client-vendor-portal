@@ -12,6 +12,7 @@ import EditAssociationNoteModal from "@/components/EditAssociationNoteModal";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
 import { MarkdownNoteRenderer } from "@/components/MarkdownNotes";
 import { formatDisplayDate } from "@/lib/dateUtils";
+import { parseVendorCategories } from "@/lib/vendorCategories";
 import {
   ArrowLeft,
   Building2,
@@ -762,7 +763,7 @@ export default function GroupDetailPage({
                     title={`View ${item.vendor.name} vendor profile`}
                   >
                     <span style={{ fontWeight: "700" }}>{item.vendor.name}</span>
-                    <span style={{ opacity: 0.8, fontSize: "0.7rem" }}>({item.vendor.vendorType})</span>
+                    <span style={{ opacity: 0.8, fontSize: "0.7rem" }}>({parseVendorCategories(item.vendor.vendorType).join(", ")})</span>
                   </Link>
                 ))}
                 {client.vendors.length > 4 && (
@@ -846,8 +847,12 @@ export default function GroupDetailPage({
                             {item.vendor.name}
                           </Link>
                         </td>
-                        <td className="nowrap">
-                          <span className="badge badge-blue">{item.vendor.vendorType}</span>
+                        <td>
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.2rem" }}>
+                            {parseVendorCategories(item.vendor.vendorType).map((cat: string, ci: number) => (
+                              <span key={ci} className="badge badge-blue" style={{ fontSize: "0.72rem" }}>{cat}</span>
+                            ))}
+                          </div>
                         </td>
                         <td className="nowrap">
                           {item.vendor.city && item.vendor.state

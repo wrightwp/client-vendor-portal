@@ -55,7 +55,7 @@ export function YesNoToggle({
       style={{
         display: "inline-flex",
         alignItems: "center",
-        background: "rgba(0, 0, 0, 0.3)",
+        background: "var(--bg-card-hover, rgba(0, 0, 0, 0.05))",
         borderRadius: "6px",
         padding: "2px",
         border: "1px solid var(--border)",
@@ -69,8 +69,8 @@ export function YesNoToggle({
         disabled={disabled}
         onClick={() => onChange("No")}
         style={{
-          border: isNo ? "1px solid rgba(255, 255, 255, 0.2)" : "1px solid transparent",
-          background: isNo ? "rgba(255, 255, 255, 0.1)" : "transparent",
+          border: isNo ? "1px solid var(--border)" : "1px solid transparent",
+          background: isNo ? "var(--bg-card)" : "transparent",
           color: isNo ? "var(--text-primary)" : "var(--text-muted)",
           fontWeight: isNo ? "700" : "500",
           fontSize: isSmall ? "0.72rem" : "0.82rem",
@@ -79,6 +79,7 @@ export function YesNoToggle({
           cursor: disabled ? "not-allowed" : "pointer",
           transition: "all 0.15s ease",
           lineHeight: "1.2",
+          boxShadow: isNo ? "var(--shadow-sm)" : "none",
         }}
       >
         {noLabel}
@@ -91,8 +92,8 @@ export function YesNoToggle({
         onClick={() => onChange("Yes")}
         style={{
           border: isYes ? "1px solid rgba(16, 185, 129, 0.45)" : "1px solid transparent",
-          background: isYes ? "rgba(16, 185, 129, 0.2)" : "transparent",
-          color: isYes ? "#34d399" : "var(--text-muted)",
+          background: isYes ? "var(--status-active-bg)" : "transparent",
+          color: isYes ? "var(--status-active)" : "var(--text-muted)",
           fontWeight: isYes ? "700" : "500",
           fontSize: isSmall ? "0.72rem" : "0.82rem",
           padding: isSmall ? "0.2rem 0.6rem" : "0.3rem 0.85rem",

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Store, Building, ArrowRight, ExternalLink, Users, Link as LinkIcon } from "lucide-react";
+import { parseVendorCategories } from "@/lib/vendorCategories";
 
 interface TopVendor {
   id: string;
@@ -108,7 +109,11 @@ export default function DashboardDirectoryInsights({
               </div>
 
               <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                {formatCategoryBadge(vendor.vendorType)}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.2rem" }}>
+                  {parseVendorCategories(vendor.vendorType).map((cat, i) => (
+                    <span key={i} className="badge badge-purple" style={{ fontSize: "0.68rem" }}>{cat}</span>
+                  ))}
+                </div>
                 <span
                   style={{
                     fontSize: "0.825rem",

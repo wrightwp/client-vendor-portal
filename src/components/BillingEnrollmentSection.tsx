@@ -592,7 +592,7 @@ export default function BillingEnrollmentSection({
               alignItems: "center",
               justifyContent: "space-between",
               gap: "0.5rem",
-              background: "rgba(0, 0, 0, 0.2)",
+              background: "var(--bg-card-hover, rgba(0, 0, 0, 0.05))",
               padding: "0.4rem 0.6rem",
               borderRadius: "8px",
               border: "1px solid var(--border)",
@@ -1716,11 +1716,12 @@ export default function BillingEnrollmentSection({
                 alignItems: "center",
                 justifyContent: "space-between",
                 padding: "0.75rem 1.25rem",
-                background: "rgba(20, 20, 30, 0.95)",
+                background: "var(--bg-elevated)",
                 backdropFilter: "blur(12px)",
                 borderRadius: "10px",
                 border: "1px solid var(--accent-pink)",
-                boxShadow: "0 8px 30px rgba(0, 0, 0, 0.5)",
+                boxShadow: "var(--shadow-lg)",
+                color: "var(--text-primary)",
                 zIndex: 10,
               }}
             >

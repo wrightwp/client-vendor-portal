@@ -9,8 +9,10 @@ import HistoryWalkthroughModal from "@/components/HistoryWalkthroughModal";
 import ContactsList from "@/components/ContactsList";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
 import EditAssociationNoteModal from "@/components/EditAssociationNoteModal";
+import VendorCategoryTagsInput from "@/components/VendorCategoryTagsInput";
 import { MarkdownNoteRenderer } from "@/components/MarkdownNotes";
 import { formatDisplayDate } from "@/lib/dateUtils";
+import { parseVendorCategories } from "@/lib/vendorCategories";
 import {
   ArrowLeft,
   Store,
@@ -82,7 +84,7 @@ export default function VendorDetailPage({
     city: "",
     state: "",
     zipCode: "",
-    vendorType: "MEDICAL_SUPPLIES",
+    vendorType: "",
     status: "ACTIVE",
     notes: "",
   });
@@ -106,7 +108,7 @@ export default function VendorDetailPage({
           city: data.vendor.city || "",
           state: data.vendor.state || "",
           zipCode: data.vendor.zipCode || "",
-          vendorType: data.vendor.vendorType || "MEDICAL_SUPPLIES",
+          vendorType: data.vendor.vendorType || "",
           status: data.vendor.status || "ACTIVE",
           notes: data.vendor.notes || "",
         });
@@ -294,7 +296,9 @@ export default function VendorDetailPage({
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.5rem" }}>
               <span className="badge badge-blue">Vendor Profile</span>
-              <span className="badge badge-purple">{vendor.vendorType}</span>
+              {parseVendorCategories(vendor.vendorType).map((cat: string, i: number) => (
+                <span key={i} className="badge badge-purple">{cat}</span>
+              ))}
               <span
                 className={`badge ${
                   vendor.status === "ACTIVE"
@@ -529,19 +533,11 @@ export default function VendorDetailPage({
 
           <div className="grid-cols-2">
             <div className="form-group">
-              <label className="form-label">Vendor Category</label>
-              <select
-                className="form-select"
+              <label className="form-label">Vendor Categories</label>
+              <VendorCategoryTagsInput
                 value={formData.vendorType}
-                onChange={(e) => setFormData({ ...formData, vendorType: e.target.value })}
-              >
-                <option value="MEDICAL_SUPPLIES">Medical Supplies & Equipment</option>
-                <option value="IT_SERVICES">IT & EHR Telehealth</option>
-                <option value="LAB_SERVICES">Lab & Pathology Services</option>
-                <option value="BILLING">Medical Billing & Revenue Cycle</option>
-                <option value="PHARMACY">Pharmaceutical Distribution</option>
-                <option value="GENERAL">General Services</option>
-              </select>
+                onChange={(v) => setFormData({ ...formData, vendorType: v })}
+              />
             </div>
 
             <div className="form-group">

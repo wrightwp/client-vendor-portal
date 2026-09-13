@@ -24,6 +24,7 @@ import { MarkdownNoteRenderer } from "./MarkdownNotes";
 import EditAssociationNoteModal from "./EditAssociationNoteModal";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import { exportGroupVendorsToExcel } from "@/lib/exportGroupVendorsExcel";
+import { parseVendorCategories } from "@/lib/vendorCategories";
 
 interface BEAssociatedVendorsTableProps {
   clientId: string;
@@ -400,9 +401,13 @@ export default function BEAssociatedVendorsTable({
                         <span>{vendor.name}</span>
                         <ArrowUpRight size={13} style={{ opacity: 0.6 }} />
                       </Link>
-                      <span className="badge badge-blue" style={{ fontSize: "0.68rem", padding: "0.1rem 0.35rem" }}>
-                        {vendor.vendorType || "General"}
-                      </span>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.2rem" }}>
+                        {parseVendorCategories(vendor.vendorType).map((cat: string, ci: number) => (
+                          <span key={ci} className="badge badge-blue" style={{ fontSize: "0.68rem", padding: "0.1rem 0.35rem" }}>
+                            {cat}
+                          </span>
+                        ))}
+                      </div>
                     </div>
 
                     {vendor.city && vendor.state && (
@@ -608,10 +613,14 @@ export default function BEAssociatedVendorsTable({
                       </div>
                     </td>
 
-                    <td style={{ padding: "0.45rem 0.75rem" }} className="nowrap">
-                      <span className="badge badge-blue" style={{ fontSize: "0.68rem", padding: "0.1rem 0.35rem" }}>
-                        {vendor.vendorType || "General"}
-                      </span>
+                    <td style={{ padding: "0.45rem 0.75rem" }}>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.2rem" }}>
+                        {parseVendorCategories(vendor.vendorType).map((cat: string, ci: number) => (
+                          <span key={ci} className="badge badge-blue" style={{ fontSize: "0.68rem", padding: "0.1rem 0.35rem" }}>
+                            {cat}
+                          </span>
+                        ))}
+                      </div>
                     </td>
 
                     <td style={{ padding: "0.45rem 0.75rem" }} className="nowrap">

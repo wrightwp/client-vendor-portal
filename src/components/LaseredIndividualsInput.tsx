@@ -184,13 +184,14 @@ export function LaseredIndividualsInput({
             style={{
               marginTop: "0.3rem",
               padding: "0.6rem",
-              background: "rgba(0, 0, 0, 0.4)",
+              background: "var(--bg-elevated)",
               border: "1px solid rgba(244, 114, 182, 0.3)",
               borderRadius: "6px",
               width: "260px",
               display: "flex",
               flexDirection: "column",
               gap: "0.4rem",
+              boxShadow: "var(--shadow-lg)",
             }}
           >
             <div style={{ fontSize: "0.72rem", fontWeight: "700", color: "var(--accent-pink)", display: "flex", alignItems: "center", gap: "0.25rem" }}>
@@ -277,7 +278,7 @@ export function LaseredIndividualsInput({
                 gridTemplateColumns: "1.2fr 1.2fr 1.5fr auto",
                 gap: "0.5rem",
                 alignItems: "center",
-                background: "rgba(0, 0, 0, 0.2)",
+                background: "var(--bg-input)",
                 padding: "0.4rem 0.6rem",
                 borderRadius: "6px",
                 border: "1px solid var(--border)",

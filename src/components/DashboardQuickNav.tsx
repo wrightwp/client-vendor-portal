@@ -296,7 +296,7 @@ export default function DashboardQuickNav({
                           {v.name}
                         </div>
                         <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                          Type: {v.vendorType.replace("_", " ")}
+                          Type: {v.vendorType}
                         </div>
                       </div>
                     </div>
