@@ -95,11 +95,11 @@ export function CurrencyInput({
         className={className}
         style={{
           width: "100%",
-          paddingLeft: showDollar ? "1.25rem" : "0.5rem",
-          paddingRight: suffix ? "3.25rem" : "0.5rem",
           textAlign: align,
-          fontSize: "0.8rem",
+          fontSize: "0.85rem",
           ...style,
+          paddingLeft: showDollar ? "1.4rem" : "0.5rem",
+          paddingRight: suffix ? "3.25rem" : "0.5rem",
         }}
       />
 

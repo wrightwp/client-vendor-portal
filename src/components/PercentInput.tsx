@@ -39,14 +39,20 @@ export function PercentInput({
   // Strip % for editing
   const displayVal = value ? value.replace(/%/g, "") : "";
 
+  const { width, margin, marginTop, marginBottom, flex, alignSelf, ...inputStyles } = style || {};
+
   return (
     <div
       style={{
         display: "inline-flex",
         alignItems: "center",
         position: "relative",
-        width: style.width || "auto",
-        ...style,
+        width: width || "100%",
+        margin,
+        marginTop,
+        marginBottom,
+        flex,
+        alignSelf,
       }}
     >
       <input
@@ -60,18 +66,19 @@ export function PercentInput({
         className={className}
         style={{
           width: "100%",
-          paddingRight: "1.4rem",
           textAlign: "right",
-          fontSize: "0.8rem",
-          ...style,
+          fontSize: "0.85rem",
+          ...inputStyles,
+          paddingRight: "1.75rem",
         }}
       />
       <span
         style={{
           position: "absolute",
-          right: "0.5rem",
+          right: "0.6rem",
           color: "var(--text-muted)",
-          fontSize: "0.8rem",
+          fontSize: "0.85rem",
+          fontWeight: "600",
           pointerEvents: "none",
         }}
       >

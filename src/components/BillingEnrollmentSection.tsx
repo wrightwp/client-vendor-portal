@@ -41,6 +41,8 @@ import ContractSelect from "./ContractSelect";
 import LaseredIndividualsInput, { LaseredIndividualsView, parseLaserString } from "./LaseredIndividualsInput";
 import MonthlyAccommodationInput from "./MonthlyAccommodationInput";
 import AggregatingSpecificInput from "./AggregatingSpecificInput";
+import MaxSpecificRenewalIncreaseInput from "./MaxSpecificRenewalIncreaseInput";
+import SpecificDeductibleInput, { formatDisplaySpecificDeductible } from "./SpecificDeductibleInput";
 import BenefitsCoveredSelect from "./BenefitsCoveredSelect";
 
 interface BillingEnrollmentSectionProps {
@@ -931,17 +933,21 @@ export default function BillingEnrollmentSection({
                   </div>
 
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.85rem", flex: 1 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <span style={{ color: "var(--text-muted)" }}>Specific Deductible</span>
-                      {isInlineEditing ? (
-                        <CurrencyInput
-                          style={{ width: "160px" }}
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ color: "var(--text-muted)" }}>Specific Deductible</span>
+                        {!isInlineEditing && (
+                          <strong style={{ color: "var(--text-primary)" }}>
+                            {formatDisplaySpecificDeductible(activeBAndE.specificDeductible)}
+                          </strong>
+                        )}
+                      </div>
+                      {isInlineEditing && (
+                        <SpecificDeductibleInput
                           value={editFormData.specificDeductible}
                           onChange={(val) => setEditFormData({ ...editFormData, specificDeductible: val })}
-                          placeholder="50,000"
+                          compact={true}
                         />
-                      ) : (
-                        <strong style={{ color: "var(--text-primary)" }}>{activeBAndE.specificDeductible || "—"}</strong>
                       )}
                     </div>
 
@@ -974,17 +980,19 @@ export default function BillingEnrollmentSection({
                       )}
                     </div>
 
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <span style={{ color: "var(--text-muted)" }}>Max Specific Renewal Increase</span>
-                      {isInlineEditing ? (
-                        <PercentInput
-                          style={{ width: "110px" }}
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ color: "var(--text-muted)" }}>Max Specific Renewal Increase</span>
+                        {!isInlineEditing && (
+                          <span>{activeBAndE.maxSpecificPremiumRenewalIncrease || "—"}</span>
+                        )}
+                      </div>
+                      {isInlineEditing && (
+                        <MaxSpecificRenewalIncreaseInput
                           value={editFormData.maxSpecificPremiumRenewalIncrease}
                           onChange={(val) => setEditFormData({ ...editFormData, maxSpecificPremiumRenewalIncrease: val })}
-                          placeholder="30"
+                          compact={true}
                         />
-                      ) : (
-                        <span>{activeBAndE.maxSpecificPremiumRenewalIncrease || "—"}</span>
                       )}
                     </div>
 

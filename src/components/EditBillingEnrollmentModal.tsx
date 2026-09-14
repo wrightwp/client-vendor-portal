@@ -13,6 +13,8 @@ import MonthlyAccommodationInput from "./MonthlyAccommodationInput";
 import AggregatingSpecificInput from "./AggregatingSpecificInput";
 import BenefitsCoveredSelect from "./BenefitsCoveredSelect";
 import VendorTypeahead from "./VendorTypeahead";
+import MaxSpecificRenewalIncreaseInput from "./MaxSpecificRenewalIncreaseInput";
+import SpecificDeductibleInput from "./SpecificDeductibleInput";
 
 interface EditBillingEnrollmentModalProps {
   clientId: string;
@@ -467,12 +469,10 @@ export default function EditBillingEnrollmentModal({
                 <div className="grid-cols-2">
                   <div className="form-group">
                     <label className="form-label">Specific Deductible</label>
-                    <CurrencyInput
-                      align="left"
-                      style={{ width: "100%" }}
-                      placeholder="75,000.00"
+                    <SpecificDeductibleInput
                       value={formData.specificDeductible}
                       onChange={(val) => setFormData({ ...formData, specificDeductible: val })}
+                      compact={false}
                     />
                   </div>
 
@@ -486,7 +486,7 @@ export default function EditBillingEnrollmentModal({
                   </div>
                 </div>
 
-                <div className="grid-cols-2" style={{ alignItems: "center" }}>
+                <div className="grid-cols-2" style={{ alignItems: "flex-start" }}>
                   <div className="form-group">
                     <label className="form-label">No-Laser Renewal Guarantee</label>
                     <YesNoToggle
@@ -497,10 +497,10 @@ export default function EditBillingEnrollmentModal({
 
                   <div className="form-group">
                     <label className="form-label">Max Specific Premium Renewal Increase</label>
-                    <PercentInput
-                      placeholder="45"
+                    <MaxSpecificRenewalIncreaseInput
                       value={formData.maxSpecificPremiumRenewalIncrease}
                       onChange={(val) => setFormData({ ...formData, maxSpecificPremiumRenewalIncrease: val })}
+                      compact={false}
                     />
                   </div>
                 </div>
