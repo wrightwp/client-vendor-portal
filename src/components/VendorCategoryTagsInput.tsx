@@ -171,11 +171,12 @@ export default function VendorCategoryTagsInput({
           padding: "0.4rem 0.6rem",
           minHeight: "40px",
           borderRadius: "var(--radius-sm, 8px)",
-          border: "1px solid var(--border)",
-          background: "var(--glass-bg, rgba(255,255,255,0.04))",
+          borderWidth: "1px",
+          borderStyle: "solid",
+          borderColor: isOpen ? "var(--accent-blue)" : "var(--border)",
+          background: "var(--bg-input)",
           cursor: "text",
           transition: "border-color 0.2s ease",
-          ...(isOpen ? { borderColor: "var(--accent-blue, #38bdf8)" } : {}),
         }}
       >
         {tags.map((tag, idx) => (
@@ -189,14 +190,14 @@ export default function VendorCategoryTagsInput({
               borderRadius: "14px",
               fontSize: "0.78rem",
               fontWeight: 600,
-              background: "linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.12) 100%)",
-              color: "var(--text-primary)",
-              border: "1px solid rgba(139, 92, 246, 0.25)",
+              background: "var(--accent-blue-light)",
+              color: "var(--accent-blue)",
+              border: "1px solid var(--accent-blue-light)",
               whiteSpace: "nowrap",
               lineHeight: 1.4,
             }}
           >
-            <Tag size={11} style={{ opacity: 0.6, flexShrink: 0 }} />
+            <Tag size={11} style={{ opacity: 0.8, flexShrink: 0 }} />
             {tag}
             <button
               type="button"
@@ -258,16 +259,17 @@ export default function VendorCategoryTagsInput({
       {/* Autocomplete dropdown */}
       {isOpen && totalItems > 0 && (
         <div
+          className="glass-panel"
           style={{
             position: "absolute",
             top: "100%",
             left: 0,
             right: 0,
             marginTop: "4px",
-            background: "var(--card-bg, #1e293b)",
+            background: "var(--bg-card)",
             border: "1px solid var(--border)",
             borderRadius: "var(--radius-sm, 8px)",
-            boxShadow: "0 8px 24px rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.1)",
+            boxShadow: "var(--shadow-lg)",
             maxHeight: "220px",
             overflowY: "auto",
             zIndex: 999,
@@ -305,7 +307,7 @@ export default function VendorCategoryTagsInput({
                 padding: "0.5rem 0.65rem",
                 border: "none",
                 borderRadius: "6px",
-                background: highlightIndex === idx ? "rgba(59, 130, 246, 0.12)" : "transparent",
+                background: highlightIndex === idx ? "var(--bg-card-hover)" : "transparent",
                 color: "var(--text-primary)",
                 fontSize: "0.84rem",
                 cursor: "pointer",
@@ -343,7 +345,7 @@ export default function VendorCategoryTagsInput({
                 borderRadius: "6px",
                 background:
                   highlightIndex === filteredSuggestions.length
-                    ? "rgba(16, 185, 129, 0.12)"
+                    ? "var(--bg-card-hover)"
                     : "transparent",
                 color: "var(--text-primary)",
                 fontSize: "0.84rem",

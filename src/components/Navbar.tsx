@@ -12,14 +12,10 @@ import {
   ShieldCheck,
   X,
   ArrowRight,
-  Sun,
-  Moon,
 } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const [theme, setTheme] = useState<"dark" | "light">("light");
-  const [mounted, setMounted] = useState(false);
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -29,25 +25,10 @@ export default function Navbar() {
   });
   const [loading, setLoading] = useState(false);
 
-  // Initialize theme state on mount
+  // Set Light Theme permanently on mount
   useEffect(() => {
-    setMounted(true);
-    const savedTheme = localStorage.getItem("theme") as "dark" | "light" | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-      document.documentElement.setAttribute("data-theme", savedTheme);
-    } else {
-      setTheme("light");
-      document.documentElement.setAttribute("data-theme", "light");
-    }
+    document.documentElement.setAttribute("data-theme", "light");
   }, []);
-
-  const toggleTheme = () => {
-    const nextTheme = theme === "dark" ? "light" : "dark";
-    setTheme(nextTheme);
-    localStorage.setItem("theme", nextTheme);
-    document.documentElement.setAttribute("data-theme", nextTheme);
-  };
 
   useEffect(() => {
     if (!query.trim()) {
@@ -153,32 +134,6 @@ export default function Navbar() {
               Ctrl K
             </kbd>
           </button>
-
-          {/* Dark / Light Theme Toggle Button */}
-          {mounted && (
-            <button
-              onClick={toggleTheme}
-              className="btn btn-secondary"
-              style={{
-                padding: "0.55rem",
-                borderRadius: "50%",
-                width: "40px",
-                height: "40px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-              }}
-              title={`Switch to ${theme === "dark" ? "Light" : "Dark"} Mode`}
-              aria-label="Toggle Theme"
-            >
-              {theme === "dark" ? (
-                <Sun size={20} style={{ color: "#ffc20e" }} />
-              ) : (
-                <Moon size={20} style={{ color: "#6366f1" }} />
-              )}
-            </button>
-          )}
         </div>
       </header>
 
