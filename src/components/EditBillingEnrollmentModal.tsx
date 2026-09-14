@@ -15,6 +15,8 @@ import BenefitsCoveredSelect from "./BenefitsCoveredSelect";
 import VendorTypeahead from "./VendorTypeahead";
 import MaxSpecificRenewalIncreaseInput from "./MaxSpecificRenewalIncreaseInput";
 import SpecificDeductibleInput from "./SpecificDeductibleInput";
+import SpecificPremiumRatesInput from "./SpecificPremiumRatesInput";
+import IncludedNoneToggle from "./IncludedNoneToggle";
 
 interface EditBillingEnrollmentModalProps {
   clientId: string;
@@ -62,12 +64,16 @@ export default function EditBillingEnrollmentModal({
     noLaserRenewalGuarantee: initialData?.noLaserRenewalGuarantee || "",
     maxSpecificPremiumRenewalIncrease: initialData?.maxSpecificPremiumRenewalIncrease || "",
     laseredIndividuals: initialData?.laseredIndividuals || "",
+    specificTierStructure: initialData?.specificTierStructure || "",
     specificPremiumSingle: initialData?.specificPremiumSingle || "",
     specificPremiumEmployeePlusOne: initialData?.specificPremiumEmployeePlusOne || "",
+    specificPremiumEmployeeSpouse: initialData?.specificPremiumEmployeeSpouse || "",
+    specificPremiumEmployeeChildren: initialData?.specificPremiumEmployeeChildren || "",
     specificPremiumFamily: initialData?.specificPremiumFamily || "",
     specificBenefitsCovered: initialData?.specificBenefitsCovered || "",
     specificContract: initialData?.specificContract || "",
 
+    aggregateStopLossStatus: initialData?.aggregateStopLossStatus || (initialData?.aggregatePremium?.trim().toLowerCase() === "none" ? "None" : "Included"),
     aggregatePremium: initialData?.aggregatePremium || "",
     monthlyAggregateAccommodation: initialData?.monthlyAggregateAccommodation || "",
     aggregateFactorSingle: initialData?.aggregateFactorSingle || "",
@@ -148,12 +154,16 @@ export default function EditBillingEnrollmentModal({
       noLaserRenewalGuarantee: sourceRecord.noLaserRenewalGuarantee || "",
       maxSpecificPremiumRenewalIncrease: sourceRecord.maxSpecificPremiumRenewalIncrease || "",
       laseredIndividuals: sourceRecord.laseredIndividuals || "",
+      specificTierStructure: sourceRecord.specificTierStructure || "",
       specificPremiumSingle: sourceRecord.specificPremiumSingle || "",
       specificPremiumEmployeePlusOne: sourceRecord.specificPremiumEmployeePlusOne || "",
+      specificPremiumEmployeeSpouse: sourceRecord.specificPremiumEmployeeSpouse || "",
+      specificPremiumEmployeeChildren: sourceRecord.specificPremiumEmployeeChildren || "",
       specificPremiumFamily: sourceRecord.specificPremiumFamily || "",
       specificBenefitsCovered: sourceRecord.specificBenefitsCovered || "",
       specificContract: sourceRecord.specificContract || "",
 
+      aggregateStopLossStatus: sourceRecord.aggregateStopLossStatus || (sourceRecord.aggregatePremium?.trim().toLowerCase() === "none" ? "None" : "Included"),
       aggregatePremium: sourceRecord.aggregatePremium || "",
       monthlyAggregateAccommodation: sourceRecord.monthlyAggregateAccommodation || "",
       aggregateFactorSingle: sourceRecord.aggregateFactorSingle || "",
@@ -532,37 +542,23 @@ export default function EditBillingEnrollmentModal({
                   </div>
                 </div>
 
-                <div style={{ background: "rgba(255, 255, 255, 0.03)", padding: "1rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
-                  <label className="form-label" style={{ marginBottom: "0.5rem" }}>Specific Premium Rates (Monthly PEPM)</label>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.75rem" }}>
-                    <div>
-                      <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Single</span>
-                      <CurrencyInput
-                        style={{ width: "100%" }}
-                        placeholder="161.65"
-                        value={formData.specificPremiumSingle}
-                        onChange={(val) => setFormData({ ...formData, specificPremiumSingle: val })}
-                      />
-                    </div>
-                    <div>
-                      <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Employee + 1</span>
-                      <CurrencyInput
-                        style={{ width: "100%" }}
-                        placeholder="301.31"
-                        value={formData.specificPremiumEmployeePlusOne}
-                        onChange={(val) => setFormData({ ...formData, specificPremiumEmployeePlusOne: val })}
-                      />
-                    </div>
-                    <div>
-                      <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Family</span>
-                      <CurrencyInput
-                        style={{ width: "100%" }}
-                        placeholder="457.63"
-                        value={formData.specificPremiumFamily}
-                        onChange={(val) => setFormData({ ...formData, specificPremiumFamily: val })}
-                      />
-                    </div>
-                  </div>
+                <div style={{ background: "rgba(0, 174, 219, 0.04)", padding: "1rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
+                  <SpecificPremiumRatesInput
+                    tierStructure={formData.specificTierStructure}
+                    onTierStructureChange={(tier) => setFormData({ ...formData, specificTierStructure: tier })}
+                    singleRate={formData.specificPremiumSingle}
+                    onSingleRateChange={(val) => setFormData({ ...formData, specificPremiumSingle: val })}
+                    eePlusOneRate={formData.specificPremiumEmployeePlusOne}
+                    onEePlusOneRateChange={(val) => setFormData({ ...formData, specificPremiumEmployeePlusOne: val })}
+                    eeSpouseRate={formData.specificPremiumEmployeeSpouse}
+                    onEeSpouseRateChange={(val) => setFormData({ ...formData, specificPremiumEmployeeSpouse: val })}
+                    eeChildrenRate={formData.specificPremiumEmployeeChildren}
+                    onEeChildrenRateChange={(val) => setFormData({ ...formData, specificPremiumEmployeeChildren: val })}
+                    familyRate={formData.specificPremiumFamily}
+                    onFamilyRateChange={(val) => setFormData({ ...formData, specificPremiumFamily: val })}
+                    isEditing={true}
+                    compact={false}
+                  />
                 </div>
 
                 <div className="form-group" style={{ marginTop: "0.25rem" }}>
@@ -584,6 +580,46 @@ export default function EditBillingEnrollmentModal({
             {/* TAB 3: Aggregate Stop-Loss */}
             {activeTab === "AGGREGATE" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                {/* Aggregate Coverage Toggle */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--bg-card-hover)", padding: "0.75rem 1rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
+                  <div>
+                    <label className="form-label" style={{ fontWeight: 700, color: "var(--accent-purple)", marginBottom: "0.1rem" }}>
+                      Aggregate Stop-Loss Coverage
+                    </label>
+                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                      Select whether Aggregate Stop-Loss coverage is included for this plan year.
+                    </div>
+                  </div>
+                  <IncludedNoneToggle
+                    size="md"
+                    value={formData.aggregateStopLossStatus}
+                    onChange={(val) => setFormData({ ...formData, aggregateStopLossStatus: val })}
+                  />
+                </div>
+
+                {formData.aggregateStopLossStatus === "None" && (
+                  <div
+                    style={{
+                      padding: "1rem 1.25rem",
+                      borderRadius: "8px",
+                      background: "rgba(239, 68, 68, 0.05)",
+                      border: "1px solid rgba(239, 68, 68, 0.2)",
+                      color: "var(--text-primary)",
+                      fontSize: "0.85rem",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.75rem",
+                    }}
+                  >
+                    <ShieldAlert size={22} style={{ color: "#ef4444", flexShrink: 0 }} />
+                    <div>
+                      <strong style={{ color: "#dc2626" }}>Aggregate Stop-Loss Status set to "None"</strong>
+                      <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginTop: "0.2rem" }}>
+                        The section will remain displayed on the group profile with a notice stating that no Aggregate Stop-Loss coverage is included.
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div className="grid-cols-2">
                   <div className="form-group">
                     <label className="form-label">Aggregate Premium (Annual / PEPM)</label>

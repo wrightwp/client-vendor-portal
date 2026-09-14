@@ -46,7 +46,7 @@ export async function PATCH(
     const { id: clientId } = await params;
     const body = await request.json();
 
-    const { id: recordId, planYear, isCurrent, ...updateData } = body;
+    const { id: recordId, planYear, isCurrent, createdAt, updatedAt, client: bodyClient, clientId: bodyClientId, ...updateData } = body;
 
     let targetPlanYear = planYear || "2026";
 

@@ -121,4 +121,20 @@ export function CurrencyInput({
   );
 }
 
+export function formatCurrencyDisplay(val?: string | null): string {
+  if (!val || !val.trim()) return "—";
+  const trimmed = val.trim();
+  const lower = trimmed.toLowerCase();
+  if (lower === "no" || lower === "none" || lower === "false") return "No";
+  if (lower === "yes") return "Yes";
+  if (trimmed.startsWith("$")) return trimmed;
+
+  const clean = trimmed.replace(/,/g, "");
+  const num = parseFloat(clean);
+  if (!isNaN(num)) {
+    return `$${num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+  return `$${trimmed}`;
+}
+
 export default CurrencyInput;

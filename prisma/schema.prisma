@@ -127,13 +127,17 @@ model ClientBillingEnrollment {
   noLaserRenewalGuarantee            String?
   maxSpecificPremiumRenewalIncrease   String?
   laseredIndividuals                  String?
+  specificTierStructure               String?
   specificPremiumSingle               String?
   specificPremiumEmployeePlusOne      String?
+  specificPremiumEmployeeSpouse       String?
+  specificPremiumEmployeeChildren     String?
   specificPremiumFamily               String?
   specificBenefitsCovered             String?
   specificContract                    String?
 
   // Aggregate Stop-Loss Information
+  aggregateStopLossStatus             String?  @default("Included")
   aggregatePremium                    String?
   monthlyAggregateAccommodation       String?
   aggregateFactorSingle               String?

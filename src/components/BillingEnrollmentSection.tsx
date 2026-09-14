@@ -35,7 +35,7 @@ import { exportBEToExcel } from "@/lib/exportBEExcel";
 import DateInput from "./DateInput";
 import { formatDisplayDate, normalizeDate } from "@/lib/dateUtils";
 import YesNoToggle from "./YesNoToggle";
-import CurrencyInput from "./CurrencyInput";
+import CurrencyInput, { formatCurrencyDisplay } from "./CurrencyInput";
 import PercentInput from "./PercentInput";
 import ContractSelect from "./ContractSelect";
 import LaseredIndividualsInput, { LaseredIndividualsView, parseLaserString } from "./LaseredIndividualsInput";
@@ -43,7 +43,9 @@ import MonthlyAccommodationInput from "./MonthlyAccommodationInput";
 import AggregatingSpecificInput from "./AggregatingSpecificInput";
 import MaxSpecificRenewalIncreaseInput from "./MaxSpecificRenewalIncreaseInput";
 import SpecificDeductibleInput, { formatDisplaySpecificDeductible } from "./SpecificDeductibleInput";
+import SpecificPremiumRatesInput from "./SpecificPremiumRatesInput";
 import BenefitsCoveredSelect from "./BenefitsCoveredSelect";
+import IncludedNoneToggle from "./IncludedNoneToggle";
 
 interface BillingEnrollmentSectionProps {
   clientId: string;
@@ -116,12 +118,16 @@ export default function BillingEnrollmentSection({
     noLaserRenewalGuarantee: activeBAndE.noLaserRenewalGuarantee || "",
     maxSpecificPremiumRenewalIncrease: activeBAndE.maxSpecificPremiumRenewalIncrease || "",
     laseredIndividuals: activeBAndE.laseredIndividuals || "",
+    specificTierStructure: activeBAndE.specificTierStructure || "",
     specificPremiumSingle: activeBAndE.specificPremiumSingle || "",
     specificPremiumEmployeePlusOne: activeBAndE.specificPremiumEmployeePlusOne || "",
+    specificPremiumEmployeeSpouse: activeBAndE.specificPremiumEmployeeSpouse || "",
+    specificPremiumEmployeeChildren: activeBAndE.specificPremiumEmployeeChildren || "",
     specificPremiumFamily: activeBAndE.specificPremiumFamily || "",
     specificBenefitsCovered: activeBAndE.specificBenefitsCovered || "",
     specificContract: activeBAndE.specificContract || "",
 
+    aggregateStopLossStatus: activeBAndE.aggregateStopLossStatus || (activeBAndE.aggregatePremium?.trim().toLowerCase() === "none" ? "None" : "Included"),
     aggregatePremium: activeBAndE.aggregatePremium || "",
     monthlyAggregateAccommodation: activeBAndE.monthlyAggregateAccommodation || "",
     aggregateFactorSingle: activeBAndE.aggregateFactorSingle || "",
@@ -185,12 +191,16 @@ export default function BillingEnrollmentSection({
       noLaserRenewalGuarantee: activeBAndE.noLaserRenewalGuarantee || "",
       maxSpecificPremiumRenewalIncrease: activeBAndE.maxSpecificPremiumRenewalIncrease || "",
       laseredIndividuals: activeBAndE.laseredIndividuals || "",
+      specificTierStructure: activeBAndE.specificTierStructure || "",
       specificPremiumSingle: activeBAndE.specificPremiumSingle || "",
       specificPremiumEmployeePlusOne: activeBAndE.specificPremiumEmployeePlusOne || "",
+      specificPremiumEmployeeSpouse: activeBAndE.specificPremiumEmployeeSpouse || "",
+      specificPremiumEmployeeChildren: activeBAndE.specificPremiumEmployeeChildren || "",
       specificPremiumFamily: activeBAndE.specificPremiumFamily || "",
       specificBenefitsCovered: activeBAndE.specificBenefitsCovered || "",
       specificContract: activeBAndE.specificContract || "",
 
+      aggregateStopLossStatus: activeBAndE.aggregateStopLossStatus || (activeBAndE.aggregatePremium?.trim().toLowerCase() === "none" ? "None" : "Included"),
       aggregatePremium: activeBAndE.aggregatePremium || "",
       monthlyAggregateAccommodation: activeBAndE.monthlyAggregateAccommodation || "",
       aggregateFactorSingle: activeBAndE.aggregateFactorSingle || "",
@@ -269,8 +279,11 @@ export default function BillingEnrollmentSection({
       noLaserRenewalGuarantee: sourceRecord.noLaserRenewalGuarantee || "",
       maxSpecificPremiumRenewalIncrease: sourceRecord.maxSpecificPremiumRenewalIncrease || "",
       laseredIndividuals: sourceRecord.laseredIndividuals || "",
+      specificTierStructure: sourceRecord.specificTierStructure || "",
       specificPremiumSingle: sourceRecord.specificPremiumSingle || "",
       specificPremiumEmployeePlusOne: sourceRecord.specificPremiumEmployeePlusOne || "",
+      specificPremiumEmployeeSpouse: sourceRecord.specificPremiumEmployeeSpouse || "",
+      specificPremiumEmployeeChildren: sourceRecord.specificPremiumEmployeeChildren || "",
       specificPremiumFamily: sourceRecord.specificPremiumFamily || "",
       specificBenefitsCovered: sourceRecord.specificBenefitsCovered || "",
       specificContract: sourceRecord.specificContract || "",
@@ -955,7 +968,9 @@ export default function BillingEnrollmentSection({
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <span style={{ color: "var(--text-muted)" }}>Aggregating Specific Deductible</span>
                         {!isInlineEditing && (
-                          <span>{activeBAndE.aggregatingSpecificDeductible || "No"}</span>
+                          <strong style={{ color: "var(--text-primary)" }}>
+                            {formatCurrencyDisplay(activeBAndE.aggregatingSpecificDeductible)}
+                          </strong>
                         )}
                       </div>
                       {isInlineEditing && (
@@ -1032,54 +1047,26 @@ export default function BillingEnrollmentSection({
                     </div>
 
                     {/* Specific Rates (Placed at bottom to align with Aggregate Factors) */}
-                    <div style={{ marginTop: "auto", background: "rgba(56, 189, 248, 0.05)", padding: "0.75rem", borderRadius: "8px", border: "1px solid rgba(56, 189, 248, 0.2)" }}>
-                      <div style={{ fontSize: "0.75rem", fontWeight: "700", color: "#38bdf8", marginBottom: "0.4rem" }}>
-                        Specific Premium Rates
+                    <div style={{ marginTop: "auto", background: "rgba(0, 174, 219, 0.05)", padding: "0.75rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
+                      <div style={{ fontSize: "0.75rem", fontWeight: "700", color: "var(--accent-blue)", marginBottom: "0.4rem" }}>
+                        Specific Premium Rates (PEPM)
                       </div>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.5rem", fontSize: "0.8rem", textAlign: "center" }}>
-                        <div>
-                          <div style={{ color: "var(--text-muted)", fontSize: "0.7rem" }}>Single</div>
-                          {isInlineEditing ? (
-                            <CurrencyInput
-                              style={{ width: "100%" }}
-                              align="center"
-                              value={editFormData.specificPremiumSingle}
-                              onChange={(val) => setEditFormData({ ...editFormData, specificPremiumSingle: val })}
-                              placeholder="140.00"
-                            />
-                          ) : (
-                            <div style={{ fontWeight: "700" }}>{activeBAndE.specificPremiumSingle || "—"}</div>
-                          )}
-                        </div>
-                        <div>
-                          <div style={{ color: "var(--text-muted)", fontSize: "0.7rem" }}>Emp + 1</div>
-                          {isInlineEditing ? (
-                            <CurrencyInput
-                              style={{ width: "100%" }}
-                              align="center"
-                              value={editFormData.specificPremiumEmployeePlusOne}
-                              onChange={(val) => setEditFormData({ ...editFormData, specificPremiumEmployeePlusOne: val })}
-                              placeholder="260.00"
-                            />
-                          ) : (
-                            <div style={{ fontWeight: "700" }}>{activeBAndE.specificPremiumEmployeePlusOne || "—"}</div>
-                          )}
-                        </div>
-                        <div>
-                          <div style={{ color: "var(--text-muted)", fontSize: "0.7rem" }}>Family</div>
-                          {isInlineEditing ? (
-                            <CurrencyInput
-                              style={{ width: "100%" }}
-                              align="center"
-                              value={editFormData.specificPremiumFamily}
-                              onChange={(val) => setEditFormData({ ...editFormData, specificPremiumFamily: val })}
-                              placeholder="400.00"
-                            />
-                          ) : (
-                            <div style={{ fontWeight: "700" }}>{activeBAndE.specificPremiumFamily || "—"}</div>
-                          )}
-                        </div>
-                      </div>
+                      <SpecificPremiumRatesInput
+                        tierStructure={isInlineEditing ? editFormData.specificTierStructure : activeBAndE.specificTierStructure}
+                        onTierStructureChange={(tier) => setEditFormData({ ...editFormData, specificTierStructure: tier })}
+                        singleRate={isInlineEditing ? editFormData.specificPremiumSingle : activeBAndE.specificPremiumSingle}
+                        onSingleRateChange={(val) => setEditFormData({ ...editFormData, specificPremiumSingle: val })}
+                        eePlusOneRate={isInlineEditing ? editFormData.specificPremiumEmployeePlusOne : activeBAndE.specificPremiumEmployeePlusOne}
+                        onEePlusOneRateChange={(val) => setEditFormData({ ...editFormData, specificPremiumEmployeePlusOne: val })}
+                        eeSpouseRate={isInlineEditing ? editFormData.specificPremiumEmployeeSpouse : activeBAndE.specificPremiumEmployeeSpouse}
+                        onEeSpouseRateChange={(val) => setEditFormData({ ...editFormData, specificPremiumEmployeeSpouse: val })}
+                        eeChildrenRate={isInlineEditing ? editFormData.specificPremiumEmployeeChildren : activeBAndE.specificPremiumEmployeeChildren}
+                        onEeChildrenRateChange={(val) => setEditFormData({ ...editFormData, specificPremiumEmployeeChildren: val })}
+                        familyRate={isInlineEditing ? editFormData.specificPremiumFamily : activeBAndE.specificPremiumFamily}
+                        onFamilyRateChange={(val) => setEditFormData({ ...editFormData, specificPremiumFamily: val })}
+                        isEditing={isInlineEditing}
+                        compact={true}
+                      />
                     </div>
                   </div>
                 </div>
@@ -1101,19 +1088,61 @@ export default function BillingEnrollmentSection({
                       <h3 style={{ fontSize: "1rem", fontWeight: "700" }}>Aggregate Stop-Loss Specs</h3>
                     </div>
                     {isInlineEditing ? (
-                      <ContractSelect
-                        value={editFormData.aggregateContract}
-                        onChange={(val) => setEditFormData({ ...editFormData, aggregateContract: val })}
-                      />
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        {editFormData.aggregateStopLossStatus !== "None" && (
+                          <ContractSelect
+                            value={editFormData.aggregateContract}
+                            onChange={(val) => setEditFormData({ ...editFormData, aggregateContract: val })}
+                          />
+                        )}
+                        <IncludedNoneToggle
+                          size="sm"
+                          value={editFormData.aggregateStopLossStatus}
+                          onChange={(val) => setEditFormData({ ...editFormData, aggregateStopLossStatus: val })}
+                        />
+                      </div>
                     ) : (
-                      <span className="badge badge-purple" style={{ fontSize: "0.7rem" }}>
-                        {activeBAndE.aggregateContract || "12/12"}
-                      </span>
+                      (activeBAndE.aggregateStopLossStatus === "None" || activeBAndE.aggregatePremium?.trim().toLowerCase() === "none") ? (
+                        <span className="badge" style={{ background: "rgba(148, 163, 184, 0.15)", color: "#64748b", border: "1px solid #cbd5e1", fontSize: "0.7rem" }}>
+                          None
+                        </span>
+                      ) : (
+                        <span className="badge badge-purple" style={{ fontSize: "0.7rem" }}>
+                          {activeBAndE.aggregateContract || "12/12"}
+                        </span>
+                      )
                     )}
                   </div>
 
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.85rem", flex: 1 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                  {/* If View Mode & Aggregate is set to None, display notice message */}
+                  {!isInlineEditing && (activeBAndE.aggregateStopLossStatus === "None" || activeBAndE.aggregatePremium?.trim().toLowerCase() === "none") ? (
+                    <div
+                      style={{
+                        flex: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        padding: "2rem 1rem",
+                        background: "rgba(148, 163, 184, 0.05)",
+                        borderRadius: "8px",
+                        border: "1px dashed var(--border)",
+                        textAlign: "center",
+                        gap: "0.5rem",
+                        margin: "0.5rem 0",
+                      }}
+                    >
+                      <ShieldAlert size={28} style={{ color: "#94a3b8" }} />
+                      <div style={{ fontWeight: "700", fontSize: "0.95rem", color: "var(--text-primary)" }}>
+                        No Aggregate Stop-Loss Coverage
+                      </div>
+                      <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", maxWidth: "280px", lineHeight: "1.4" }}>
+                        There is no Aggregate Stop-Loss coverage included for this plan year specification.
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.85rem", flex: 1 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                       <span style={{ color: "var(--text-muted)" }}>Aggregate Premium</span>
                       {isInlineEditing ? (
                         <CurrencyInput
@@ -1237,8 +1266,9 @@ export default function BillingEnrollmentSection({
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
+            </div>
 
               {/* DEDICATED STOP-LOSS NOTES SECTION (Directly Below Aggregate and Specific Sections) */}
               <div
