@@ -21,6 +21,7 @@ import {
   Edit3,
   Save,
   X,
+  Plus,
   Phone,
   Mail,
   MapPin,
@@ -98,6 +99,7 @@ export default function GroupDetailPage({
 
   // Association Form State
   const [newAssociation, setNewAssociation] = useState({ vendorId: "", notes: "", fee: "" });
+  const [vendorSearchQuery, setVendorSearchQuery] = useState("");
   const [associating, setAssociating] = useState(false);
 
   const fetchClientDetails = async () => {
@@ -206,6 +208,7 @@ export default function GroupDetailPage({
       const data = await res.json();
       if (data.success) {
         setNewAssociation({ vendorId: "", notes: "", fee: "" });
+        setVendorSearchQuery("");
         await fetchClientDetails();
         setMessage({ text: "Vendor associated successfully!", type: "success" });
       } else {
@@ -213,6 +216,68 @@ export default function GroupDetailPage({
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setAssociating(false);
+    }
+  };
+
+  const handleQuickAddVendor = async () => {
+    const selectedVendor = vendorsList.find((v) => v.id === newAssociation.vendorId);
+    const vendorName = (selectedVendor ? selectedVendor.name : vendorSearchQuery).trim();
+
+    if (!vendorName) {
+      alert("Please type a Vendor Name in the search box to Quick Add.");
+      return;
+    }
+
+    setAssociating(true);
+    const targetClientId = client?.id || id;
+
+    try {
+      let targetVendorId = newAssociation.vendorId;
+
+      if (!targetVendorId) {
+        const createRes = await fetch("/api/vendors", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: vendorName,
+            notes: newAssociation.notes || undefined,
+          }),
+        });
+
+        const createData = await createRes.json();
+        if (!createData.success || !createData.vendor) {
+          alert(createData.error || "Failed to create vendor profile.");
+          setAssociating(false);
+          return;
+        }
+        targetVendorId = createData.vendor.id;
+      }
+
+      const assocRes = await fetch("/api/associations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientId: targetClientId,
+          vendorId: targetVendorId,
+          fee: newAssociation.fee,
+          notes: newAssociation.notes,
+        }),
+      });
+
+      const assocData = await assocRes.json();
+      if (assocData.success) {
+        setNewAssociation({ vendorId: "", notes: "", fee: "" });
+        setVendorSearchQuery("");
+        await Promise.all([fetchClientDetails(), fetchVendorsList()]);
+        setMessage({ text: `Vendor "${vendorName}" created & linked successfully!`, type: "success" });
+      } else {
+        alert(assocData.error || "Failed to link vendor");
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert("Error adding vendor: " + (err.message || "Unknown error"));
     } finally {
       setAssociating(false);
     }
@@ -322,9 +387,7 @@ export default function GroupDetailPage({
                 className={`badge ${
                   client.status === "ACTIVE"
                     ? "badge-active"
-                    : client.status === "INACTIVE"
-                    ? "badge-inactive"
-                    : "badge-pending"
+                    : "badge-inactive"
                 }`}
               >
                 {client.status}
@@ -568,34 +631,13 @@ export default function GroupDetailPage({
             </div>
 
             <div className="form-group">
-              <label className="form-label">Specialty / Type</label>
+              <label className="form-label">SIC Code</label>
               <input
                 type="text"
                 className="form-input"
+                placeholder="1234"
                 value={formData.specialty}
                 onChange={(e) => setFormData({ ...formData, specialty: e.target.value })}
-              />
-            </div>
-          </div>
-
-          <div className="grid-cols-2">
-            <div className="form-group">
-              <label className="form-label">Phone Number</label>
-              <input
-                type="text"
-                className="form-input"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Contact Email</label>
-              <input
-                type="email"
-                className="form-input"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
             </div>
           </div>
@@ -610,7 +652,7 @@ export default function GroupDetailPage({
             />
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "0.75rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "0.75rem" }}>
             <div className="form-group">
               <label className="form-label">City</label>
               <input
@@ -640,6 +682,18 @@ export default function GroupDetailPage({
                 onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
               />
             </div>
+          </div>
+
+          <div className="grid-cols-2">
+            <div className="form-group">
+              <label className="form-label">Phone Number</label>
+              <input
+                type="text"
+                className="form-input"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              />
+            </div>
 
             <div className="form-group">
               <label className="form-label">Status</label>
@@ -649,8 +703,7 @@ export default function GroupDetailPage({
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
               >
                 <option value="ACTIVE">ACTIVE</option>
-                <option value="INACTIVE">INACTIVE</option>
-                <option value="PENDING">PENDING</option>
+                <option value="TERMINATED">TERMINATED</option>
               </select>
             </div>
           </div>
@@ -782,17 +835,23 @@ export default function GroupDetailPage({
           <>
             {/* Interactive Search-Based Vendor Linking Form */}
             <form onSubmit={handleAddAssociation} className="glass-panel" style={{ padding: "1.25rem", marginBottom: "1.5rem", border: "1px dashed var(--accent-blue)" }}>
-              <h3 style={{ fontSize: "0.9rem", fontWeight: "800", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                <LinkIcon size={16} style={{ color: "var(--accent-blue)" }} />
-                <span>Search & Link a Vendor</span>
-              </h3>
+              <div style={{ marginBottom: "0.75rem" }}>
+                <h3 style={{ fontSize: "0.9rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.4rem", margin: 0 }}>
+                  <LinkIcon size={16} style={{ color: "var(--accent-blue)" }} />
+                  <span>Search &amp; Link a Vendor</span>
+                </h3>
+              </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1.2fr auto", gap: "0.75rem", alignItems: "center" }}>
                 <SearchSelect
                   items={unlinkedVendors}
                   selectedId={newAssociation.vendorId}
-                  onSelect={(item) => setNewAssociation({ ...newAssociation, vendorId: item ? item.id : "" })}
-                  placeholder="Search vendor by name, category, tax ID, city..."
+                  onSelect={(item) => {
+                    setNewAssociation({ ...newAssociation, vendorId: item ? item.id : "" });
+                    if (item) setVendorSearchQuery(item.name);
+                  }}
+                  onQueryChange={(q) => setVendorSearchQuery(q)}
+                  placeholder="Search or type vendor name..."
                   type="vendor"
                 />
 
@@ -812,9 +871,22 @@ export default function GroupDetailPage({
                   onChange={(e) => setNewAssociation({ ...newAssociation, notes: e.target.value })}
                 />
 
-                <button type="submit" disabled={associating || !newAssociation.vendorId} className="btn btn-blue btn-sm">
-                  {associating ? "Linking..." : "Link Vendor"}
-                </button>
+                <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                  <button type="submit" disabled={associating || !newAssociation.vendorId} className="btn btn-secondary btn-sm">
+                    {associating ? "Linking..." : "Link Vendor"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleQuickAddVendor}
+                    disabled={associating || (!vendorSearchQuery.trim() && !newAssociation.vendorId)}
+                    className="btn btn-blue btn-sm"
+                    style={{ whiteSpace: "nowrap" }}
+                    title="Create a vendor profile with the provided name & details and link directly to this group"
+                  >
+                    <Plus size={14} />
+                    <span>Quick Add</span>
+                  </button>
+                </div>
               </div>
             </form>
 
@@ -893,10 +965,10 @@ export default function GroupDetailPage({
                               onClick={() => setActiveNoteVendor({ vendorId: item.vendorId, name: item.vendor.name, notes: item.notes || "", fee: item.fee || "" })}
                               className="btn btn-secondary btn-sm"
                               style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
-                              title="Edit Group-Specific Vendor Fee & Notes"
+                              title="Edit Group-Specific Vendor Notes"
                             >
                               <FileText size={14} style={{ color: "var(--accent-blue)" }} />
-                              <span>{item.notes || item.fee ? "Edit Details" : "+ Add Note"}</span>
+                              <span>Edit Notes</span>
                             </button>
                             <Link href={`/vendors/${item.vendor.id}`} className="btn btn-secondary btn-sm">
                               View Vendor

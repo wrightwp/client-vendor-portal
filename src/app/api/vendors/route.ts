@@ -59,14 +59,15 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { name, taxId, phone, email, address, city, state, zipCode, vendorType, notes, status } = body;
 
-    if (!name || !taxId) {
+    if (!name || !name.trim()) {
       return NextResponse.json(
-        { success: false, error: "Vendor Name and Tax ID are required." },
+        { success: false, error: "Vendor Name is required." },
         { status: 400 }
       );
     }
 
-    const cleanInputTaxId = taxId.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+    const effectiveTaxId = taxId && taxId.trim() ? taxId.trim() : `V-${Math.floor(100000 + Math.random() * 900000)}`;
+    const cleanInputTaxId = effectiveTaxId.toLowerCase().replace(/[^a-z0-9]/g, "");
 
     const existingVendors = await db.vendor.findMany();
     const exactDuplicate = existingVendors.find((v) => {
@@ -74,7 +75,7 @@ export async function POST(request: Request) {
       return cleanInputTaxId && vTax && cleanInputTaxId === vTax;
     });
 
-    if (exactDuplicate) {
+    if (exactDuplicate && taxId) {
       return NextResponse.json(
         {
           success: false,
@@ -87,8 +88,8 @@ export async function POST(request: Request) {
 
     const vendor = await db.vendor.create({
       data: {
-        name,
-        taxId,
+        name: name.trim(),
+        taxId: effectiveTaxId,
         phone: phone || null,
         email: email || null,
         address: address || null,

@@ -12,12 +12,14 @@ import LaseredIndividualsInput from "./LaseredIndividualsInput";
 import MonthlyAccommodationInput from "./MonthlyAccommodationInput";
 import AggregatingSpecificInput from "./AggregatingSpecificInput";
 import BenefitsCoveredSelect from "./BenefitsCoveredSelect";
+import VendorTypeahead from "./VendorTypeahead";
 
 interface EditBillingEnrollmentModalProps {
   clientId: string;
   clientName: string;
   initialData: any;
   allEnrollments?: any[];
+  allVendors?: any[];
   isNewPlanYear?: boolean;
   onClose: () => void;
   onSuccess: () => void;
@@ -28,6 +30,7 @@ export default function EditBillingEnrollmentModal({
   clientName,
   initialData,
   allEnrollments = [],
+  allVendors = [],
   isNewPlanYear = false,
   onClose,
   onSuccess,
@@ -345,7 +348,7 @@ export default function EditBillingEnrollmentModal({
                       <label className="form-label">Effective Start Date</label>
                       <DateInput
                         className="form-input"
-                        placeholder="01/01/2026"
+                        placeholder=""
                         value={startDate}
                         onChange={setStartDate}
                       />
@@ -355,7 +358,7 @@ export default function EditBillingEnrollmentModal({
                       <label className="form-label">Effective End Date</label>
                       <DateInput
                         className="form-input"
-                        placeholder="12/31/2026"
+                        placeholder=""
                         value={endDate}
                         onChange={setEndDate}
                       />
@@ -411,23 +414,23 @@ export default function EditBillingEnrollmentModal({
                 <div className="grid-cols-2">
                   <div className="form-group">
                     <label className="form-label">Current Stop-Loss Carrier</label>
-                    <input
-                      type="text"
-                      className="form-input"
+                    <VendorTypeahead
                       placeholder="e.g. HCC Life"
                       value={formData.currentStopLossCarrier}
-                      onChange={(e) => setFormData({ ...formData, currentStopLossCarrier: e.target.value })}
+                      onChange={(val) => setFormData({ ...formData, currentStopLossCarrier: val })}
+                      allVendors={allVendors}
+                      allowedCategories={["Stoploss", "Stoploss MGU"]}
                     />
                   </div>
 
                   <div className="form-group">
                     <label className="form-label">Current Managing General Underwriter</label>
-                    <input
-                      type="text"
-                      className="form-input"
+                    <VendorTypeahead
                       placeholder="e.g. HCC Life Insurance"
                       value={formData.currentManagingGeneralUnderwriter}
-                      onChange={(e) => setFormData({ ...formData, currentManagingGeneralUnderwriter: e.target.value })}
+                      onChange={(val) => setFormData({ ...formData, currentManagingGeneralUnderwriter: val })}
+                      allVendors={allVendors}
+                      allowedCategories={["Stoploss", "Stoploss MGU"]}
                     />
                   </div>
                 </div>
@@ -435,23 +438,23 @@ export default function EditBillingEnrollmentModal({
                 <div className="grid-cols-2">
                   <div className="form-group">
                     <label className="form-label">Prior Stop-Loss Carrier</label>
-                    <input
-                      type="text"
-                      className="form-input"
+                    <VendorTypeahead
                       placeholder="e.g. Voya"
                       value={formData.priorStopLossCarrier}
-                      onChange={(e) => setFormData({ ...formData, priorStopLossCarrier: e.target.value })}
+                      onChange={(val) => setFormData({ ...formData, priorStopLossCarrier: val })}
+                      allVendors={allVendors}
+                      allowedCategories={["Stoploss", "Stoploss MGU"]}
                     />
                   </div>
 
                   <div className="form-group">
                     <label className="form-label">Prior Managing General Underwriter</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="e.g. Tokyo Marine"
+                    <VendorTypeahead
+                      placeholder="e.g. Tokio Marine"
                       value={formData.priorManagingGeneralUnderwriter}
-                      onChange={(e) => setFormData({ ...formData, priorManagingGeneralUnderwriter: e.target.value })}
+                      onChange={(val) => setFormData({ ...formData, priorManagingGeneralUnderwriter: val })}
+                      allVendors={allVendors}
+                      allowedCategories={["Stoploss", "Stoploss MGU"]}
                     />
                   </div>
                 </div>

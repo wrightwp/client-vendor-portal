@@ -104,7 +104,7 @@ export default function Navbar() {
           >
             <ShieldCheck size={22} />
           </div>
-          <span>HealthPortal</span>
+          <span>Client Information Portal</span>
         </Link>
 
         <nav className="nav-links">

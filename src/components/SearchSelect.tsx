@@ -7,6 +7,7 @@ interface SearchSelectProps {
   items: any[];
   selectedId: string;
   onSelect: (item: any | null) => void;
+  onQueryChange?: (query: string) => void;
   placeholder?: string;
   type: "vendor" | "client";
 }
@@ -15,6 +16,7 @@ export default function SearchSelect({
   items,
   selectedId,
   onSelect,
+  onQueryChange,
   placeholder = "Search to select...",
   type,
 }: SearchSelectProps) {
@@ -76,7 +78,11 @@ export default function SearchSelect({
 
           <button
             type="button"
-            onClick={() => onSelect(null)}
+            onClick={() => {
+              onSelect(null);
+              setQuery("");
+              if (onQueryChange) onQueryChange("");
+            }}
             style={{
               background: "none",
               border: "none",
@@ -109,7 +115,9 @@ export default function SearchSelect({
               style={{ paddingLeft: "2.5rem" }}
               value={query}
               onChange={(e) => {
-                setQuery(e.target.value);
+                const val = e.target.value;
+                setQuery(val);
+                if (onQueryChange) onQueryChange(val);
                 setIsOpen(true);
               }}
               onFocus={() => setIsOpen(true)}
@@ -143,6 +151,7 @@ export default function SearchSelect({
                       onSelect(item);
                       setIsOpen(false);
                       setQuery("");
+                      if (onQueryChange) onQueryChange(item.name);
                     }}
                     style={{
                       padding: "0.65rem 0.875rem",

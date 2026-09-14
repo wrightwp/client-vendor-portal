@@ -27,6 +27,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import EditBillingEnrollmentModal from "./EditBillingEnrollmentModal";
+import VendorTypeahead from "./VendorTypeahead";
 import PrintBillingEnrollmentModal from "./PrintBillingEnrollmentModal";
 import BEAssociatedVendorsTable from "./BEAssociatedVendorsTable";
 import { MarkdownNoteRenderer } from "./MarkdownNotes";
@@ -570,7 +571,7 @@ export default function BillingEnrollmentSection({
                 <DateInput
                   className="form-input"
                   style={{ width: "115px", padding: "0.25rem 0.5rem", fontSize: "0.75rem" }}
-                  placeholder="MM/DD/YYYY"
+                  placeholder=""
                   value={editFormData.startDate}
                   onChange={(val) => setEditFormData({ ...editFormData, startDate: val })}
                 />
@@ -578,7 +579,7 @@ export default function BillingEnrollmentSection({
                 <DateInput
                   className="form-input"
                   style={{ width: "115px", padding: "0.25rem 0.5rem", fontSize: "0.75rem" }}
-                  placeholder="MM/DD/YYYY"
+                  placeholder=""
                   value={editFormData.endDate}
                   onChange={(val) => setEditFormData({ ...editFormData, endDate: val })}
                 />
@@ -729,13 +730,13 @@ export default function BillingEnrollmentSection({
                   <div>
                     <div style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>Current Carrier</div>
                     {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
+                      <VendorTypeahead
                         style={{ marginTop: "0.2rem", fontSize: "0.85rem", padding: "0.3rem 0.5rem" }}
                         value={editFormData.currentStopLossCarrier}
-                        onChange={(e) => setEditFormData({ ...editFormData, currentStopLossCarrier: e.target.value })}
+                        onChange={(val) => setEditFormData({ ...editFormData, currentStopLossCarrier: val })}
                         placeholder="e.g. Tokio Marine, Sun Life"
+                        allVendors={allVendors}
+                        allowedCategories={["Stoploss", "Stoploss MGU"]}
                       />
                     ) : (
                       <div style={{ fontWeight: "700", marginTop: "0.2rem" }}>
@@ -747,13 +748,13 @@ export default function BillingEnrollmentSection({
                   <div>
                     <div style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>Current MGU</div>
                     {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
+                      <VendorTypeahead
                         style={{ marginTop: "0.2rem", fontSize: "0.85rem", padding: "0.3rem 0.5rem" }}
                         value={editFormData.currentManagingGeneralUnderwriter}
-                        onChange={(e) => setEditFormData({ ...editFormData, currentManagingGeneralUnderwriter: e.target.value })}
+                        onChange={(val) => setEditFormData({ ...editFormData, currentManagingGeneralUnderwriter: val })}
                         placeholder="e.g. SLU, Berkley"
+                        allVendors={allVendors}
+                        allowedCategories={["Stoploss", "Stoploss MGU"]}
                       />
                     ) : (
                       <div style={{ fontWeight: "700", marginTop: "0.2rem" }}>
@@ -765,13 +766,13 @@ export default function BillingEnrollmentSection({
                   <div>
                     <div style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>Prior Carrier</div>
                     {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
+                      <VendorTypeahead
                         style={{ marginTop: "0.2rem", fontSize: "0.85rem", padding: "0.3rem 0.5rem" }}
                         value={editFormData.priorStopLossCarrier}
-                        onChange={(e) => setEditFormData({ ...editFormData, priorStopLossCarrier: e.target.value })}
+                        onChange={(val) => setEditFormData({ ...editFormData, priorStopLossCarrier: val })}
                         placeholder="Prior carrier name"
+                        allVendors={allVendors}
+                        allowedCategories={["Stoploss", "Stoploss MGU"]}
                       />
                     ) : (
                       <div style={{ marginTop: "0.2rem" }}>
@@ -783,13 +784,13 @@ export default function BillingEnrollmentSection({
                   <div>
                     <div style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>Prior MGU</div>
                     {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
+                      <VendorTypeahead
                         style={{ marginTop: "0.2rem", fontSize: "0.85rem", padding: "0.3rem 0.5rem" }}
                         value={editFormData.priorManagingGeneralUnderwriter}
-                        onChange={(e) => setEditFormData({ ...editFormData, priorManagingGeneralUnderwriter: e.target.value })}
+                        onChange={(val) => setEditFormData({ ...editFormData, priorManagingGeneralUnderwriter: val })}
                         placeholder="Prior MGU name"
+                        allVendors={allVendors}
+                        allowedCategories={["Stoploss", "Stoploss MGU"]}
                       />
                     ) : (
                       <div style={{ marginTop: "0.2rem" }}>
@@ -1782,6 +1783,7 @@ export default function BillingEnrollmentSection({
           clientName={clientName}
           initialData={null}
           allEnrollments={sortedEnrollments}
+          allVendors={allVendors}
           isNewPlanYear={true}
           onClose={() => setIsNewYearMode(false)}
           onSuccess={() => {

@@ -461,6 +461,16 @@ async function main() {
 
     { name: "Zimmer Biomet Devices", taxId: "35-3456789", phone: "(800) 613-6131", email: "orders@zimmerbiomet.com", city: "Warsaw", state: "IN", vendorType: "MEDICAL_SUPPLIES", notes: "Joint replacement implants and dental bone grafts." },
     { name: "Kareo Clinical Software", taxId: "20-4567890", phone: "(888) 773-2401", email: "sales@kareo.com", city: "Irvine", state: "CA", vendorType: "IT_SERVICES", notes: "Independent practice EHR and patient billing." },
+
+    // Stop Loss Carriers & MGUs
+    { name: "Tokio Marine HCC", taxId: "74-8829102", phone: "(800) 442-5429", email: "stoploss@tmhcc.com", city: "Houston", state: "TX", vendorType: "Stoploss", notes: "Leading medical stop loss insurance carrier." },
+    { name: "Sun Life Financial", taxId: "04-2281920", phone: "(800) 247-6875", email: "stoploss@sunlife.com", city: "Wellesley Hills", state: "MA", vendorType: "Stoploss", notes: "National group stop loss insurance carrier." },
+    { name: "Voya Financial Stop Loss", taxId: "13-3928104", phone: "(800) 328-4928", email: "stoploss@voya.com", city: "Minneapolis", state: "MN", vendorType: "Stoploss", notes: "Excess loss and stop loss medical insurance coverage." },
+    { name: "HCC Life Insurance", taxId: "74-1182930", phone: "(800) 745-9830", email: "info@hcclife.com", city: "Kennesaw", state: "GA", vendorType: "Stoploss", notes: "Comprehensive stop loss policy underwriting." },
+    { name: "Berkley Accident & Health", taxId: "22-9182374", phone: "(800) 438-2742", email: "info@berkleyah.com", city: "Hamilton", state: "NJ", vendorType: "Stoploss MGU", notes: "Managing General Underwriter specializing in stop loss." },
+    { name: "SLU Stop Loss Underwriters", taxId: "04-7718293", phone: "(800) 882-9182", email: "underwriting@stoploss.com", city: "Boston", state: "MA", vendorType: "Stoploss MGU", notes: "Managing General Underwriter for self-funded benefit plans." },
+    { name: "Symetra Financial", taxId: "91-0392817", phone: "(800) 796-3872", email: "stoploss@symetra.com", city: "Bellevue", state: "WA", vendorType: "Stoploss", notes: "Group medical stop loss carrier." },
+    { name: "HM Insurance Group", taxId: "25-1829304", phone: "(800) 328-5434", email: "info@hmig.com", city: "Pittsburgh", state: "PA", vendorType: "Stoploss MGU", notes: "Direct stop loss and MGU services." },
   ];
 
   // Stop-Loss Carriers & Underwriters Pool for randomized realistic B&E multi-year seeding

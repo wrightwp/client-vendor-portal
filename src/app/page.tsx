@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import {
-  Activity,
   Plus,
   Building,
   Store,
@@ -206,26 +205,9 @@ export default async function DashboardPage() {
         }}
       >
         <div style={{ zIndex: 2 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
-            <Activity size={20} style={{ color: "var(--accent-yellow)" }} />
-            <span
-              style={{
-                fontSize: "0.85rem",
-                fontWeight: "800",
-                textTransform: "uppercase",
-                color: "var(--accent-yellow)",
-                letterSpacing: "0.05em",
-              }}
-            >
-              Operations &amp; Benefits Command Center
-            </span>
-          </div>
-          <h1 style={{ fontSize: "2.25rem", fontWeight: "800", marginBottom: "0.5rem", letterSpacing: "-0.02em" }}>
-            Client &amp; Vendor Management Portal
+          <h1 style={{ fontSize: "2.25rem", fontWeight: "800", letterSpacing: "-0.02em" }}>
+            Client Information Dashboard
           </h1>
-          <p style={{ color: "var(--text-secondary)", maxWidth: "700px", fontSize: "0.95rem" }}>
-            Operational directory, stop-loss coverage analytics, census tracking, and vendor partnership ecosystem for healthcare provider networks.
-          </p>
         </div>
 
         <div style={{ display: "flex", gap: "1rem", zIndex: 2 }}>

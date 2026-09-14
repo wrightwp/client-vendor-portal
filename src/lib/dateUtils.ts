@@ -20,16 +20,81 @@ export function formatDateInput(input: string): string {
     return `${month}/${day}/${year}`;
   }
 
-  // Extract only digits
+  // If input contains slashes (e.g., "1/1/2027", "1/12/2027", "01/1/2027", "1/")
+  if (input.includes("/")) {
+    const rawParts = input.split("/");
+    let monthStr = rawParts[0].replace(/\D/g, "");
+    if (rawParts.length > 1 && monthStr.length > 0) {
+      let m = parseInt(monthStr, 10);
+      if (m > 12) m = 12;
+      if (m === 0) m = 1;
+      monthStr = String(m).padStart(2, "0");
+    }
+
+    if (rawParts.length === 1) {
+      return monthStr;
+    }
+
+    let dayStr = "";
+    let yearStr = "";
+
+    if (rawParts.length === 2) {
+      const restDigits = rawParts[1].replace(/\D/g, "");
+      if (restDigits.length > 2) {
+        if (restDigits.length === 5) {
+          dayStr = restDigits.slice(0, 1).padStart(2, "0");
+          yearStr = restDigits.slice(1, 5);
+        } else if (restDigits.length === 6) {
+          dayStr = restDigits.slice(0, 2);
+          yearStr = restDigits.slice(2, 6);
+        } else if (restDigits.length === 3) {
+          dayStr = restDigits.slice(0, 1).padStart(2, "0");
+          yearStr = restDigits.slice(1, 3);
+        } else if (restDigits.length === 4) {
+          if (restDigits.startsWith("0")) {
+            dayStr = restDigits.slice(0, 2);
+            yearStr = restDigits.slice(2, 4);
+          } else {
+            dayStr = restDigits.slice(0, 1).padStart(2, "0");
+            yearStr = restDigits.slice(1, 4);
+          }
+        } else {
+          dayStr = restDigits.slice(0, 2);
+          yearStr = restDigits.slice(2, 6);
+        }
+
+        let d = parseInt(dayStr, 10);
+        if (d > 31) d = 31;
+        if (d === 0) d = 1;
+        dayStr = String(d).padStart(2, "0");
+
+        return `${monthStr}/${dayStr}/${yearStr}`;
+      } else {
+        dayStr = restDigits.slice(0, 2);
+        return `${monthStr}/${dayStr}`;
+      }
+    }
+
+    const restDayDigits = rawParts[1].replace(/\D/g, "").slice(0, 2);
+    if (restDayDigits.length > 0) {
+      let d = parseInt(restDayDigits, 10);
+      if (d > 31) d = 31;
+      if (d === 0) d = 1;
+      dayStr = String(d).padStart(2, "0");
+    }
+
+    yearStr = rawParts[2].replace(/\D/g, "").slice(0, 4);
+    return `${monthStr}/${dayStr}/${yearStr}`;
+  }
+
+  // Extract only digits if no slashes typed yet
   const digits = input.replace(/\D/g, "").slice(0, 8);
   if (!digits) return "";
 
   if (digits.length <= 2) {
-    // If first digit is > 1 (e.g. 2..9), user can only mean 02..09
     if (digits.length === 1 && parseInt(digits, 10) > 1) {
       return `0${digits}/`;
     }
-    // If 2 digits typed and <= 12, auto add trailing slash
     if (digits.length === 2) {
       let m = parseInt(digits, 10);
       if (m > 12) m = 12;
@@ -47,7 +112,6 @@ export function formatDateInput(input: string): string {
 
   const rest = digits.slice(2);
   if (rest.length <= 2) {
-    // If rest length is 1 and > 3 (e.g. day 4..9), user means 04..09
     if (rest.length === 1 && parseInt(rest, 10) > 3) {
       return `${formattedMonth}/0${rest}/`;
     }
@@ -78,7 +142,7 @@ export function normalizeDate(dateStr: string | null | undefined): string {
   if (!dateStr || !dateStr.trim()) return "";
   const clean = dateStr.trim();
 
-  // Check ISO format YYYY-MM-DD
+  // 1. ISO format YYYY-MM-DD or YYYY/MM/DD
   const isoMatch = clean.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
   if (isoMatch) {
     const year = isoMatch[1];
@@ -87,7 +151,7 @@ export function normalizeDate(dateStr: string | null | undefined): string {
     return `${month}/${day}/${year}`;
   }
 
-  // Check M/D/YYYY or M/D/YY
+  // 2. US format M/D/YYYY or M/D/YY
   const usMatch = clean.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})/);
   if (usMatch) {
     let month = parseInt(usMatch[1], 10);
@@ -106,12 +170,31 @@ export function normalizeDate(dateStr: string | null | undefined): string {
     return `${String(month).padStart(2, "0")}/${String(day).padStart(2, "0")}/${year}`;
   }
 
-  // Pure digits (e.g. 8 digits MMDDYYYY or 6 digits MMDDYY)
+  // 3. Partial M/D format (e.g. 1/1 or 01/01)
+  const partialUsMatch = clean.match(/^(\d{1,2})[-/](\d{1,2})$/);
+  if (partialUsMatch) {
+    let month = parseInt(partialUsMatch[1], 10);
+    let day = parseInt(partialUsMatch[2], 10);
+    if (month < 1) month = 1;
+    if (month > 12) month = 12;
+    if (day < 1) day = 1;
+    if (day > 31) day = 31;
+    const currentYear = new Date().getFullYear();
+    return `${String(month).padStart(2, "0")}/${String(day).padStart(2, "0")}/${currentYear}`;
+  }
+
+  // 4. Pure digits (8 digits MMDDYYYY or 6 digits MMDDYY)
   const digits = clean.replace(/\D/g, "");
   if (digits.length === 8) {
     const m = digits.slice(0, 2);
     const d = digits.slice(2, 4);
     const y = digits.slice(4, 8);
+    return `${m}/${d}/${y}`;
+  }
+  if (digits.length === 6) {
+    const m = digits.slice(0, 2);
+    const d = digits.slice(2, 4);
+    const y = `20${digits.slice(4, 6)}`;
     return `${m}/${d}/${y}`;
   }
 

@@ -13,6 +13,8 @@ export const PRESET_CATEGORIES: string[] = [
   "Medical Billing & Revenue Cycle",
   "Pharmaceutical Distribution",
   "General Services",
+  "Stoploss",
+  "Stoploss MGU",
 ];
 
 /**

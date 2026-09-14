@@ -56,6 +56,7 @@ export default function BEAssociatedVendorsTable({
     fee: "",
     notes: "",
   });
+  const [vendorSearchQuery, setVendorSearchQuery] = useState("");
   const [associating, setAssociating] = useState(false);
 
   // Modal States
@@ -123,6 +124,7 @@ export default function BEAssociatedVendorsTable({
       const data = await res.json();
       if (data.success) {
         setNewAssociation({ vendorId: "", fee: "", notes: "" });
+        setVendorSearchQuery("");
         setShowLinkForm(false);
         onRefresh();
       } else {
@@ -130,6 +132,67 @@ export default function BEAssociatedVendorsTable({
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setAssociating(false);
+    }
+  };
+
+  // Handle Quick Add Vendor (Create & Link)
+  const handleQuickAddVendor = async () => {
+    const selectedVendor = allVendors.find((v) => v.id === newAssociation.vendorId);
+    const vendorName = (selectedVendor ? selectedVendor.name : vendorSearchQuery).trim();
+
+    if (!vendorName) {
+      alert("Please type a Vendor Name in the search box to Quick Add.");
+      return;
+    }
+
+    setAssociating(true);
+    try {
+      let targetVendorId = newAssociation.vendorId;
+
+      if (!targetVendorId) {
+        const createRes = await fetch("/api/vendors", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: vendorName,
+            notes: newAssociation.notes || undefined,
+          }),
+        });
+
+        const createData = await createRes.json();
+        if (!createData.success || !createData.vendor) {
+          alert(createData.error || "Failed to create vendor profile.");
+          setAssociating(false);
+          return;
+        }
+        targetVendorId = createData.vendor.id;
+      }
+
+      const assocRes = await fetch("/api/associations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientId,
+          vendorId: targetVendorId,
+          fee: newAssociation.fee,
+          notes: newAssociation.notes,
+        }),
+      });
+
+      const assocData = await assocRes.json();
+      if (assocData.success) {
+        setNewAssociation({ vendorId: "", fee: "", notes: "" });
+        setVendorSearchQuery("");
+        setShowLinkForm(false);
+        onRefresh();
+      } else {
+        alert(assocData.error || "Failed to link vendor");
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert("Error adding vendor: " + (err.message || "Unknown error"));
     } finally {
       setAssociating(false);
     }
@@ -305,8 +368,12 @@ export default function BEAssociatedVendorsTable({
             <SearchSelect
               items={unlinkedVendors}
               selectedId={newAssociation.vendorId}
-              onSelect={(item) => setNewAssociation({ ...newAssociation, vendorId: item ? item.id : "" })}
-              placeholder="Search vendor..."
+              onSelect={(item) => {
+                setNewAssociation({ ...newAssociation, vendorId: item ? item.id : "" });
+                if (item) setVendorSearchQuery(item.name);
+              }}
+              onQueryChange={(q) => setVendorSearchQuery(q)}
+              placeholder="Search or type vendor..."
               type="vendor"
             />
 
@@ -328,14 +395,27 @@ export default function BEAssociatedVendorsTable({
               onChange={(e) => setNewAssociation({ ...newAssociation, notes: e.target.value })}
             />
 
-            <button
-              type="submit"
-              disabled={associating || !newAssociation.vendorId}
-              className="btn btn-blue btn-sm"
-              style={{ whiteSpace: "nowrap", padding: "0.35rem 0.65rem", fontSize: "0.78rem" }}
-            >
-              {associating ? "Linking..." : "Link"}
-            </button>
+            <div style={{ display: "flex", gap: "0.35rem", alignItems: "center" }}>
+              <button
+                type="submit"
+                disabled={associating || !newAssociation.vendorId}
+                className="btn btn-secondary btn-sm"
+                style={{ whiteSpace: "nowrap", padding: "0.35rem 0.65rem", fontSize: "0.78rem" }}
+              >
+                {associating ? "Linking..." : "Link"}
+              </button>
+              <button
+                type="button"
+                onClick={handleQuickAddVendor}
+                disabled={associating || (!vendorSearchQuery.trim() && !newAssociation.vendorId)}
+                className="btn btn-blue btn-sm"
+                style={{ whiteSpace: "nowrap", padding: "0.35rem 0.65rem", fontSize: "0.78rem" }}
+                title="Create a new vendor profile from the provided name & details and link directly to this group"
+              >
+                <Plus size={13} />
+                <span>Quick Add</span>
+              </button>
+            </div>
           </div>
         </form>
       )}

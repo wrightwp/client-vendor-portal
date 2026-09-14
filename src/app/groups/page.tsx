@@ -204,8 +204,7 @@ function GroupsContent() {
           >
             <option value="ALL">All Statuses</option>
             <option value="ACTIVE">Active</option>
-            <option value="INACTIVE">Inactive</option>
-            <option value="PENDING">Pending</option>
+            <option value="TERMINATED">Terminated</option>
           </select>
 
           <span className="badge badge-pink" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }}>
@@ -221,8 +220,8 @@ function GroupsContent() {
             <tr>
               <th style={{ minWidth: "220px" }}>Group Name</th>
               <th className="nowrap">Group Number</th>
-              <th style={{ minWidth: "180px" }}>Location & Contact</th>
-              <th>Specialty / Group Type</th>
+              <th style={{ minWidth: "180px" }}>Location &amp; Contact</th>
+              <th>SIC Code</th>
               <th className="nowrap">Status</th>
               <th className="nowrap">Linked Vendors</th>
               <th style={{ textAlign: "right" }} className="nowrap">Actions</th>
@@ -282,18 +281,27 @@ function GroupsContent() {
                     <span
                       className={`badge ${client.status === "ACTIVE"
                         ? "badge-active"
-                        : client.status === "INACTIVE"
-                          ? "badge-inactive"
-                          : "badge-pending"
+                        : "badge-inactive"
                         }`}
                     >
                       {client.status}
                     </span>
                   </td>
-                  <td className="nowrap">
-                    <span className="badge badge-pink">
-                      {client.vendors?.length || 0} Vendors
-                    </span>
+                  <td className="nowrap" onClick={(e) => e.stopPropagation()}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                      <span className="badge badge-pink">
+                        {client.vendors?.length || 0} Vendors
+                      </span>
+                      <Link
+                        href="/vendors?action=new"
+                        className="btn btn-blue btn-xs"
+                        style={{ padding: "0.2rem 0.5rem", fontSize: "0.75rem" }}
+                        title="Quick add a new vendor profile"
+                      >
+                        <Plus size={12} />
+                        <span>Quick Add</span>
+                      </Link>
+                    </div>
                   </td>
                   <td style={{ textAlign: "right" }} className="nowrap" onClick={(e) => e.stopPropagation()}>
                     <Link
@@ -368,7 +376,7 @@ function GroupsContent() {
                     <input
                       type="text"
                       className="form-input"
-                      placeholder="e.g. GRP-99210"
+                      placeholder="G-1234"
                       required
                       value={newClient.npiNumber}
                       onChange={(e) => setNewClient({ ...newClient, npiNumber: e.target.value })}
@@ -376,37 +384,13 @@ function GroupsContent() {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Specialty / Type</label>
+                    <label className="form-label">SIC Code</label>
                     <input
                       type="text"
                       className="form-input"
-                      placeholder="e.g. Multi-Specialty Hospital System"
+                      placeholder="1234"
                       value={newClient.specialty}
                       onChange={(e) => setNewClient({ ...newClient, specialty: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid-cols-2">
-                  <div className="form-group">
-                    <label className="form-label">Phone Number</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="(555) 000-0000"
-                      value={newClient.phone}
-                      onChange={(e) => setNewClient({ ...newClient, phone: e.target.value })}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Contact Email</label>
-                    <input
-                      type="email"
-                      className="form-input"
-                      placeholder="contact@group.org"
-                      value={newClient.email}
-                      onChange={(e) => setNewClient({ ...newClient, email: e.target.value })}
                     />
                   </div>
                 </div>
@@ -458,6 +442,17 @@ function GroupsContent() {
                 </div>
 
                 <div className="form-group">
+                  <label className="form-label">Phone Number</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="(555) 000-0000"
+                    value={newClient.phone}
+                    onChange={(e) => setNewClient({ ...newClient, phone: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group">
                   <label className="form-label">Status</label>
                   <select
                     className="form-select"
@@ -465,8 +460,7 @@ function GroupsContent() {
                     onChange={(e) => setNewClient({ ...newClient, status: e.target.value })}
                   >
                     <option value="ACTIVE">ACTIVE</option>
-                    <option value="INACTIVE">INACTIVE</option>
-                    <option value="PENDING">PENDING</option>
+                    <option value="TERMINATED">TERMINATED</option>
                   </select>
                 </div>
 
