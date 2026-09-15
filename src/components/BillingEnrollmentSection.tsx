@@ -374,6 +374,21 @@ export default function BillingEnrollmentSection({
     }
   };
 
+  // Keyboard Shortcut: Ctrl+S / Cmd+S to save when inline editing is active
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+        if (isInlineEditing && !savingInline) {
+          e.preventDefault();
+          handleSaveInline();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isInlineEditing, savingInline, editFormData, activeBAndE]);
+
   const showStopLoss = viewTab === "BOTH" || viewTab === "STOP_LOSS";
   const showBilling = viewTab === "BOTH" || viewTab === "BILLING";
 
@@ -740,9 +755,38 @@ export default function BillingEnrollmentSection({
                   border: "1px solid var(--border)",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
-                  <Shield size={18} style={{ color: "var(--accent-pink)" }} />
-                  <h3 style={{ fontSize: "1rem", fontWeight: "700" }}>Stop-Loss Carrier & Underwriter</h3>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <Shield size={18} style={{ color: "var(--accent-pink)" }} />
+                    <h3 style={{ fontSize: "1rem", fontWeight: "700" }}>Stop-Loss Carrier & Underwriter</h3>
+                  </div>
+                  {!isInlineEditing ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsExpanded(true);
+                        setIsInlineEditing(true);
+                      }}
+                      className="btn btn-secondary btn-sm"
+                      style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                      title="Edit section"
+                    >
+                      <Edit3 size={12} />
+                      <span>Edit</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={savingInline}
+                      onClick={handleSaveInline}
+                      className="btn btn-primary btn-sm"
+                      style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem", background: "#10b981", borderColor: "#10b981" }}
+                      title="Save changes"
+                    >
+                      <Save size={12} />
+                      <span>Save</span>
+                    </button>
+                  )}
                 </div>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", fontSize: "0.85rem" }}>
@@ -831,9 +875,38 @@ export default function BillingEnrollmentSection({
                 gridColumn: showStopLoss ? undefined : "span 2",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
-                <Users size={18} style={{ color: "var(--accent-pink)" }} />
-                <h3 style={{ fontSize: "1rem", fontWeight: "700" }}>Enrollment Census / Tier Breakdown</h3>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <Users size={18} style={{ color: "var(--accent-pink)" }} />
+                  <h3 style={{ fontSize: "1rem", fontWeight: "700" }}>Enrollment Census / Tier Breakdown</h3>
+                </div>
+                {!isInlineEditing ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsExpanded(true);
+                      setIsInlineEditing(true);
+                    }}
+                    className="btn btn-secondary btn-sm"
+                    style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                    title="Edit section"
+                  >
+                    <Edit3 size={12} />
+                    <span>Edit</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={savingInline}
+                    onClick={handleSaveInline}
+                    className="btn btn-primary btn-sm"
+                    style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem", background: "#10b981", borderColor: "#10b981" }}
+                    title="Save changes"
+                  >
+                    <Save size={12} />
+                    <span>Save</span>
+                  </button>
+                )}
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.75rem", textAlign: "center" }}>
@@ -937,16 +1010,46 @@ export default function BillingEnrollmentSection({
                       <Percent size={18} style={{ color: "var(--accent-blue)" }} />
                       <h3 style={{ fontSize: "1rem", fontWeight: "700" }}>Specific Stop-Loss Specs</h3>
                     </div>
-                    {isInlineEditing ? (
-                      <ContractSelect
-                        value={editFormData.specificContract}
-                        onChange={(val) => setEditFormData({ ...editFormData, specificContract: val })}
-                      />
-                    ) : (
-                      <span className="badge badge-blue" style={{ fontSize: "0.7rem" }}>
-                        {activeBAndE.specificContract || "12/12"}
-                      </span>
-                    )}
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                      {isInlineEditing ? (
+                        <>
+                          <ContractSelect
+                            value={editFormData.specificContract}
+                            onChange={(val) => setEditFormData({ ...editFormData, specificContract: val })}
+                          />
+                          <button
+                            type="button"
+                            disabled={savingInline}
+                            onClick={handleSaveInline}
+                            className="btn btn-primary btn-sm"
+                            style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem", background: "#10b981", borderColor: "#10b981" }}
+                            title="Save changes"
+                          >
+                            <Save size={12} />
+                            <span>Save</span>
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <span className="badge badge-blue" style={{ fontSize: "0.7rem" }}>
+                            {activeBAndE.specificContract || "12/12"}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsExpanded(true);
+                              setIsInlineEditing(true);
+                            }}
+                            className="btn btn-secondary btn-sm"
+                            style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                            title="Edit section"
+                          >
+                            <Edit3 size={12} />
+                            <span>Edit</span>
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
 
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.85rem", flex: 1 }}>
@@ -1091,31 +1194,59 @@ export default function BillingEnrollmentSection({
                       <Layers size={18} style={{ color: "var(--accent-purple)" }} />
                       <h3 style={{ fontSize: "1rem", fontWeight: "700" }}>Aggregate Stop-Loss Specs</h3>
                     </div>
-                    {isInlineEditing ? (
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                        {editFormData.aggregateStopLossStatus !== "None" && (
-                          <ContractSelect
-                            value={editFormData.aggregateContract}
-                            onChange={(val) => setEditFormData({ ...editFormData, aggregateContract: val })}
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                      {isInlineEditing ? (
+                        <>
+                          {editFormData.aggregateStopLossStatus !== "None" && (
+                            <ContractSelect
+                              value={editFormData.aggregateContract}
+                              onChange={(val) => setEditFormData({ ...editFormData, aggregateContract: val })}
+                            />
+                          )}
+                          <IncludedNoneToggle
+                            size="sm"
+                            value={editFormData.aggregateStopLossStatus}
+                            onChange={(val) => setEditFormData({ ...editFormData, aggregateStopLossStatus: val })}
                           />
-                        )}
-                        <IncludedNoneToggle
-                          size="sm"
-                          value={editFormData.aggregateStopLossStatus}
-                          onChange={(val) => setEditFormData({ ...editFormData, aggregateStopLossStatus: val })}
-                        />
-                      </div>
-                    ) : (
-                      (activeBAndE.aggregateStopLossStatus === "None" || activeBAndE.aggregatePremium?.trim().toLowerCase() === "none") ? (
-                        <span className="badge" style={{ background: "rgba(148, 163, 184, 0.15)", color: "#64748b", border: "1px solid #cbd5e1", fontSize: "0.7rem" }}>
-                          None
-                        </span>
+                          <button
+                            type="button"
+                            disabled={savingInline}
+                            onClick={handleSaveInline}
+                            className="btn btn-primary btn-sm"
+                            style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem", background: "#10b981", borderColor: "#10b981" }}
+                            title="Save changes"
+                          >
+                            <Save size={12} />
+                            <span>Save</span>
+                          </button>
+                        </>
                       ) : (
-                        <span className="badge badge-purple" style={{ fontSize: "0.7rem" }}>
-                          {activeBAndE.aggregateContract || "12/12"}
-                        </span>
-                      )
-                    )}
+                        <>
+                          {(activeBAndE.aggregateStopLossStatus === "None" || activeBAndE.aggregatePremium?.trim().toLowerCase() === "none") ? (
+                            <span className="badge" style={{ background: "rgba(148, 163, 184, 0.15)", color: "#64748b", border: "1px solid #cbd5e1", fontSize: "0.7rem" }}>
+                              No Agg Coverage
+                            </span>
+                          ) : (
+                            <span className="badge badge-purple" style={{ fontSize: "0.7rem" }}>
+                              {activeBAndE.aggregateContract || "12/12"}
+                            </span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsExpanded(true);
+                              setIsInlineEditing(true);
+                            }}
+                            className="btn btn-secondary btn-sm"
+                            style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                            title="Edit section"
+                          >
+                            <Edit3 size={12} />
+                            <span>Edit</span>
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
 
                   {/* If View Mode & Aggregate is set to None, display notice message */}
@@ -1380,11 +1511,40 @@ export default function BillingEnrollmentSection({
                 border: "1px solid var(--border)",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.85rem" }}>
-                <Network size={18} style={{ color: "var(--accent-yellow)" }} />
-                <h3 style={{ fontSize: "1rem", fontWeight: "700" }}>
-                  Composite Administration & PPO Network Information
-                </h3>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.85rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <Network size={18} style={{ color: "var(--accent-yellow)" }} />
+                  <h3 style={{ fontSize: "1rem", fontWeight: "700" }}>
+                    Composite Administration & PPO Network Information
+                  </h3>
+                </div>
+                {!isInlineEditing ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsExpanded(true);
+                      setIsInlineEditing(true);
+                    }}
+                    className="btn btn-secondary btn-sm"
+                    style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                    title="Edit section"
+                  >
+                    <Edit3 size={12} />
+                    <span>Edit</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={savingInline}
+                    onClick={handleSaveInline}
+                    className="btn btn-primary btn-sm"
+                    style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem", background: "#10b981", borderColor: "#10b981" }}
+                    title="Save changes"
+                  >
+                    <Save size={12} />
+                    <span>Save</span>
+                  </button>
+                )}
               </div>
 
               <div className="grid-cols-2" style={{ gap: "0.85rem", fontSize: "0.85rem" }}>
@@ -1604,9 +1764,38 @@ export default function BillingEnrollmentSection({
                   height: "100%",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
-                  <Pill size={18} style={{ color: "#34d399" }} />
-                  <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>PBM Information</h3>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <Pill size={18} style={{ color: "#34d399" }} />
+                    <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>PBM Information</h3>
+                  </div>
+                  {!isInlineEditing ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsExpanded(true);
+                        setIsInlineEditing(true);
+                      }}
+                      className="btn btn-secondary btn-sm"
+                      style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                      title="Edit section"
+                    >
+                      <Edit3 size={12} />
+                      <span>Edit</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={savingInline}
+                      onClick={handleSaveInline}
+                      className="btn btn-primary btn-sm"
+                      style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem", background: "#10b981", borderColor: "#10b981" }}
+                      title="Save changes"
+                    >
+                      <Save size={12} />
+                      <span>Save</span>
+                    </button>
+                  )}
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem", flex: 1 }}>
@@ -1675,9 +1864,38 @@ export default function BillingEnrollmentSection({
                   height: "100%",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
-                  <DollarSign size={18} style={{ color: "#f472b6" }} />
-                  <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>Commission Info</h3>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <DollarSign size={18} style={{ color: "#f472b6" }} />
+                    <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>Commission Info</h3>
+                  </div>
+                  {!isInlineEditing ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsExpanded(true);
+                        setIsInlineEditing(true);
+                      }}
+                      className="btn btn-secondary btn-sm"
+                      style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                      title="Edit section"
+                    >
+                      <Edit3 size={12} />
+                      <span>Edit</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={savingInline}
+                      onClick={handleSaveInline}
+                      className="btn btn-primary btn-sm"
+                      style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem", background: "#10b981", borderColor: "#10b981" }}
+                      title="Save changes"
+                    >
+                      <Save size={12} />
+                      <span>Save</span>
+                    </button>
+                  )}
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem", flex: 1 }}>
@@ -1736,9 +1954,38 @@ export default function BillingEnrollmentSection({
                   gridColumn: !showBilling ? "span 3" : undefined,
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
-                  <HeartHandshake size={18} style={{ color: "#60a5fa" }} />
-                  <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>Transplant & Domestic</h3>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <HeartHandshake size={18} style={{ color: "#60a5fa" }} />
+                    <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>Transplant & Domestic</h3>
+                  </div>
+                  {!isInlineEditing ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsExpanded(true);
+                        setIsInlineEditing(true);
+                      }}
+                      className="btn btn-secondary btn-sm"
+                      style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                      title="Edit section"
+                    >
+                      <Edit3 size={12} />
+                      <span>Edit</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={savingInline}
+                      onClick={handleSaveInline}
+                      className="btn btn-primary btn-sm"
+                      style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem", background: "#10b981", borderColor: "#10b981" }}
+                      title="Save changes"
+                    >
+                      <Save size={12} />
+                      <span>Save</span>
+                    </button>
+                  )}
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem", flex: 1 }}>
@@ -1781,9 +2028,38 @@ export default function BillingEnrollmentSection({
                   borderRadius: "8px",
                 }}
               >
-                <div style={{ fontSize: "0.8rem", fontWeight: "700", color: "#ffc20e", marginBottom: "0.4rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                  <AlertCircle size={15} />
-                  <span>B&E Specification Notes ({activeBAndE.planYear || "2026"})</span>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.4rem" }}>
+                  <div style={{ fontSize: "0.8rem", fontWeight: "700", color: "#ffc20e", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                    <AlertCircle size={15} />
+                    <span>B&E Specification Notes ({activeBAndE.planYear || "2026"})</span>
+                  </div>
+                  {!isInlineEditing ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsExpanded(true);
+                        setIsInlineEditing(true);
+                      }}
+                      className="btn btn-secondary btn-sm"
+                      style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                      title="Edit section"
+                    >
+                      <Edit3 size={12} />
+                      <span>Edit</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={savingInline}
+                      onClick={handleSaveInline}
+                      className="btn btn-primary btn-sm"
+                      style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem", background: "#10b981", borderColor: "#10b981" }}
+                      title="Save changes"
+                    >
+                      <Save size={12} />
+                      <span>Save</span>
+                    </button>
+                  )}
                 </div>
 
                 {isInlineEditing ? (
@@ -1803,54 +2079,164 @@ export default function BillingEnrollmentSection({
             )
           )}
 
-          {/* Sticky Bottom Save Action Bar during In-Page Editing */}
-          {isInlineEditing && (
-            <div
+          {/* B&E Section Footer Bar (Allows Edit / Save / Print directly from bottom of section) */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "0.85rem 1.25rem",
+              background: "rgba(255, 255, 255, 0.025)",
+              border: "1px solid var(--border)",
+              borderRadius: "10px",
+              marginTop: "0.75rem",
+              flexWrap: "wrap",
+              gap: "0.75rem",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <Calendar size={16} style={{ color: "var(--accent-pink)" }} />
+              <span style={{ fontSize: "0.85rem", fontWeight: "700", color: "var(--text-primary)" }}>
+                {isInlineEditing
+                  ? `Editing Plan Year ${activeBAndE.planYear || "2026"} Specifications`
+                  : `Plan Year ${activeBAndE.planYear || "2026"} Specifications`}
+              </span>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              {!isInlineEditing ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setIsPrintOpen(true)}
+                    className="btn btn-secondary btn-sm"
+                    style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}
+                  >
+                    <Printer size={14} style={{ color: "var(--accent-pink)" }} />
+                    <span>Print/Export</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsExpanded(true);
+                      setIsInlineEditing(true);
+                    }}
+                    className="btn btn-primary btn-sm"
+                    style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}
+                  >
+                    <Edit3 size={14} />
+                    <span>Edit ({activeBAndE.planYear || "2026"})</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setIsInlineEditing(false)}
+                    className="btn btn-secondary btn-sm"
+                  >
+                    <X size={14} />
+                    <span>Cancel</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={savingInline}
+                    onClick={handleSaveInline}
+                    className="btn btn-primary btn-sm"
+                    style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", background: "#10b981", borderColor: "#10b981" }}
+                  >
+                    <Save size={14} />
+                    <span>{savingInline ? "Saving Changes..." : "Save Changes"}</span>
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fixed Floating Save Action Bar (Follows viewport during active editing) */}
+      {isInlineEditing && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "1.5rem",
+            right: "2rem",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.85rem",
+            padding: "0.65rem 1.15rem",
+            background: "var(--bg-elevated, #0f172a)",
+            backdropFilter: "blur(12px)",
+            borderRadius: "12px",
+            border: "1px solid var(--accent-pink)",
+            boxShadow: "0 10px 25px rgba(0, 0, 0, 0.4)",
+            color: "var(--text-primary)",
+            zIndex: 9999,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <span
               style={{
-                position: "sticky",
-                bottom: "1rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "0.75rem 1.25rem",
-                background: "var(--bg-elevated)",
-                backdropFilter: "blur(12px)",
-                borderRadius: "10px",
-                border: "1px solid var(--accent-pink)",
-                boxShadow: "var(--shadow-lg)",
-                color: "var(--text-primary)",
-                zIndex: 10,
+                display: "inline-block",
+                width: "8px",
+                height: "8px",
+                borderRadius: "50%",
+                background: "#10b981",
+                boxShadow: "0 0 8px #10b981",
+              }}
+            />
+            <span style={{ fontSize: "0.8rem", fontWeight: "700" }}>
+              Editing {activeBAndE.planYear || "2026"}
+            </span>
+            <kbd
+              style={{
+                fontSize: "0.68rem",
+                background: "rgba(255, 255, 255, 0.1)",
+                padding: "0.15rem 0.4rem",
+                borderRadius: "4px",
+                color: "var(--text-muted)",
+                border: "1px solid var(--border)",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <CheckCircle2 size={18} style={{ color: "var(--accent-pink)" }} />
-                <span style={{ fontSize: "0.85rem", fontWeight: "600" }}>
-                  You are editing Plan Year {activeBAndE.planYear || "2026"} specifications in-place.
-                </span>
-              </div>
+              Ctrl+S
+            </kbd>
+          </div>
 
-              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                <button
-                  type="button"
-                  onClick={() => setIsInlineEditing(false)}
-                  className="btn btn-secondary btn-sm"
-                >
-                  Cancel
-                </button>
+          <div style={{ height: "18px", width: "1px", background: "var(--border)" }} />
 
-                <button
-                  type="button"
-                  disabled={savingInline}
-                  onClick={handleSaveInline}
-                  className="btn btn-primary btn-sm"
-                  style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", background: "#10b981", borderColor: "#10b981" }}
-                >
-                  <Save size={15} />
-                  <span>{savingInline ? "Saving Changes..." : "Save Changes"}</span>
-                </button>
-              </div>
-            </div>
-          )}
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <button
+              type="button"
+              onClick={() => setIsInlineEditing(false)}
+              className="btn btn-secondary btn-sm"
+              style={{ fontSize: "0.78rem", padding: "0.25rem 0.6rem" }}
+            >
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              disabled={savingInline}
+              onClick={handleSaveInline}
+              className="btn btn-primary btn-sm"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.35rem",
+                background: "#10b981",
+                borderColor: "#10b981",
+                fontSize: "0.78rem",
+                padding: "0.25rem 0.75rem",
+                boxShadow: "0 2px 8px rgba(16, 185, 129, 0.4)",
+              }}
+            >
+              <Save size={14} />
+              <span>{savingInline ? "Saving..." : "Save Changes"}</span>
+            </button>
+          </div>
         </div>
       )}
 
