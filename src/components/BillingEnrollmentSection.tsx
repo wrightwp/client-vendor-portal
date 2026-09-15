@@ -760,7 +760,7 @@ export default function BillingEnrollmentSection({
                     <Shield size={18} style={{ color: "var(--accent-pink)" }} />
                     <h3 style={{ fontSize: "1rem", fontWeight: "700" }}>Stop-Loss Carrier & Underwriter</h3>
                   </div>
-                  {!isInlineEditing ? (
+                  {!isInlineEditing && (
                     <button
                       type="button"
                       onClick={() => {
@@ -773,18 +773,6 @@ export default function BillingEnrollmentSection({
                     >
                       <Edit3 size={12} />
                       <span>Edit</span>
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      disabled={savingInline}
-                      onClick={handleSaveInline}
-                      className="btn btn-primary btn-sm"
-                      style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem", background: "#10b981", borderColor: "#10b981" }}
-                      title="Save changes"
-                    >
-                      <Save size={12} />
-                      <span>Save</span>
                     </button>
                   )}
                 </div>
@@ -880,7 +868,7 @@ export default function BillingEnrollmentSection({
                   <Users size={18} style={{ color: "var(--accent-pink)" }} />
                   <h3 style={{ fontSize: "1rem", fontWeight: "700" }}>Enrollment Census / Tier Breakdown</h3>
                 </div>
-                {!isInlineEditing ? (
+                {!isInlineEditing && (
                   <button
                     type="button"
                     onClick={() => {
@@ -893,18 +881,6 @@ export default function BillingEnrollmentSection({
                   >
                     <Edit3 size={12} />
                     <span>Edit</span>
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    disabled={savingInline}
-                    onClick={handleSaveInline}
-                    className="btn btn-primary btn-sm"
-                    style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem", background: "#10b981", borderColor: "#10b981" }}
-                    title="Save changes"
-                  >
-                    <Save size={12} />
-                    <span>Save</span>
                   </button>
                 )}
               </div>
@@ -1012,23 +988,10 @@ export default function BillingEnrollmentSection({
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                       {isInlineEditing ? (
-                        <>
-                          <ContractSelect
-                            value={editFormData.specificContract}
-                            onChange={(val) => setEditFormData({ ...editFormData, specificContract: val })}
-                          />
-                          <button
-                            type="button"
-                            disabled={savingInline}
-                            onClick={handleSaveInline}
-                            className="btn btn-primary btn-sm"
-                            style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem", background: "#10b981", borderColor: "#10b981" }}
-                            title="Save changes"
-                          >
-                            <Save size={12} />
-                            <span>Save</span>
-                          </button>
-                        </>
+                        <ContractSelect
+                          value={editFormData.specificContract}
+                          onChange={(val) => setEditFormData({ ...editFormData, specificContract: val })}
+                        />
                       ) : (
                         <>
                           <span className="badge badge-blue" style={{ fontSize: "0.7rem" }}>
@@ -1208,17 +1171,6 @@ export default function BillingEnrollmentSection({
                             value={editFormData.aggregateStopLossStatus}
                             onChange={(val) => setEditFormData({ ...editFormData, aggregateStopLossStatus: val })}
                           />
-                          <button
-                            type="button"
-                            disabled={savingInline}
-                            onClick={handleSaveInline}
-                            className="btn btn-primary btn-sm"
-                            style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem", background: "#10b981", borderColor: "#10b981" }}
-                            title="Save changes"
-                          >
-                            <Save size={12} />
-                            <span>Save</span>
-                          </button>
                         </>
                       ) : (
                         <>
@@ -1518,7 +1470,7 @@ export default function BillingEnrollmentSection({
                     Composite Administration & PPO Network Information
                   </h3>
                 </div>
-                {!isInlineEditing ? (
+                {!isInlineEditing && (
                   <button
                     type="button"
                     onClick={() => {
@@ -1531,18 +1483,6 @@ export default function BillingEnrollmentSection({
                   >
                     <Edit3 size={12} />
                     <span>Edit</span>
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    disabled={savingInline}
-                    onClick={handleSaveInline}
-                    className="btn btn-primary btn-sm"
-                    style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem", background: "#10b981", borderColor: "#10b981" }}
-                    title="Save changes"
-                  >
-                    <Save size={12} />
-                    <span>Save</span>
                   </button>
                 )}
               </div>
@@ -1769,7 +1709,7 @@ export default function BillingEnrollmentSection({
                     <Pill size={18} style={{ color: "#34d399" }} />
                     <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>PBM Information</h3>
                   </div>
-                  {!isInlineEditing ? (
+                  {!isInlineEditing && (
                     <button
                       type="button"
                       onClick={() => {
@@ -1782,18 +1722,6 @@ export default function BillingEnrollmentSection({
                     >
                       <Edit3 size={12} />
                       <span>Edit</span>
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      disabled={savingInline}
-                      onClick={handleSaveInline}
-                      className="btn btn-primary btn-sm"
-                      style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem", background: "#10b981", borderColor: "#10b981" }}
-                      title="Save changes"
-                    >
-                      <Save size={12} />
-                      <span>Save</span>
                     </button>
                   )}
                 </div>
@@ -1869,7 +1797,7 @@ export default function BillingEnrollmentSection({
                     <DollarSign size={18} style={{ color: "#f472b6" }} />
                     <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>Commission Info</h3>
                   </div>
-                  {!isInlineEditing ? (
+                  {!isInlineEditing && (
                     <button
                       type="button"
                       onClick={() => {
@@ -1882,18 +1810,6 @@ export default function BillingEnrollmentSection({
                     >
                       <Edit3 size={12} />
                       <span>Edit</span>
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      disabled={savingInline}
-                      onClick={handleSaveInline}
-                      className="btn btn-primary btn-sm"
-                      style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem", background: "#10b981", borderColor: "#10b981" }}
-                      title="Save changes"
-                    >
-                      <Save size={12} />
-                      <span>Save</span>
                     </button>
                   )}
                 </div>
@@ -1959,7 +1875,7 @@ export default function BillingEnrollmentSection({
                     <HeartHandshake size={18} style={{ color: "#60a5fa" }} />
                     <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>Transplant & Domestic</h3>
                   </div>
-                  {!isInlineEditing ? (
+                  {!isInlineEditing && (
                     <button
                       type="button"
                       onClick={() => {
@@ -1972,18 +1888,6 @@ export default function BillingEnrollmentSection({
                     >
                       <Edit3 size={12} />
                       <span>Edit</span>
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      disabled={savingInline}
-                      onClick={handleSaveInline}
-                      className="btn btn-primary btn-sm"
-                      style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem", background: "#10b981", borderColor: "#10b981" }}
-                      title="Save changes"
-                    >
-                      <Save size={12} />
-                      <span>Save</span>
                     </button>
                   )}
                 </div>
@@ -2033,7 +1937,7 @@ export default function BillingEnrollmentSection({
                     <AlertCircle size={15} />
                     <span>B&E Specification Notes ({activeBAndE.planYear || "2026"})</span>
                   </div>
-                  {!isInlineEditing ? (
+                  {!isInlineEditing && (
                     <button
                       type="button"
                       onClick={() => {
@@ -2046,18 +1950,6 @@ export default function BillingEnrollmentSection({
                     >
                       <Edit3 size={12} />
                       <span>Edit</span>
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      disabled={savingInline}
-                      onClick={handleSaveInline}
-                      className="btn btn-primary btn-sm"
-                      style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem", background: "#10b981", borderColor: "#10b981" }}
-                      title="Save changes"
-                    >
-                      <Save size={12} />
-                      <span>Save</span>
                     </button>
                   )}
                 </div>
