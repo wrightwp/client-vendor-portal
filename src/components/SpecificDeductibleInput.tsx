@@ -16,7 +16,7 @@ export type DeductibleBasis = "Per Individual" | "Per Family";
  * Formats a raw amount string as currency (e.g., "50000" -> "$50,000.00")
  */
 export function formatCurrencyAmount(val: string): string {
-  if (!val || !val.trim()) return "$50,000.00";
+  if (!val || !val.trim()) return "$0.00";
   const cleaned = val.trim().replace(/,/g, "").replace(/^\$/, "").trim();
   const num = parseFloat(cleaned);
   if (!isNaN(num)) {
@@ -35,7 +35,7 @@ export function formatCurrencyAmount(val: string): string {
 export function parseSpecificDeductible(val: string): { amount: string; basis: DeductibleBasis } {
   const trimmed = (val || "").trim();
   if (!trimmed) {
-    return { amount: "$50,000.00", basis: "Per Individual" };
+    return { amount: "", basis: "Per Individual" };
   }
 
   const isFamily = /per\s*family|family/i.test(trimmed);
@@ -43,10 +43,9 @@ export function parseSpecificDeductible(val: string): { amount: string; basis: D
 
   // Extract currency amount part before slash or bracket
   const parts = trimmed.split(/[/(\\]/);
-  const amountPart = parts[0].trim();
-  const amount = formatCurrencyAmount(amountPart || "$50,000.00");
+  const rawAmt = parts[0].trim().replace(/^\$/, "").trim();
 
-  return { amount, basis };
+  return { amount: rawAmt, basis };
 }
 
 /**
@@ -55,7 +54,8 @@ export function parseSpecificDeductible(val: string): { amount: string; basis: D
 export function formatDisplaySpecificDeductible(val: string | null | undefined): string {
   if (!val || !val.trim()) return "—";
   const { amount, basis } = parseSpecificDeductible(val);
-  return `${amount} / ${basis}`;
+  const formattedAmount = formatCurrencyAmount(amount);
+  return `${formattedAmount} / ${basis}`;
 }
 
 export function SpecificDeductibleInput({
@@ -69,23 +69,40 @@ export function SpecificDeductibleInput({
 
   useEffect(() => {
     const p = parseSpecificDeductible(value);
-    setAmount(p.amount);
     setBasis(p.basis);
+    const cleanCurrent = amount.replace(/^\$/, "").replace(/,/g, "").trim();
+    const cleanP = p.amount.replace(/^\$/, "").replace(/,/g, "").trim();
+    if (cleanP !== cleanCurrent) {
+      setAmount(p.amount);
+    }
   }, [value]);
 
-  const emitChange = (newAmount: string, newBasis: DeductibleBasis) => {
-    const formattedAmt = formatCurrencyAmount(newAmount);
-    onChange(`${formattedAmt} / ${newBasis}`);
+  const emitChange = (newAmount: string, newBasis: DeductibleBasis, format = false) => {
+    const clean = newAmount.replace(/^\$/, "").replace(/,/g, "").trim();
+    if (!clean) {
+      onChange(`$0.00 / ${newBasis}`);
+      return;
+    }
+    if (format) {
+      const formattedAmt = formatCurrencyAmount(clean);
+      onChange(`${formattedAmt} / ${newBasis}`);
+    } else {
+      onChange(`$${clean} / ${newBasis}`);
+    }
   };
 
   const handleAmountChange = (val: string) => {
     setAmount(val);
-    emitChange(val, basis);
+    emitChange(val, basis, false);
+  };
+
+  const handleAmountBlur = () => {
+    emitChange(amount, basis, true);
   };
 
   const handleBasisChange = (newBasis: DeductibleBasis) => {
     setBasis(newBasis);
-    emitChange(amount, newBasis);
+    emitChange(amount, newBasis, false);
   };
 
   if (compact) {
@@ -94,6 +111,7 @@ export function SpecificDeductibleInput({
         <CurrencyInput
           value={amount}
           onChange={handleAmountChange}
+          onBlur={handleAmountBlur}
           placeholder="0.00"
           style={{ width: "140px", fontSize: "0.825rem", padding: "0.25rem 0.5rem" }}
         />
@@ -166,6 +184,7 @@ export function SpecificDeductibleInput({
         placeholder="0.00"
         value={amount}
         onChange={handleAmountChange}
+        onBlur={handleAmountBlur}
       />
 
       <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.2rem" }}>

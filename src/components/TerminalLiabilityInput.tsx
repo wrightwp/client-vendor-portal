@@ -95,10 +95,14 @@ export function TerminalLiabilityInput({
   useEffect(() => {
     const p = parseTloString(value);
     setSelectedOption(p.option);
-    setFeeAmount(p.fee);
+    const cleanCurrent = feeAmount.replace(/pepm/gi, "").replace(/^\$/, "").replace(/,/g, "").trim();
+    const cleanP = p.fee.replace(/pepm/gi, "").replace(/^\$/, "").replace(/,/g, "").trim();
+    if (cleanP !== cleanCurrent) {
+      setFeeAmount(p.fee);
+    }
   }, [value]);
 
-  const emitChange = (opt: TloOption, fee: string) => {
+  const emitChange = (opt: TloOption, fee: string, format = false) => {
     if (opt === "No") {
       onChange("No");
     } else if (opt === "Included") {
@@ -109,11 +113,15 @@ export function TerminalLiabilityInput({
         .replace(/^\$/, "")
         .trim();
       if (cleanFee) {
-        const num = parseFloat(cleanFee.replace(/,/g, ""));
-        const formattedFee = !isNaN(num)
-          ? num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-          : cleanFee;
-        onChange(`Separately Billed ($${formattedFee} PEPM)`);
+        if (format) {
+          const num = parseFloat(cleanFee.replace(/,/g, ""));
+          const formattedFee = !isNaN(num)
+            ? num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            : cleanFee;
+          onChange(`Separately Billed ($${formattedFee} PEPM)`);
+        } else {
+          onChange(`Separately Billed ($${cleanFee} PEPM)`);
+        }
       } else {
         onChange("Separately Billed");
       }
@@ -122,12 +130,16 @@ export function TerminalLiabilityInput({
 
   const handleOptionSelect = (opt: TloOption) => {
     setSelectedOption(opt);
-    emitChange(opt, feeAmount);
+    emitChange(opt, feeAmount, false);
   };
 
   const handleFeeChange = (val: string) => {
     setFeeAmount(val);
-    emitChange("Separately Billed", val);
+    emitChange("Separately Billed", val, false);
+  };
+
+  const handleFeeBlur = () => {
+    emitChange("Separately Billed", feeAmount, true);
   };
 
   if (compact) {
@@ -176,6 +188,7 @@ export function TerminalLiabilityInput({
           <CurrencyInput
             value={feeAmount}
             onChange={handleFeeChange}
+            onBlur={handleFeeBlur}
             placeholder="0.00"
             suffix="PEPM"
             style={{ width: "160px", fontSize: "0.75rem" }}
@@ -237,6 +250,7 @@ export function TerminalLiabilityInput({
           <CurrencyInput
             value={feeAmount}
             onChange={handleFeeChange}
+            onBlur={handleFeeBlur}
             placeholder="0.00"
             suffix="PEPM"
             style={{ flex: 1 }}

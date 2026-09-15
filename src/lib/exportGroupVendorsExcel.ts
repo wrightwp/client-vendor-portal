@@ -1,5 +1,6 @@
 import * as XLSX from "xlsx";
 import { formatDisplayDate } from "./dateUtils";
+import { formatGroupFeeDisplay } from "@/components/CurrencyInput";
 
 export function exportGroupVendorsToExcel(groupName: string, vendors: any[]) {
   const list = vendors || [];
@@ -32,7 +33,7 @@ export function exportGroupVendorsToExcel(groupName: string, vendors: any[]) {
     rows.push([
       v.name || "—",
       v.vendorType || "—",
-      item.fee || "—",
+      formatGroupFeeDisplay(item.fee) || "—",
       v.taxId || "—",
       v.phone || "—",
       v.email || "—",

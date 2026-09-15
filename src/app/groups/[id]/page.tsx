@@ -13,6 +13,7 @@ import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
 import { MarkdownNoteRenderer } from "@/components/MarkdownNotes";
 import { formatDisplayDate } from "@/lib/dateUtils";
 import { parseVendorCategories } from "@/lib/vendorCategories";
+import { formatGroupFeeDisplay } from "@/components/CurrencyInput";
 import {
   ArrowLeft,
   Building2,
@@ -903,7 +904,7 @@ export default function GroupDetailPage({
                       <th>Vendor Name</th>
                       <th className="nowrap">Category</th>
                       <th className="nowrap">Location</th>
-                      <th className="nowrap">Group Fee</th>
+                      <th className="nowrap" style={{ textAlign: "right" }}>Group Fee</th>
                       <th>Association Notes</th>
                       <th style={{ textAlign: "right" }} className="nowrap">Actions</th>
                     </tr>
@@ -931,7 +932,7 @@ export default function GroupDetailPage({
                             ? `${item.vendor.city}, ${item.vendor.state}`
                             : "—"}
                         </td>
-                        <td className="nowrap">
+                        <td className="nowrap" style={{ textAlign: "right" }}>
                           {item.fee ? (
                             <span
                               style={{
@@ -944,7 +945,7 @@ export default function GroupDetailPage({
                                 fontSize: "0.8rem",
                               }}
                             >
-                              {item.fee}
+                              {formatGroupFeeDisplay(item.fee)}
                             </span>
                           ) : (
                             <span style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}>—</span>

@@ -25,6 +25,7 @@ import EditAssociationNoteModal from "./EditAssociationNoteModal";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import { exportGroupVendorsToExcel } from "@/lib/exportGroupVendorsExcel";
 import { parseVendorCategories } from "@/lib/vendorCategories";
+import { formatGroupFeeDisplay } from "./CurrencyInput";
 
 interface BEAssociatedVendorsTableProps {
   clientId: string;
@@ -86,7 +87,7 @@ export default function BEAssociatedVendorsTable({
         body: JSON.stringify({
           clientId,
           vendorId,
-          fee: tempFeeValue.trim(),
+          fee: formatGroupFeeDisplay(tempFeeValue.trim()),
         }),
       });
       const data = await res.json();
@@ -176,7 +177,7 @@ export default function BEAssociatedVendorsTable({
         body: JSON.stringify({
           clientId,
           vendorId: targetVendorId,
-          fee: newAssociation.fee,
+          fee: formatGroupFeeDisplay(newAssociation.fee),
           notes: newAssociation.notes,
         }),
       });
@@ -617,7 +618,7 @@ export default function BEAssociatedVendorsTable({
                           fontWeight: "800",
                         }}
                       >
-                        {item.fee || "+ Set Fee"}
+                        {formatGroupFeeDisplay(item.fee) || "+ Set Fee"}
                       </strong>
                       <Edit3 size={10} style={{ opacity: 0.7, color: item.fee ? "var(--accent-blue)" : "var(--text-muted)" }} />
                     </div>
@@ -652,8 +653,8 @@ export default function BEAssociatedVendorsTable({
               <tr>
                 <th style={{ padding: "0.45rem 0.75rem" }}>Vendor</th>
                 <th style={{ padding: "0.45rem 0.75rem" }} className="nowrap">Category</th>
-                <th style={{ padding: "0.45rem 0.75rem", minWidth: "150px" }} className="nowrap">
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                <th style={{ padding: "0.45rem 0.75rem", minWidth: "140px", textAlign: "right" }} className="nowrap">
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "0.25rem" }}>
                     <DollarSign size={13} />
                     <span>Group Fee</span>
                   </div>
@@ -703,9 +704,9 @@ export default function BEAssociatedVendorsTable({
                       </div>
                     </td>
 
-                    <td style={{ padding: "0.45rem 0.75rem" }} className="nowrap">
+                    <td style={{ padding: "0.45rem 0.75rem", textAlign: "right" }} className="nowrap">
                       {isEditingThisFee ? (
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "0.25rem" }}>
                           <input
                             type="text"
                             autoFocus
@@ -774,7 +775,7 @@ export default function BEAssociatedVendorsTable({
                               fontSize: "0.78rem",
                             }}
                           >
-                            {item.fee || "+ Add Fee"}
+                            {formatGroupFeeDisplay(item.fee) || "+ Add Fee"}
                           </span>
                           <Edit3 size={10} style={{ opacity: 0.7, color: item.fee ? "var(--accent-blue)" : "var(--text-muted)" }} />
                         </div>
