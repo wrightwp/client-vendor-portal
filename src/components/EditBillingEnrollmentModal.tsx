@@ -16,6 +16,9 @@ import VendorTypeahead from "./VendorTypeahead";
 import MaxSpecificRenewalIncreaseInput from "./MaxSpecificRenewalIncreaseInput";
 import SpecificDeductibleInput from "./SpecificDeductibleInput";
 import SpecificPremiumRatesInput from "./SpecificPremiumRatesInput";
+import AggregateFactorsInput from "./AggregateFactorsInput";
+import EnrollmentCensusInput, { calculateCensusTotal } from "./EnrollmentCensusInput";
+import { TierStructure } from "./TierStructureSelector";
 import IncludedNoneToggle from "./IncludedNoneToggle";
 import TerminalLiabilityInput from "./TerminalLiabilityInput";
 import AggregateRunInLimitInput from "./AggregateRunInLimitInput";
@@ -44,10 +47,8 @@ export default function EditBillingEnrollmentModal({
   const [recordId, setRecordId] = useState<string | undefined>(
     isNewPlanYear ? undefined : initialData?.id
   );
-  const [planYear, setPlanYear] = useState<string>(
-    isNewPlanYear
-      ? String(new Date().getFullYear() + 1)
-      : initialData?.planYear || "2026"
+  const [planYear, setPlanYear] = useState(
+    initialData?.planYear || (isNewPlanYear ? String(new Date().getFullYear() + 1) : "2026")
   );
   const [startDate, setStartDate] = useState<string>(formatDisplayDate(initialData?.startDate));
   const [endDate, setEndDate] = useState<string>(formatDisplayDate(initialData?.endDate));
@@ -81,6 +82,8 @@ export default function EditBillingEnrollmentModal({
     terminalLiabilityOption: initialData?.terminalLiabilityOption || "",
     aggregateFactorSingle: initialData?.aggregateFactorSingle || "",
     aggregateFactorEmployeePlusOne: initialData?.aggregateFactorEmployeePlusOne || "",
+    aggregateFactorEmployeeSpouse: initialData?.aggregateFactorEmployeeSpouse || "",
+    aggregateFactorEmployeeChildren: initialData?.aggregateFactorEmployeeChildren || "",
     aggregateFactorFamily: initialData?.aggregateFactorFamily || "",
     aggregateMinAttachmentPoint: initialData?.aggregateMinAttachmentPoint || "",
     aggregateBenefitsCovered: initialData?.aggregateBenefitsCovered || "",
@@ -113,6 +116,8 @@ export default function EditBillingEnrollmentModal({
 
     figuresSingle: initialData?.figuresSingle || "",
     figuresEmployeePlusOne: initialData?.figuresEmployeePlusOne || "",
+    figuresEmployeeSpouse: initialData?.figuresEmployeeSpouse || "",
+    figuresEmployeeChildren: initialData?.figuresEmployeeChildren || "",
     figuresFamily: initialData?.figuresFamily || "",
     figuresTotal: initialData?.figuresTotal || "",
 
@@ -128,18 +133,21 @@ export default function EditBillingEnrollmentModal({
   >("YEAR_DATES");
   const [error, setError] = useState("");
 
-  const handleUpdateCensusTier = (
-    field: "figuresSingle" | "figuresEmployeePlusOne" | "figuresFamily",
-    val: string
-  ) => {
-    const updated = { ...formData, [field]: val };
-    const s = parseInt(field === "figuresSingle" ? val : updated.figuresSingle, 10) || 0;
-    const e = parseInt(field === "figuresEmployeePlusOne" ? val : updated.figuresEmployeePlusOne, 10) || 0;
-    const f = parseInt(field === "figuresFamily" ? val : updated.figuresFamily, 10) || 0;
-    if (s > 0 || e > 0 || f > 0) {
-      updated.figuresTotal = String(s + e + f);
-    }
-    setFormData(updated);
+  const handleTierStructureChange = (newTier: TierStructure) => {
+    setFormData((prev) => {
+      const newTotal = calculateCensusTotal(newTier, {
+        single: prev.figuresSingle,
+        eePlusOne: prev.figuresEmployeePlusOne,
+        eeSpouse: prev.figuresEmployeeSpouse,
+        eeChildren: prev.figuresEmployeeChildren,
+        family: prev.figuresFamily,
+      });
+      return {
+        ...prev,
+        specificTierStructure: newTier,
+        figuresTotal: String(newTotal),
+      };
+    });
   };
 
   const handleCopyFromPriorYear = (sourceYear: string) => {
@@ -172,6 +180,8 @@ export default function EditBillingEnrollmentModal({
       terminalLiabilityOption: sourceRecord.terminalLiabilityOption || "",
       aggregateFactorSingle: sourceRecord.aggregateFactorSingle || "",
       aggregateFactorEmployeePlusOne: sourceRecord.aggregateFactorEmployeePlusOne || "",
+      aggregateFactorEmployeeSpouse: sourceRecord.aggregateFactorEmployeeSpouse || "",
+      aggregateFactorEmployeeChildren: sourceRecord.aggregateFactorEmployeeChildren || "",
       aggregateFactorFamily: sourceRecord.aggregateFactorFamily || "",
       aggregateMinAttachmentPoint: sourceRecord.aggregateMinAttachmentPoint || "",
       aggregateBenefitsCovered: sourceRecord.aggregateBenefitsCovered || "",
@@ -204,6 +214,8 @@ export default function EditBillingEnrollmentModal({
 
       figuresSingle: sourceRecord.figuresSingle || "",
       figuresEmployeePlusOne: sourceRecord.figuresEmployeePlusOne || "",
+      figuresEmployeeSpouse: sourceRecord.figuresEmployeeSpouse || "",
+      figuresEmployeeChildren: sourceRecord.figuresEmployeeChildren || "",
       figuresFamily: sourceRecord.figuresFamily || "",
       figuresTotal: sourceRecord.figuresTotal || "",
 
@@ -549,17 +561,17 @@ export default function EditBillingEnrollmentModal({
                 <div style={{ background: "rgba(0, 174, 219, 0.04)", padding: "1rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
                   <SpecificPremiumRatesInput
                     tierStructure={formData.specificTierStructure}
-                    onTierStructureChange={(tier) => setFormData({ ...formData, specificTierStructure: tier })}
+                    onTierStructureChange={handleTierStructureChange}
                     singleRate={formData.specificPremiumSingle}
-                    onSingleRateChange={(val) => setFormData({ ...formData, specificPremiumSingle: val })}
+                    onSingleRateChange={(val) => setFormData((prev) => ({ ...prev, specificPremiumSingle: val }))}
                     eePlusOneRate={formData.specificPremiumEmployeePlusOne}
-                    onEePlusOneRateChange={(val) => setFormData({ ...formData, specificPremiumEmployeePlusOne: val })}
+                    onEePlusOneRateChange={(val) => setFormData((prev) => ({ ...prev, specificPremiumEmployeePlusOne: val }))}
                     eeSpouseRate={formData.specificPremiumEmployeeSpouse}
-                    onEeSpouseRateChange={(val) => setFormData({ ...formData, specificPremiumEmployeeSpouse: val })}
+                    onEeSpouseRateChange={(val) => setFormData((prev) => ({ ...prev, specificPremiumEmployeeSpouse: val }))}
                     eeChildrenRate={formData.specificPremiumEmployeeChildren}
-                    onEeChildrenRateChange={(val) => setFormData({ ...formData, specificPremiumEmployeeChildren: val })}
+                    onEeChildrenRateChange={(val) => setFormData((prev) => ({ ...prev, specificPremiumEmployeeChildren: val }))}
                     familyRate={formData.specificPremiumFamily}
-                    onFamilyRateChange={(val) => setFormData({ ...formData, specificPremiumFamily: val })}
+                    onFamilyRateChange={(val) => setFormData((prev) => ({ ...prev, specificPremiumFamily: val }))}
                     isEditing={true}
                     compact={false}
                   />
@@ -573,7 +585,7 @@ export default function EditBillingEnrollmentModal({
                   <textarea
                     rows={3}
                     className="form-textarea"
-                    placeholder="Enter stop-loss notes, laser details, specific deductible guarantees, carrier binding clauses..."
+                    placeholder="Enter stop-loss contract terms, laser specifics, renewal caps, or carrier clauses..."
                     value={formData.stopLossNotes}
                     onChange={(e) => setFormData({ ...formData, stopLossNotes: e.target.value })}
                   />
@@ -584,146 +596,102 @@ export default function EditBillingEnrollmentModal({
             {/* TAB 3: Aggregate Stop-Loss */}
             {activeTab === "AGGREGATE" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                {/* Aggregate Coverage Toggle */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--bg-card-hover)", padding: "0.75rem 1rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
-                  <div>
-                    <label className="form-label" style={{ fontWeight: 700, color: "var(--accent-purple)", marginBottom: "0.1rem" }}>
-                      Aggregate Stop-Loss Coverage
-                    </label>
-                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                      Select whether Aggregate Stop-Loss coverage is included for this plan year.
-                    </div>
-                  </div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>Aggregate Stop-Loss Protection</h3>
                   <IncludedNoneToggle
-                    size="md"
                     value={formData.aggregateStopLossStatus}
                     onChange={(val) => setFormData({ ...formData, aggregateStopLossStatus: val })}
                   />
                 </div>
 
-                {formData.aggregateStopLossStatus === "None" && (
-                  <div
-                    style={{
-                      padding: "1rem 1.25rem",
-                      borderRadius: "8px",
-                      background: "rgba(239, 68, 68, 0.05)",
-                      border: "1px solid rgba(239, 68, 68, 0.2)",
-                      color: "var(--text-primary)",
-                      fontSize: "0.85rem",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.75rem",
-                    }}
-                  >
-                    <ShieldAlert size={22} style={{ color: "#ef4444", flexShrink: 0 }} />
-                    <div>
-                      <strong style={{ color: "#dc2626" }}>Aggregate Stop-Loss Status set to "None"</strong>
-                      <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginTop: "0.2rem" }}>
-                        The section will remain displayed on the group profile with a notice stating that no Aggregate Stop-Loss coverage is included.
+                {formData.aggregateStopLossStatus !== "None" && (
+                  <>
+                    <div className="grid-cols-2">
+                      <div className="form-group">
+                        <label className="form-label">Aggregate Premium (Annual)</label>
+                        <CurrencyInput
+                          style={{ width: "100%" }}
+                          placeholder="0.00"
+                          value={formData.aggregatePremium}
+                          onChange={(val) => setFormData({ ...formData, aggregatePremium: val })}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Min. Attachment Point</label>
+                        <CurrencyInput
+                          style={{ width: "100%" }}
+                          placeholder="0.00"
+                          value={formData.aggregateMinAttachmentPoint}
+                          onChange={(val) => setFormData({ ...formData, aggregateMinAttachmentPoint: val })}
+                        />
                       </div>
                     </div>
-                  </div>
+
+                    <div className="grid-cols-2">
+                      <div className="form-group">
+                        <label className="form-label">Monthly Accommodation</label>
+                        <MonthlyAccommodationInput
+                          value={formData.monthlyAggregateAccommodation}
+                          onChange={(val) => setFormData({ ...formData, monthlyAggregateAccommodation: val })}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Terminal Liability Option (TLO)</label>
+                        <TerminalLiabilityInput
+                          value={formData.terminalLiabilityOption}
+                          onChange={(val) => setFormData({ ...formData, terminalLiabilityOption: val })}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid-cols-3">
+                      <div className="form-group">
+                        <label className="form-label">Run-in Limit</label>
+                        <AggregateRunInLimitInput
+                          value={formData.aggregateRunInLimit}
+                          onChange={(val) => setFormData({ ...formData, aggregateRunInLimit: val })}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Benefits Covered</label>
+                        <BenefitsCoveredSelect
+                          value={formData.aggregateBenefitsCovered}
+                          onChange={(val) => setFormData({ ...formData, aggregateBenefitsCovered: val })}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Contract Type</label>
+                        <ContractSelect
+                          value={formData.aggregateContract}
+                          onChange={(val) => setFormData({ ...formData, aggregateContract: val })}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ background: "rgba(255, 255, 255, 0.03)", padding: "1rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
+                      <AggregateFactorsInput
+                        tierStructure={formData.specificTierStructure}
+                        onTierStructureChange={handleTierStructureChange}
+                        singleFactor={formData.aggregateFactorSingle}
+                        onSingleFactorChange={(val) => setFormData((prev) => ({ ...prev, aggregateFactorSingle: val }))}
+                        eePlusOneFactor={formData.aggregateFactorEmployeePlusOne}
+                        onEePlusOneFactorChange={(val) => setFormData((prev) => ({ ...prev, aggregateFactorEmployeePlusOne: val }))}
+                        eeSpouseFactor={formData.aggregateFactorEmployeeSpouse}
+                        onEeSpouseFactorChange={(val) => setFormData((prev) => ({ ...prev, aggregateFactorEmployeeSpouse: val }))}
+                        eeChildrenFactor={formData.aggregateFactorEmployeeChildren}
+                        onEeChildrenFactorChange={(val) => setFormData((prev) => ({ ...prev, aggregateFactorEmployeeChildren: val }))}
+                        familyFactor={formData.aggregateFactorFamily}
+                        onFamilyFactorChange={(val) => setFormData((prev) => ({ ...prev, aggregateFactorFamily: val }))}
+                        isEditing={true}
+                        compact={false}
+                      />
+                    </div>
+                  </>
                 )}
-                <div className="grid-cols-2">
-                  <div className="form-group">
-                    <label className="form-label">Aggregate Premium (Annual / PEPM)</label>
-                    <CurrencyInput
-                      align="left"
-                      style={{ width: "100%" }}
-                      placeholder="0.00"
-                      value={formData.aggregatePremium}
-                      onChange={(val) => setFormData({ ...formData, aggregatePremium: val })}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Monthly Aggregate Accommodation</label>
-                    <MonthlyAccommodationInput
-                      value={formData.monthlyAggregateAccommodation}
-                      onChange={(val) => setFormData({ ...formData, monthlyAggregateAccommodation: val })}
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Terminal Liability Option (TLO)</label>
-                  <TerminalLiabilityInput
-                    value={formData.terminalLiabilityOption}
-                    onChange={(val) => setFormData({ ...formData, terminalLiabilityOption: val })}
-                  />
-                </div>
-
-                <div className="grid-cols-2" style={{ alignItems: "center" }}>
-                  <div className="form-group">
-                    <label className="form-label">Min. Attachment Point</label>
-                    <CurrencyInput
-                      align="left"
-                      style={{ width: "100%" }}
-                      placeholder="0.00"
-                      value={formData.aggregateMinAttachmentPoint}
-                      onChange={(val) => setFormData({ ...formData, aggregateMinAttachmentPoint: val })}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Aggregate Run-in Limit</label>
-                    <AggregateRunInLimitInput
-                      value={formData.aggregateRunInLimit}
-                      onChange={(val) => setFormData({ ...formData, aggregateRunInLimit: val })}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid-cols-2">
-                  <div className="form-group">
-                    <label className="form-label">Benefits Covered</label>
-                    <BenefitsCoveredSelect
-                      value={formData.aggregateBenefitsCovered}
-                      onChange={(val) => setFormData({ ...formData, aggregateBenefitsCovered: val })}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Aggregate Contract Type</label>
-                    <ContractSelect
-                      value={formData.aggregateContract}
-                      onChange={(val) => setFormData({ ...formData, aggregateContract: val })}
-                    />
-                  </div>
-                </div>
-
-                <div style={{ background: "rgba(255, 255, 255, 0.03)", padding: "1rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
-                  <label className="form-label" style={{ marginBottom: "0.5rem" }}>Aggregate Factors (Monthly PEPM)</label>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.75rem" }}>
-                    <div>
-                      <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Single Factor</span>
-                      <CurrencyInput
-                        style={{ width: "100%" }}
-                        placeholder="0.00"
-                        value={formData.aggregateFactorSingle}
-                        onChange={(val) => setFormData({ ...formData, aggregateFactorSingle: val })}
-                      />
-                    </div>
-                    <div>
-                      <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Employee + 1 Factor</span>
-                      <CurrencyInput
-                        style={{ width: "100%" }}
-                        placeholder="0.00"
-                        value={formData.aggregateFactorEmployeePlusOne}
-                        onChange={(val) => setFormData({ ...formData, aggregateFactorEmployeePlusOne: val })}
-                      />
-                    </div>
-                    <div>
-                      <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Family Factor</span>
-                      <CurrencyInput
-                        style={{ width: "100%" }}
-                        placeholder="0.00"
-                        value={formData.aggregateFactorFamily}
-                        onChange={(val) => setFormData({ ...formData, aggregateFactorFamily: val })}
-                      />
-                    </div>
-                  </div>
-                </div>
               </div>
             )}
 
@@ -743,7 +711,7 @@ export default function EditBillingEnrollmentModal({
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Medical Fee</label>
+                    <label className="form-label">Medical Administration Fee</label>
                     <CurrencyInput
                       style={{ width: "100%" }}
                       placeholder="0.00"
@@ -754,7 +722,7 @@ export default function EditBillingEnrollmentModal({
                   </div>
                 </div>
 
-                <div className="grid-cols-2">
+                <div className="grid-cols-3">
                   <div className="form-group">
                     <label className="form-label">UR (AHH)</label>
                     <CurrencyInput
@@ -776,9 +744,7 @@ export default function EditBillingEnrollmentModal({
                       onChange={(val) => setFormData({ ...formData, amwellFee: val })}
                     />
                   </div>
-                </div>
 
-                <div className="grid-cols-2">
                   <div className="form-group">
                     <label className="form-label">Physicians Care / HAP</label>
                     <CurrencyInput
@@ -789,50 +755,47 @@ export default function EditBillingEnrollmentModal({
                       onChange={(val) => setFormData({ ...formData, physiciansCareHapFee: val })}
                     />
                   </div>
+                </div>
 
+                <div className="grid-cols-2">
                   <div className="form-group">
                     <label className="form-label">Wrap Networks</label>
                     <input
                       type="text"
                       className="form-input"
-                      placeholder="Aetna 25%, Valenz 25%"
+                      placeholder="e.g. Wrap Network..."
                       value={formData.wrapNetwork}
                       onChange={(e) => setFormData({ ...formData, wrapNetwork: e.target.value })}
                     />
                   </div>
-                </div>
 
-                <div className="grid-cols-2">
                   <div className="form-group">
-                    <label className="form-label">Aetna Signature Admin</label>
+                    <label className="form-label">Aetna Signature Administrators</label>
                     <CurrencyInput
                       style={{ width: "100%" }}
                       placeholder="0.00"
-                      suffix="PEPM"
                       value={formData.aetnaSignatureAdminFee}
                       onChange={(val) => setFormData({ ...formData, aetnaSignatureAdminFee: val })}
                     />
                   </div>
+                </div>
 
+                <div className="grid-cols-3">
                   <div className="form-group">
                     <label className="form-label">Network Access Fee</label>
                     <CurrencyInput
                       style={{ width: "100%" }}
                       placeholder="0.00"
-                      suffix="PEPM"
                       value={formData.networkAccessFee}
                       onChange={(val) => setFormData({ ...formData, networkAccessFee: val })}
                     />
                   </div>
-                </div>
 
-                <div className="grid-cols-2">
                   <div className="form-group">
                     <label className="form-label">Reinsurance Fee</label>
                     <CurrencyInput
                       style={{ width: "100%" }}
                       placeholder="0.00"
-                      suffix="PEPM"
                       value={formData.reinsuranceFee}
                       onChange={(val) => setFormData({ ...formData, reinsuranceFee: val })}
                     />
@@ -843,7 +806,6 @@ export default function EditBillingEnrollmentModal({
                     <CurrencyInput
                       style={{ width: "100%" }}
                       placeholder="0.00"
-                      suffix="hr"
                       value={formData.lcmSpaFee}
                       onChange={(val) => setFormData({ ...formData, lcmSpaFee: val })}
                     />
@@ -856,18 +818,17 @@ export default function EditBillingEnrollmentModal({
                     <CurrencyInput
                       style={{ width: "100%" }}
                       placeholder="0.00"
-                      suffix="PEPM"
                       value={formData.agentFee}
                       onChange={(val) => setFormData({ ...formData, agentFee: val })}
                     />
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">PPO Fee Notes</label>
+                    <label className="form-label">PPO Fee Notes / Structure</label>
                     <input
                       type="text"
                       className="form-input"
-                      placeholder="$9.00 PEPM + 3% of allowed..."
+                      placeholder="e.g. 5.5% of savings, $8.50 PEPM..."
                       value={formData.ppoFee}
                       onChange={(e) => setFormData({ ...formData, ppoFee: e.target.value })}
                     />
@@ -879,16 +840,15 @@ export default function EditBillingEnrollmentModal({
             {/* TAB 5: PBM & Commissions */}
             {activeTab === "PBM" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                <h3 style={{ fontSize: "0.95rem", fontWeight: "700", color: "#34d399" }}>PBM Information</h3>
                 <div className="grid-cols-2">
                   <div className="form-group">
-                    <label className="form-label">PBM / Rx Provider</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="Liviniti"
+                    <label className="form-label">PBM Rx Provider</label>
+                    <VendorTypeahead
+                      placeholder="Select or enter PBM Provider..."
                       value={formData.pbmRx}
-                      onChange={(e) => setFormData({ ...formData, pbmRx: e.target.value })}
+                      onChange={(val) => setFormData({ ...formData, pbmRx: val })}
+                      allVendors={allVendors}
+                      allowedCategories={["PBM"]}
                     />
                   </div>
 
@@ -901,7 +861,7 @@ export default function EditBillingEnrollmentModal({
                   </div>
                 </div>
 
-                <div className="grid-cols-2" style={{ alignItems: "center" }}>
+                <div className="grid-cols-2">
                   <div className="form-group">
                     <label className="form-label">Is Rx ASR's Contract?</label>
                     <YesNoToggle
@@ -919,43 +879,42 @@ export default function EditBillingEnrollmentModal({
                   </div>
                 </div>
 
-                <h3 style={{ fontSize: "0.95rem", fontWeight: "700", color: "#f472b6", marginTop: "1rem" }}>Commission Information</h3>
-                <div className="grid-cols-2">
+                <div className="grid-cols-3">
                   <div className="form-group">
-                    <label className="form-label">Stop-Loss Commission</label>
+                    <label className="form-label">Stop-Loss Commission (%)</label>
                     <PercentInput
-                      placeholder="0"
+                      style={{ width: "100%" }}
+                      placeholder="10"
                       value={formData.stopLossCommission}
                       onChange={(val) => setFormData({ ...formData, stopLossCommission: val })}
                     />
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Stop-Loss Other Compensation</label>
+                    <label className="form-label">Stop-Loss Other Compensation (%)</label>
                     <PercentInput
-                      placeholder="0"
+                      style={{ width: "100%" }}
+                      placeholder="3"
                       value={formData.stopLossOtherCompensation}
                       onChange={(val) => setFormData({ ...formData, stopLossOtherCompensation: val })}
                     />
                   </div>
-                </div>
 
-                <div className="grid-cols-2" style={{ alignItems: "center" }}>
                   <div className="form-group">
-                    <label className="form-label">Agent Compensation</label>
+                    <label className="form-label">Agent Compensation?</label>
                     <YesNoToggle
                       value={formData.commissionAgentCompensation}
                       onChange={(val) => setFormData({ ...formData, commissionAgentCompensation: val })}
                     />
                   </div>
+                </div>
 
-                  <div className="form-group">
-                    <label className="form-label">Organ Transplant Policy</label>
-                    <YesNoToggle
-                      value={formData.organTransplantPolicy}
-                      onChange={(val) => setFormData({ ...formData, organTransplantPolicy: val })}
-                    />
-                  </div>
+                <div className="form-group">
+                  <label className="form-label">Organ Transplant Policy?</label>
+                  <YesNoToggle
+                    value={formData.organTransplantPolicy}
+                    onChange={(val) => setFormData({ ...formData, organTransplantPolicy: val })}
+                  />
                 </div>
               </div>
             )}
@@ -963,60 +922,25 @@ export default function EditBillingEnrollmentModal({
             {/* TAB 6: Census & Notes */}
             {activeTab === "CENSUS" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>Enrollment Census Figures</h3>
-                  <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
-                    Total updates automatically as tiers are entered
-                  </span>
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.75rem" }}>
-                  <div className="form-group">
-                    <label className="form-label">Single Count</label>
-                    <input
-                      type="number"
-                      min="0"
-                      className="form-input"
-                      placeholder="0"
-                      value={formData.figuresSingle}
-                      onChange={(e) => handleUpdateCensusTier("figuresSingle", e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Employee + 1 Count</label>
-                    <input
-                      type="number"
-                      min="0"
-                      className="form-input"
-                      placeholder="0"
-                      value={formData.figuresEmployeePlusOne}
-                      onChange={(e) => handleUpdateCensusTier("figuresEmployeePlusOne", e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Family Count</label>
-                    <input
-                      type="number"
-                      min="0"
-                      className="form-input"
-                      placeholder="0"
-                      value={formData.figuresFamily}
-                      onChange={(e) => handleUpdateCensusTier("figuresFamily", e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Total Census</label>
-                    <input
-                      type="number"
-                      min="0"
-                      className="form-input"
-                      placeholder="0"
-                      value={formData.figuresTotal}
-                      onChange={(e) => setFormData({ ...formData, figuresTotal: e.target.value })}
-                    />
-                  </div>
+                <div style={{ background: "rgba(255, 255, 255, 0.03)", padding: "1rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
+                  <EnrollmentCensusInput
+                    tierStructure={formData.specificTierStructure}
+                    onTierStructureChange={handleTierStructureChange}
+                    single={formData.figuresSingle}
+                    onSingleChange={(val) => setFormData((prev) => ({ ...prev, figuresSingle: val }))}
+                    eePlusOne={formData.figuresEmployeePlusOne}
+                    onEePlusOneChange={(val) => setFormData((prev) => ({ ...prev, figuresEmployeePlusOne: val }))}
+                    eeSpouse={formData.figuresEmployeeSpouse}
+                    onEeSpouseChange={(val) => setFormData((prev) => ({ ...prev, figuresEmployeeSpouse: val }))}
+                    eeChildren={formData.figuresEmployeeChildren}
+                    onEeChildrenChange={(val) => setFormData((prev) => ({ ...prev, figuresEmployeeChildren: val }))}
+                    family={formData.figuresFamily}
+                    onFamilyChange={(val) => setFormData((prev) => ({ ...prev, figuresFamily: val }))}
+                    total={formData.figuresTotal}
+                    onTotalChange={(val) => setFormData((prev) => ({ ...prev, figuresTotal: val }))}
+                    isEditing={true}
+                    compact={false}
+                  />
                 </div>
 
                 <div className="form-group">

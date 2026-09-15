@@ -143,6 +143,8 @@ model ClientBillingEnrollment {
   terminalLiabilityOption             String?
   aggregateFactorSingle               String?
   aggregateFactorEmployeePlusOne      String?
+  aggregateFactorEmployeeSpouse       String?
+  aggregateFactorEmployeeChildren     String?
   aggregateFactorFamily               String?
   aggregateMinAttachmentPoint         String?
   aggregateBenefitsCovered            String?
@@ -180,6 +182,8 @@ model ClientBillingEnrollment {
   // Enrollment Figures / Census
   figuresSingle                       String?
   figuresEmployeePlusOne              String?
+  figuresEmployeeSpouse               String?
+  figuresEmployeeChildren             String?
   figuresFamily                       String?
   figuresTotal                        String?
 

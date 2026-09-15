@@ -2,37 +2,32 @@
 
 import React from "react";
 import CurrencyInput from "./CurrencyInput";
-import { Layers } from "lucide-react";
+import { TierStructure, detectTierStructure, TierStructureSelector } from "./TierStructureSelector";
 
-import { TierStructure, TIER_OPTIONS, detectTierStructure, TierStructureSelector } from "./TierStructureSelector";
-
-export { TIER_OPTIONS, detectTierStructure };
-export type { TierStructure };
-
-interface SpecificPremiumRatesInputProps {
+interface AggregateFactorsInputProps {
   tierStructure?: string;
   onTierStructureChange?: (tier: TierStructure) => void;
 
-  singleRate?: string;
-  onSingleRateChange?: (val: string) => void;
+  singleFactor?: string;
+  onSingleFactorChange?: (val: string) => void;
 
-  eePlusOneRate?: string;
-  onEePlusOneRateChange?: (val: string) => void;
+  eePlusOneFactor?: string;
+  onEePlusOneFactorChange?: (val: string) => void;
 
-  eeSpouseRate?: string;
-  onEeSpouseRateChange?: (val: string) => void;
+  eeSpouseFactor?: string;
+  onEeSpouseFactorChange?: (val: string) => void;
 
-  eeChildrenRate?: string;
-  onEeChildrenRateChange?: (val: string) => void;
+  eeChildrenFactor?: string;
+  onEeChildrenFactorChange?: (val: string) => void;
 
-  familyRate?: string;
-  onFamilyRateChange?: (val: string) => void;
+  familyFactor?: string;
+  onFamilyFactorChange?: (val: string) => void;
 
   isEditing: boolean;
   compact?: boolean;
 }
 
-function formatRateAsCurrency(val?: string): string {
+function formatFactorDisplay(val?: string): string {
   if (!val || val === "—") return "—";
   const trimmed = val.trim();
   if (!trimmed) return "—";
@@ -44,53 +39,49 @@ function formatRateAsCurrency(val?: string): string {
   return `$${trimmed}`;
 }
 
-export function SpecificPremiumRatesInput({
+export function AggregateFactorsInput({
   tierStructure,
   onTierStructureChange,
 
-  singleRate = "",
-  onSingleRateChange,
+  singleFactor = "",
+  onSingleFactorChange,
 
-  eePlusOneRate = "",
-  onEePlusOneRateChange,
+  eePlusOneFactor = "",
+  onEePlusOneFactorChange,
 
-  eeSpouseRate = "",
-  onEeSpouseRateChange,
+  eeSpouseFactor = "",
+  onEeSpouseFactorChange,
 
-  eeChildrenRate = "",
-  onEeChildrenRateChange,
+  eeChildrenFactor = "",
+  onEeChildrenFactorChange,
 
-  familyRate = "",
-  onFamilyRateChange,
+  familyFactor = "",
+  onFamilyFactorChange,
 
   isEditing,
   compact = false,
-}: SpecificPremiumRatesInputProps) {
+}: AggregateFactorsInputProps) {
   const activeTier = detectTierStructure({
     tierStructure,
-    single: singleRate,
-    eePlusOne: eePlusOneRate,
-    eeSpouse: eeSpouseRate,
-    eeChildren: eeChildrenRate,
-    family: familyRate,
+    aggregateFactorSingle: singleFactor,
+    aggregateFactorEmployeePlusOne: eePlusOneFactor,
+    aggregateFactorEmployeeSpouse: eeSpouseFactor,
+    aggregateFactorEmployeeChildren: eeChildrenFactor,
+    aggregateFactorFamily: familyFactor,
   });
 
-  const handleSelectTier = (tier: TierStructure) => {
-    if (onTierStructureChange) {
-      onTierStructureChange(tier);
-    }
-  };
-
-  // Render View Mode
+  // -------------------------------------------------------------
+  // VIEW MODE
+  // -------------------------------------------------------------
   if (!isEditing) {
     if (activeTier === "1-Tier") {
       return (
         <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem", textAlign: "center" }}>
           <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 700 }}>
-            Composite Rate (1-Tier)
+            Composite Factor (1-Tier)
           </span>
-          <div style={{ fontSize: "0.95rem", fontWeight: "700", color: "#00aedb" }}>
-            {formatRateAsCurrency(singleRate)}
+          <div style={{ fontSize: "0.95rem", fontWeight: "700", color: "#c084fc" }}>
+            {formatFactorDisplay(singleFactor)}
           </div>
         </div>
       );
@@ -101,11 +92,11 @@ export function SpecificPremiumRatesInput({
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", fontSize: "0.8rem", textAlign: "center" }}>
           <div>
             <div style={{ color: "var(--text-muted)", fontSize: "0.7rem", fontWeight: 600 }}>Single (EE)</div>
-            <div style={{ fontWeight: "700", color: "#00aedb" }}>{formatRateAsCurrency(singleRate)}</div>
+            <div style={{ fontWeight: "700", color: "#c084fc" }}>{formatFactorDisplay(singleFactor)}</div>
           </div>
           <div>
             <div style={{ color: "var(--text-muted)", fontSize: "0.7rem", fontWeight: 600 }}>Family (FAM)</div>
-            <div style={{ fontWeight: "700", color: "#00aedb" }}>{formatRateAsCurrency(familyRate)}</div>
+            <div style={{ fontWeight: "700", color: "#c084fc" }}>{formatFactorDisplay(familyFactor)}</div>
           </div>
         </div>
       );
@@ -116,19 +107,19 @@ export function SpecificPremiumRatesInput({
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "0.4rem", fontSize: "0.78rem", textAlign: "center" }}>
           <div>
             <div style={{ color: "var(--text-muted)", fontSize: "0.68rem", fontWeight: 600 }}>Single</div>
-            <div style={{ fontWeight: "700", color: "#00aedb" }}>{formatRateAsCurrency(singleRate)}</div>
+            <div style={{ fontWeight: "700", color: "#c084fc" }}>{formatFactorDisplay(singleFactor)}</div>
           </div>
           <div>
             <div style={{ color: "var(--text-muted)", fontSize: "0.68rem", fontWeight: 600 }}>EE + Spouse</div>
-            <div style={{ fontWeight: "700", color: "#00aedb" }}>{formatRateAsCurrency(eeSpouseRate)}</div>
+            <div style={{ fontWeight: "700", color: "#c084fc" }}>{formatFactorDisplay(eeSpouseFactor)}</div>
           </div>
           <div>
             <div style={{ color: "var(--text-muted)", fontSize: "0.68rem", fontWeight: 600 }}>EE + Child(ren)</div>
-            <div style={{ fontWeight: "700", color: "#00aedb" }}>{formatRateAsCurrency(eeChildrenRate)}</div>
+            <div style={{ fontWeight: "700", color: "#c084fc" }}>{formatFactorDisplay(eeChildrenFactor)}</div>
           </div>
           <div>
             <div style={{ color: "var(--text-muted)", fontSize: "0.68rem", fontWeight: 600 }}>Family</div>
-            <div style={{ fontWeight: "700", color: "#00aedb" }}>{formatRateAsCurrency(familyRate)}</div>
+            <div style={{ fontWeight: "700", color: "#c084fc" }}>{formatFactorDisplay(familyFactor)}</div>
           </div>
         </div>
       );
@@ -139,45 +130,47 @@ export function SpecificPremiumRatesInput({
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.5rem", fontSize: "0.8rem", textAlign: "center" }}>
         <div>
           <div style={{ color: "var(--text-muted)", fontSize: "0.7rem", fontWeight: 600 }}>Single</div>
-          <div style={{ fontWeight: "700", color: "#00aedb" }}>{formatRateAsCurrency(singleRate)}</div>
+          <div style={{ fontWeight: "700", color: "#c084fc" }}>{formatFactorDisplay(singleFactor)}</div>
         </div>
         <div>
           <div style={{ color: "var(--text-muted)", fontSize: "0.7rem", fontWeight: 600 }}>Emp + 1</div>
-          <div style={{ fontWeight: "700", color: "#00aedb" }}>{formatRateAsCurrency(eePlusOneRate)}</div>
+          <div style={{ fontWeight: "700", color: "#c084fc" }}>{formatFactorDisplay(eePlusOneFactor)}</div>
         </div>
         <div>
           <div style={{ color: "var(--text-muted)", fontSize: "0.7rem", fontWeight: 600 }}>Family</div>
-          <div style={{ fontWeight: "700", color: "#00aedb" }}>{formatRateAsCurrency(familyRate)}</div>
+          <div style={{ fontWeight: "700", color: "#c084fc" }}>{formatFactorDisplay(familyFactor)}</div>
         </div>
       </div>
     );
   }
 
-  // Render Edit Mode
+  // -------------------------------------------------------------
+  // EDIT MODE
+  // -------------------------------------------------------------
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", width: "100%" }}>
-      {/* Tier Selector Bar */}
+      {/* Linked Tier Level Selector */}
       {onTierStructureChange && (
         <TierStructureSelector
           value={activeTier}
-          onChange={handleSelectTier}
-          colorScheme="blue"
-          label="Specific Rating Tier Structure"
+          onChange={onTierStructureChange}
+          colorScheme="purple"
+          label="Aggregate Tier Structure"
           compact={compact}
         />
       )}
 
-      {/* Dynamic Rate Fields based on Active Tier */}
+      {/* Dynamic Factor Inputs */}
       {activeTier === "1-Tier" && (
         <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
           <label style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600 }}>
-            Composite Rate ($ PEPM)
+            Composite Factor ($ PEPM)
           </label>
           <CurrencyInput
             style={{ width: "100%" }}
             align={compact ? "center" : "left"}
-            value={singleRate}
-            onChange={(val) => onSingleRateChange && onSingleRateChange(val)}
+            value={singleFactor}
+            onChange={(val) => onSingleFactorChange && onSingleFactorChange(val)}
             placeholder="0.00"
           />
         </div>
@@ -187,25 +180,25 @@ export function SpecificPremiumRatesInput({
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
           <div>
             <label style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600 }}>
-              Single Rate (EE)
+              Single Factor (EE)
             </label>
             <CurrencyInput
               style={{ width: "100%" }}
               align={compact ? "center" : "left"}
-              value={singleRate}
-              onChange={(val) => onSingleRateChange && onSingleRateChange(val)}
+              value={singleFactor}
+              onChange={(val) => onSingleFactorChange && onSingleFactorChange(val)}
               placeholder="0.00"
             />
           </div>
           <div>
             <label style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600 }}>
-              Family Rate (FAM)
+              Family Factor (FAM)
             </label>
             <CurrencyInput
               style={{ width: "100%" }}
               align={compact ? "center" : "left"}
-              value={familyRate}
-              onChange={(val) => onFamilyRateChange && onFamilyRateChange(val)}
+              value={familyFactor}
+              onChange={(val) => onFamilyFactorChange && onFamilyFactorChange(val)}
               placeholder="0.00"
             />
           </div>
@@ -221,8 +214,8 @@ export function SpecificPremiumRatesInput({
             <CurrencyInput
               style={{ width: "100%" }}
               align={compact ? "center" : "left"}
-              value={singleRate}
-              onChange={(val) => onSingleRateChange && onSingleRateChange(val)}
+              value={singleFactor}
+              onChange={(val) => onSingleFactorChange && onSingleFactorChange(val)}
               placeholder="0.00"
             />
           </div>
@@ -233,8 +226,8 @@ export function SpecificPremiumRatesInput({
             <CurrencyInput
               style={{ width: "100%" }}
               align={compact ? "center" : "left"}
-              value={eePlusOneRate}
-              onChange={(val) => onEePlusOneRateChange && onEePlusOneRateChange(val)}
+              value={eePlusOneFactor}
+              onChange={(val) => onEePlusOneFactorChange && onEePlusOneFactorChange(val)}
               placeholder="0.00"
             />
           </div>
@@ -245,8 +238,8 @@ export function SpecificPremiumRatesInput({
             <CurrencyInput
               style={{ width: "100%" }}
               align={compact ? "center" : "left"}
-              value={familyRate}
-              onChange={(val) => onFamilyRateChange && onFamilyRateChange(val)}
+              value={familyFactor}
+              onChange={(val) => onFamilyFactorChange && onFamilyFactorChange(val)}
               placeholder="0.00"
             />
           </div>
@@ -262,8 +255,8 @@ export function SpecificPremiumRatesInput({
             <CurrencyInput
               style={{ width: "100%" }}
               align={compact ? "center" : "left"}
-              value={singleRate}
-              onChange={(val) => onSingleRateChange && onSingleRateChange(val)}
+              value={singleFactor}
+              onChange={(val) => onSingleFactorChange && onSingleFactorChange(val)}
               placeholder="0.00"
             />
           </div>
@@ -274,8 +267,8 @@ export function SpecificPremiumRatesInput({
             <CurrencyInput
               style={{ width: "100%" }}
               align={compact ? "center" : "left"}
-              value={eeSpouseRate}
-              onChange={(val) => onEeSpouseRateChange && onEeSpouseRateChange(val)}
+              value={eeSpouseFactor}
+              onChange={(val) => onEeSpouseFactorChange && onEeSpouseFactorChange(val)}
               placeholder="0.00"
             />
           </div>
@@ -286,8 +279,8 @@ export function SpecificPremiumRatesInput({
             <CurrencyInput
               style={{ width: "100%" }}
               align={compact ? "center" : "left"}
-              value={eeChildrenRate}
-              onChange={(val) => onEeChildrenRateChange && onEeChildrenRateChange(val)}
+              value={eeChildrenFactor}
+              onChange={(val) => onEeChildrenFactorChange && onEeChildrenFactorChange(val)}
               placeholder="0.00"
             />
           </div>
@@ -298,8 +291,8 @@ export function SpecificPremiumRatesInput({
             <CurrencyInput
               style={{ width: "100%" }}
               align={compact ? "center" : "left"}
-              value={familyRate}
-              onChange={(val) => onFamilyRateChange && onFamilyRateChange(val)}
+              value={familyFactor}
+              onChange={(val) => onFamilyFactorChange && onFamilyFactorChange(val)}
               placeholder="0.00"
             />
           </div>
@@ -309,4 +302,4 @@ export function SpecificPremiumRatesInput({
   );
 }
 
-export default SpecificPremiumRatesInput;
+export default AggregateFactorsInput;

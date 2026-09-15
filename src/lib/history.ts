@@ -56,6 +56,8 @@ export const FIELD_LABELS: Record<string, string> = {
   terminalLiabilityOption: "Terminal Liability Option",
   aggregateFactorSingle: "Aggregate Factor (Single)",
   aggregateFactorEmployeePlusOne: "Aggregate Factor (EE+1)",
+  aggregateFactorEmployeeSpouse: "Aggregate Factor (EE+Spouse)",
+  aggregateFactorEmployeeChildren: "Aggregate Factor (EE+Children)",
   aggregateFactorFamily: "Aggregate Factor (Family)",
   aggregateMinAttachmentPoint: "Aggregate Min Attachment Point",
   aggregateBenefitsCovered: "Aggregate Benefits Covered",
@@ -93,6 +95,8 @@ export const FIELD_LABELS: Record<string, string> = {
   // B&E - Census Breakdown
   figuresSingle: "Census: Single",
   figuresEmployeePlusOne: "Census: EE+1",
+  figuresEmployeeSpouse: "Census: EE+Spouse",
+  figuresEmployeeChildren: "Census: EE+Children",
   figuresFamily: "Census: Family",
   figuresTotal: "Census: Total",
 

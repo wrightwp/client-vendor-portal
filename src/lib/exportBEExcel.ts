@@ -29,13 +29,17 @@ export function exportBEToExcel(clientName: string, data: any) {
     [""],
 
     ["2. ENROLLMENT CENSUS / TIER BREAKDOWN"],
+    ["Tier Structure", bAndE.specificTierStructure || "3-Tier"],
     ["Single Tier Count", bAndE.figuresSingle ?? 0],
-    ["Employee + 1 Tier Count", bAndE.figuresEmployeePlusOne ?? 0],
+    ["Employee + 1 Tier Count", bAndE.figuresEmployeePlusOne ?? "—"],
+    ["Employee + Spouse Tier Count", bAndE.figuresEmployeeSpouse ?? "—"],
+    ["Employee + Child(ren) Tier Count", bAndE.figuresEmployeeChildren ?? "—"],
     ["Family Tier Count", bAndE.figuresFamily ?? 0],
     ["Total Census Count", bAndE.figuresTotal ?? 0],
     [""],
 
     ["3. SPECIFIC STOP-LOSS INFORMATION"],
+    ["Tier Structure", bAndE.specificTierStructure || "3-Tier"],
     ["Specific Deductible", bAndE.specificDeductible || "—"],
     ["Aggregating Specific Deductible", bAndE.aggregatingSpecificDeductible || "No"],
     ["No-Laser Renewal Guarantee", bAndE.noLaserRenewalGuarantee || "No"],
@@ -45,6 +49,8 @@ export function exportBEToExcel(clientName: string, data: any) {
     ["Specific Benefits Covered", bAndE.specificBenefitsCovered || "Med/Rx"],
     ["Specific Rate - Single", bAndE.specificPremiumSingle || "—"],
     ["Specific Rate - Employee + 1", bAndE.specificPremiumEmployeePlusOne || "—"],
+    ["Specific Rate - EE + Spouse", bAndE.specificPremiumEmployeeSpouse || "—"],
+    ["Specific Rate - EE + Child(ren)", bAndE.specificPremiumEmployeeChildren || "—"],
     ["Specific Rate - Family", bAndE.specificPremiumFamily || "—"],
     [""],
 
@@ -59,6 +65,8 @@ export function exportBEToExcel(clientName: string, data: any) {
     ["Aggregate Benefits Covered", bAndE.aggregateBenefitsCovered || "Med/Rx"],
     ["Aggregate Factor - Single", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : formatCurrencyDisplay(bAndE.aggregateFactorSingle)],
     ["Aggregate Factor - Employee + 1", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : formatCurrencyDisplay(bAndE.aggregateFactorEmployeePlusOne)],
+    ["Aggregate Factor - EE + Spouse", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : formatCurrencyDisplay(bAndE.aggregateFactorEmployeeSpouse)],
+    ["Aggregate Factor - EE + Child(ren)", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : formatCurrencyDisplay(bAndE.aggregateFactorEmployeeChildren)],
     ["Aggregate Factor - Family", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : formatCurrencyDisplay(bAndE.aggregateFactorFamily)],
     [""],
 

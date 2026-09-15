@@ -181,11 +181,15 @@ export default function PrintBillingEnrollmentModal({
             </div>
 
             <div style={{ marginTop: "0.75rem", background: "#f8fafc", padding: "0.75rem 1rem", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
-              <div style={{ fontWeight: "700", fontSize: "0.8rem", color: "#475569", marginBottom: "0.3rem" }}>Specific Premium Rates:</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.5rem", fontSize: "0.85rem" }}>
+              <div style={{ fontWeight: "700", fontSize: "0.8rem", color: "#475569", marginBottom: "0.3rem" }}>
+                Specific Premium Rates ({bAndE.specificTierStructure || "3-Tier"}):
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "0.5rem", fontSize: "0.85rem" }}>
                 <div><strong>Single:</strong> {bAndE.specificPremiumSingle || "N/A"}</div>
-                <div><strong>Employee + 1:</strong> {bAndE.specificPremiumEmployeePlusOne || "N/A"}</div>
-                <div><strong>Family:</strong> {bAndE.specificPremiumFamily || "N/A"}</div>
+                {bAndE.specificPremiumEmployeePlusOne && <div><strong>EE + 1:</strong> {bAndE.specificPremiumEmployeePlusOne}</div>}
+                {bAndE.specificPremiumEmployeeSpouse && <div><strong>EE + Spouse:</strong> {bAndE.specificPremiumEmployeeSpouse}</div>}
+                {bAndE.specificPremiumEmployeeChildren && <div><strong>EE + Child:</strong> {bAndE.specificPremiumEmployeeChildren}</div>}
+                {bAndE.specificPremiumFamily && <div><strong>Family:</strong> {bAndE.specificPremiumFamily}</div>}
               </div>
             </div>
           </div>
@@ -212,11 +216,15 @@ export default function PrintBillingEnrollmentModal({
                 </div>
 
                 <div style={{ marginTop: "0.75rem", background: "#f8fafc", padding: "0.75rem 1rem", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
-                  <div style={{ fontWeight: "700", fontSize: "0.8rem", color: "#475569", marginBottom: "0.3rem" }}>Aggregate Factors:</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.5rem", fontSize: "0.85rem" }}>
+                  <div style={{ fontWeight: "700", fontSize: "0.8rem", color: "#475569", marginBottom: "0.3rem" }}>
+                    Aggregate Factors ({bAndE.specificTierStructure || "3-Tier"}):
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "0.5rem", fontSize: "0.85rem" }}>
                     <div><strong>Single:</strong> {formatCurrencyDisplay(bAndE.aggregateFactorSingle)}</div>
-                    <div><strong>Employee + 1:</strong> {formatCurrencyDisplay(bAndE.aggregateFactorEmployeePlusOne)}</div>
-                    <div><strong>Family:</strong> {formatCurrencyDisplay(bAndE.aggregateFactorFamily)}</div>
+                    {bAndE.aggregateFactorEmployeePlusOne && <div><strong>EE + 1:</strong> {formatCurrencyDisplay(bAndE.aggregateFactorEmployeePlusOne)}</div>}
+                    {bAndE.aggregateFactorEmployeeSpouse && <div><strong>EE + Spouse:</strong> {formatCurrencyDisplay(bAndE.aggregateFactorEmployeeSpouse)}</div>}
+                    {bAndE.aggregateFactorEmployeeChildren && <div><strong>EE + Child:</strong> {formatCurrencyDisplay(bAndE.aggregateFactorEmployeeChildren)}</div>}
+                    {bAndE.aggregateFactorFamily && <div><strong>Family:</strong> {formatCurrencyDisplay(bAndE.aggregateFactorFamily)}</div>}
                   </div>
                 </div>
               </>
@@ -274,12 +282,14 @@ export default function PrintBillingEnrollmentModal({
           {/* Section 6: Census Figures */}
           <div style={{ marginBottom: "1.5rem" }}>
             <h2 style={{ fontSize: "1rem", fontWeight: "700", color: "#0f172a", borderBottom: "1px solid #e2e8f0", paddingBottom: "0.3rem", marginBottom: "0.75rem" }}>
-              Enrollment Figures (Census)
+              Enrollment Figures (Census - {bAndE.specificTierStructure || "3-Tier"})
             </h2>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.5rem", fontSize: "0.85rem", textAlign: "center", background: "#f8fafc", padding: "0.75rem", borderRadius: "6px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))", gap: "0.5rem", fontSize: "0.85rem", textAlign: "center", background: "#f8fafc", padding: "0.75rem", borderRadius: "6px" }}>
               <div><strong>Single:</strong> {bAndE.figuresSingle || "0"}</div>
-              <div><strong>Employee + 1:</strong> {bAndE.figuresEmployeePlusOne || "0"}</div>
-              <div><strong>Family:</strong> {bAndE.figuresFamily || "0"}</div>
+              {bAndE.figuresEmployeePlusOne && <div><strong>EE + 1:</strong> {bAndE.figuresEmployeePlusOne}</div>}
+              {bAndE.figuresEmployeeSpouse && <div><strong>EE + Spouse:</strong> {bAndE.figuresEmployeeSpouse}</div>}
+              {bAndE.figuresEmployeeChildren && <div><strong>EE + Child:</strong> {bAndE.figuresEmployeeChildren}</div>}
+              {bAndE.figuresFamily && <div><strong>Family:</strong> {bAndE.figuresFamily}</div>}
               <div><strong>Total:</strong> {bAndE.figuresTotal || "0"}</div>
             </div>
           </div>

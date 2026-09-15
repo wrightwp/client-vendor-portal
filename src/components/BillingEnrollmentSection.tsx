@@ -44,6 +44,9 @@ import AggregatingSpecificInput from "./AggregatingSpecificInput";
 import MaxSpecificRenewalIncreaseInput from "./MaxSpecificRenewalIncreaseInput";
 import SpecificDeductibleInput, { formatDisplaySpecificDeductible } from "./SpecificDeductibleInput";
 import SpecificPremiumRatesInput from "./SpecificPremiumRatesInput";
+import AggregateFactorsInput from "./AggregateFactorsInput";
+import EnrollmentCensusInput, { calculateCensusTotal } from "./EnrollmentCensusInput";
+import { TierStructure, detectTierStructure } from "./TierStructureSelector";
 import BenefitsCoveredSelect from "./BenefitsCoveredSelect";
 import IncludedNoneToggle from "./IncludedNoneToggle";
 import TerminalLiabilityInput, { formatTloDisplay } from "./TerminalLiabilityInput";
@@ -144,6 +147,8 @@ export default function BillingEnrollmentSection({
     terminalLiabilityOption: activeBAndE.terminalLiabilityOption || "",
     aggregateFactorSingle: activeBAndE.aggregateFactorSingle || "",
     aggregateFactorEmployeePlusOne: activeBAndE.aggregateFactorEmployeePlusOne || "",
+    aggregateFactorEmployeeSpouse: activeBAndE.aggregateFactorEmployeeSpouse || "",
+    aggregateFactorEmployeeChildren: activeBAndE.aggregateFactorEmployeeChildren || "",
     aggregateFactorFamily: activeBAndE.aggregateFactorFamily || "",
     aggregateMinAttachmentPoint: activeBAndE.aggregateMinAttachmentPoint || "",
     aggregateBenefitsCovered: activeBAndE.aggregateBenefitsCovered || "",
@@ -178,6 +183,8 @@ export default function BillingEnrollmentSection({
 
     figuresSingle: activeBAndE.figuresSingle || "",
     figuresEmployeePlusOne: activeBAndE.figuresEmployeePlusOne || "",
+    figuresEmployeeSpouse: activeBAndE.figuresEmployeeSpouse || "",
+    figuresEmployeeChildren: activeBAndE.figuresEmployeeChildren || "",
     figuresFamily: activeBAndE.figuresFamily || "",
     figuresTotal: activeBAndE.figuresTotal || "",
 
@@ -220,6 +227,8 @@ export default function BillingEnrollmentSection({
       terminalLiabilityOption: rec.terminalLiabilityOption || "",
       aggregateFactorSingle: rec.aggregateFactorSingle || "",
       aggregateFactorEmployeePlusOne: rec.aggregateFactorEmployeePlusOne || "",
+      aggregateFactorEmployeeSpouse: rec.aggregateFactorEmployeeSpouse || "",
+      aggregateFactorEmployeeChildren: rec.aggregateFactorEmployeeChildren || "",
       aggregateFactorFamily: rec.aggregateFactorFamily || "",
       aggregateMinAttachmentPoint: rec.aggregateMinAttachmentPoint || "",
       aggregateBenefitsCovered: rec.aggregateBenefitsCovered || "",
@@ -254,6 +263,8 @@ export default function BillingEnrollmentSection({
 
       figuresSingle: rec.figuresSingle || "",
       figuresEmployeePlusOne: rec.figuresEmployeePlusOne || "",
+      figuresEmployeeSpouse: rec.figuresEmployeeSpouse || "",
+      figuresEmployeeChildren: rec.figuresEmployeeChildren || "",
       figuresFamily: rec.figuresFamily || "",
       figuresTotal: rec.figuresTotal || "",
 
@@ -262,18 +273,21 @@ export default function BillingEnrollmentSection({
     });
   }, [activeBAndE, activeYear, isInlineEditing]);
 
-  // Live auto-calculation of Census Total: Single + Emp+1 + Family
-  const handleUpdateCensusTier = (
-    field: "figuresSingle" | "figuresEmployeePlusOne" | "figuresFamily",
-    val: string
-  ) => {
-    const s = parseInt(field === "figuresSingle" ? val : editFormData.figuresSingle, 10) || 0;
-    const e1 = parseInt(field === "figuresEmployeePlusOne" ? val : editFormData.figuresEmployeePlusOne, 10) || 0;
-    const f = parseInt(field === "figuresFamily" ? val : editFormData.figuresFamily, 10) || 0;
-    setEditFormData({
-      ...editFormData,
-      [field]: val,
-      figuresTotal: String(s + e1 + f),
+  // Unified Tier Structure Change across Census, Specific Rates, and Aggregate Factors
+  const handleTierStructureChange = (newTier: TierStructure) => {
+    setEditFormData((prev) => {
+      const newTotal = calculateCensusTotal(newTier, {
+        single: prev.figuresSingle,
+        eePlusOne: prev.figuresEmployeePlusOne,
+        eeSpouse: prev.figuresEmployeeSpouse,
+        eeChildren: prev.figuresEmployeeChildren,
+        family: prev.figuresFamily,
+      });
+      return {
+        ...prev,
+        specificTierStructure: newTier,
+        figuresTotal: String(newTotal),
+      };
     });
   };
 
@@ -307,6 +321,8 @@ export default function BillingEnrollmentSection({
       monthlyAggregateAccommodation: sourceRecord.monthlyAggregateAccommodation || "",
       aggregateFactorSingle: sourceRecord.aggregateFactorSingle || "",
       aggregateFactorEmployeePlusOne: sourceRecord.aggregateFactorEmployeePlusOne || "",
+      aggregateFactorEmployeeSpouse: sourceRecord.aggregateFactorEmployeeSpouse || "",
+      aggregateFactorEmployeeChildren: sourceRecord.aggregateFactorEmployeeChildren || "",
       aggregateFactorFamily: sourceRecord.aggregateFactorFamily || "",
       aggregateMinAttachmentPoint: sourceRecord.aggregateMinAttachmentPoint || "",
       aggregateBenefitsCovered: sourceRecord.aggregateBenefitsCovered || "",
@@ -341,6 +357,8 @@ export default function BillingEnrollmentSection({
 
       figuresSingle: sourceRecord.figuresSingle || "",
       figuresEmployeePlusOne: sourceRecord.figuresEmployeePlusOne || "",
+      figuresEmployeeSpouse: sourceRecord.figuresEmployeeSpouse || "",
+      figuresEmployeeChildren: sourceRecord.figuresEmployeeChildren || "",
       figuresFamily: sourceRecord.figuresFamily || "",
       figuresTotal: sourceRecord.figuresTotal || "",
 
@@ -896,84 +914,24 @@ export default function BillingEnrollmentSection({
                 )}
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.75rem", textAlign: "center" }}>
-                <div style={{ background: "rgba(255, 255, 255, 0.03)", padding: "0.75rem 0.5rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
-                  {isInlineEditing ? (
-                    <input
-                      type="number"
-                      min="0"
-                      className="form-input"
-                      style={{ textAlign: "center", fontWeight: "800", fontSize: "1.1rem", padding: "0.2rem", color: "var(--accent-pink)" }}
-                      value={editFormData.figuresSingle}
-                      onChange={(e) => handleUpdateCensusTier("figuresSingle", e.target.value)}
-                      placeholder="0"
-                    />
-                  ) : (
-                    <div style={{ fontSize: "1.25rem", fontWeight: "800", color: "var(--accent-pink)" }}>
-                      {activeBAndE.figuresSingle || "0"}
-                    </div>
-                  )}
-                  <div style={{ fontSize: "0.725rem", color: "var(--text-muted)", marginTop: "0.2rem" }}>Single</div>
-                </div>
-
-                <div style={{ background: "rgba(255, 255, 255, 0.03)", padding: "0.75rem 0.5rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
-                  {isInlineEditing ? (
-                    <input
-                      type="number"
-                      min="0"
-                      className="form-input"
-                      style={{ textAlign: "center", fontWeight: "800", fontSize: "1.1rem", padding: "0.2rem", color: "var(--accent-pink)" }}
-                      value={editFormData.figuresEmployeePlusOne}
-                      onChange={(e) => handleUpdateCensusTier("figuresEmployeePlusOne", e.target.value)}
-                      placeholder="0"
-                    />
-                  ) : (
-                    <div style={{ fontSize: "1.25rem", fontWeight: "800", color: "var(--accent-pink)" }}>
-                      {activeBAndE.figuresEmployeePlusOne || "0"}
-                    </div>
-                  )}
-                  <div style={{ fontSize: "0.725rem", color: "var(--text-muted)", marginTop: "0.2rem" }}>Employee + 1</div>
-                </div>
-
-                <div style={{ background: "rgba(255, 255, 255, 0.03)", padding: "0.75rem 0.5rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
-                  {isInlineEditing ? (
-                    <input
-                      type="number"
-                      min="0"
-                      className="form-input"
-                      style={{ textAlign: "center", fontWeight: "800", fontSize: "1.1rem", padding: "0.2rem", color: "var(--accent-pink)" }}
-                      value={editFormData.figuresFamily}
-                      onChange={(e) => handleUpdateCensusTier("figuresFamily", e.target.value)}
-                      placeholder="0"
-                    />
-                  ) : (
-                    <div style={{ fontSize: "1.25rem", fontWeight: "800", color: "var(--accent-pink)" }}>
-                      {activeBAndE.figuresFamily || "0"}
-                    </div>
-                  )}
-                  <div style={{ fontSize: "0.725rem", color: "var(--text-muted)", marginTop: "0.2rem" }}>Family</div>
-                </div>
-
-                <div style={{ background: "rgba(244, 114, 182, 0.1)", padding: "0.75rem 0.5rem", borderRadius: "8px", border: "1px solid rgba(244, 114, 182, 0.3)" }}>
-                  {isInlineEditing ? (
-                    <input
-                      type="number"
-                      min="0"
-                      className="form-input"
-                      style={{ textAlign: "center", fontWeight: "800", fontSize: "1.1rem", padding: "0.2rem", color: "#f472b6" }}
-                      value={editFormData.figuresTotal}
-                      onChange={(e) => setEditFormData({ ...editFormData, figuresTotal: e.target.value })}
-                      placeholder="0"
-                      title="Calculated Total (can be adjusted if needed)"
-                    />
-                  ) : (
-                    <div style={{ fontSize: "1.25rem", fontWeight: "800", color: "#f472b6" }}>
-                      {activeBAndE.figuresTotal || "0"}
-                    </div>
-                  )}
-                  <div style={{ fontSize: "0.725rem", color: "#f472b6", fontWeight: "700", marginTop: "0.2rem" }}>Total Census</div>
-                </div>
-              </div>
+              <EnrollmentCensusInput
+                tierStructure={isInlineEditing ? editFormData.specificTierStructure : activeBAndE.specificTierStructure}
+                onTierStructureChange={isInlineEditing ? handleTierStructureChange : undefined}
+                single={isInlineEditing ? editFormData.figuresSingle : activeBAndE.figuresSingle}
+                onSingleChange={(val) => setEditFormData((prev) => ({ ...prev, figuresSingle: val }))}
+                eePlusOne={isInlineEditing ? editFormData.figuresEmployeePlusOne : activeBAndE.figuresEmployeePlusOne}
+                onEePlusOneChange={(val) => setEditFormData((prev) => ({ ...prev, figuresEmployeePlusOne: val }))}
+                eeSpouse={isInlineEditing ? editFormData.figuresEmployeeSpouse : activeBAndE.figuresEmployeeSpouse}
+                onEeSpouseChange={(val) => setEditFormData((prev) => ({ ...prev, figuresEmployeeSpouse: val }))}
+                eeChildren={isInlineEditing ? editFormData.figuresEmployeeChildren : activeBAndE.figuresEmployeeChildren}
+                onEeChildrenChange={(val) => setEditFormData((prev) => ({ ...prev, figuresEmployeeChildren: val }))}
+                family={isInlineEditing ? editFormData.figuresFamily : activeBAndE.figuresFamily}
+                onFamilyChange={(val) => setEditFormData((prev) => ({ ...prev, figuresFamily: val }))}
+                total={isInlineEditing ? editFormData.figuresTotal : activeBAndE.figuresTotal}
+                onTotalChange={(val) => setEditFormData((prev) => ({ ...prev, figuresTotal: val }))}
+                isEditing={isInlineEditing}
+                compact={true}
+              />
             </div>
           </div>
 
@@ -1134,17 +1092,17 @@ export default function BillingEnrollmentSection({
                       </div>
                       <SpecificPremiumRatesInput
                         tierStructure={isInlineEditing ? editFormData.specificTierStructure : activeBAndE.specificTierStructure}
-                        onTierStructureChange={(tier) => setEditFormData({ ...editFormData, specificTierStructure: tier })}
+                        onTierStructureChange={isInlineEditing ? handleTierStructureChange : undefined}
                         singleRate={isInlineEditing ? editFormData.specificPremiumSingle : activeBAndE.specificPremiumSingle}
-                        onSingleRateChange={(val) => setEditFormData({ ...editFormData, specificPremiumSingle: val })}
+                        onSingleRateChange={(val) => setEditFormData((prev) => ({ ...prev, specificPremiumSingle: val }))}
                         eePlusOneRate={isInlineEditing ? editFormData.specificPremiumEmployeePlusOne : activeBAndE.specificPremiumEmployeePlusOne}
-                        onEePlusOneRateChange={(val) => setEditFormData({ ...editFormData, specificPremiumEmployeePlusOne: val })}
+                        onEePlusOneRateChange={(val) => setEditFormData((prev) => ({ ...prev, specificPremiumEmployeePlusOne: val }))}
                         eeSpouseRate={isInlineEditing ? editFormData.specificPremiumEmployeeSpouse : activeBAndE.specificPremiumEmployeeSpouse}
-                        onEeSpouseRateChange={(val) => setEditFormData({ ...editFormData, specificPremiumEmployeeSpouse: val })}
+                        onEeSpouseRateChange={(val) => setEditFormData((prev) => ({ ...prev, specificPremiumEmployeeSpouse: val }))}
                         eeChildrenRate={isInlineEditing ? editFormData.specificPremiumEmployeeChildren : activeBAndE.specificPremiumEmployeeChildren}
-                        onEeChildrenRateChange={(val) => setEditFormData({ ...editFormData, specificPremiumEmployeeChildren: val })}
+                        onEeChildrenRateChange={(val) => setEditFormData((prev) => ({ ...prev, specificPremiumEmployeeChildren: val }))}
                         familyRate={isInlineEditing ? editFormData.specificPremiumFamily : activeBAndE.specificPremiumFamily}
-                        onFamilyRateChange={(val) => setEditFormData({ ...editFormData, specificPremiumFamily: val })}
+                        onFamilyRateChange={(val) => setEditFormData((prev) => ({ ...prev, specificPremiumFamily: val }))}
                         isEditing={isInlineEditing}
                         compact={true}
                       />
@@ -1241,168 +1199,140 @@ export default function BillingEnrollmentSection({
                   ) : (
                     <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.85rem", flex: 1 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <span style={{ color: "var(--text-muted)" }}>Aggregate Premium</span>
-                      {isInlineEditing ? (
-                        <CurrencyInput
-                          style={{ width: "160px" }}
-                          value={editFormData.aggregatePremium}
-                          onChange={(val) => setEditFormData({ ...editFormData, aggregatePremium: val })}
-                          placeholder="0.00"
-                        />
-                      ) : (
-                        <strong style={{ color: "var(--text-primary)" }}>{activeBAndE.aggregatePremium || "—"}</strong>
-                      )}
-                    </div>
-
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                        <span style={{ color: "var(--text-muted)" }}>Monthly Accommodation</span>
-                        {!isInlineEditing && (() => {
-                          const parsed = parseMonthlyAccommodationDisplay(activeBAndE.monthlyAggregateAccommodation);
-                          if (parsed.isNo || !parsed.amountDisplay) {
-                            return <strong style={{ color: "var(--text-primary)" }}>No</strong>;
-                          }
-                          return (
-                            <div style={{ textAlign: "right" }}>
-                              <strong style={{ color: "var(--text-primary)", fontWeight: "800", fontSize: "0.85rem" }}>
-                                {parsed.amountDisplay}
-                              </strong>
-                              {parsed.noteText && (
-                                <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontStyle: "italic", marginTop: "0.15rem" }}>
-                                  {parsed.noteText}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })()}
-                      </div>
-                      {isInlineEditing && (
-                        <MonthlyAccommodationInput
-                          value={editFormData.monthlyAggregateAccommodation}
-                          onChange={(val) => setEditFormData({ ...editFormData, monthlyAggregateAccommodation: val })}
-                          compact={true}
-                        />
-                      )}
-                    </div>
-
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ color: "var(--text-muted)" }}>Terminal Liability Option (TLO)</span>
-                        {!isInlineEditing && (
-                          <span style={{ fontWeight: activeBAndE.terminalLiabilityOption?.toLowerCase().includes("separately") ? 600 : 400 }}>
-                            {formatTloDisplay(activeBAndE.terminalLiabilityOption)}
-                          </span>
+                        <span style={{ color: "var(--text-muted)" }}>Aggregate Premium</span>
+                        {isInlineEditing ? (
+                          <CurrencyInput
+                            style={{ width: "160px" }}
+                            value={editFormData.aggregatePremium}
+                            onChange={(val) => setEditFormData({ ...editFormData, aggregatePremium: val })}
+                            placeholder="0.00"
+                          />
+                        ) : (
+                          <strong style={{ color: "var(--text-primary)" }}>{activeBAndE.aggregatePremium || "—"}</strong>
                         )}
                       </div>
-                      {isInlineEditing && (
-                        <TerminalLiabilityInput
-                          value={editFormData.terminalLiabilityOption}
-                          onChange={(val) => setEditFormData({ ...editFormData, terminalLiabilityOption: val })}
-                          compact={true}
-                        />
-                      )}
-                    </div>
 
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <span style={{ color: "var(--text-muted)" }}>Min Attachment Point</span>
-                      {isInlineEditing ? (
-                        <CurrencyInput
-                          style={{ width: "160px" }}
-                          value={editFormData.aggregateMinAttachmentPoint}
-                          onChange={(val) => setEditFormData({ ...editFormData, aggregateMinAttachmentPoint: val })}
-                          placeholder="0.00"
-                        />
-                      ) : (
-                        <strong style={{ color: "#c084fc" }}>{activeBAndE.aggregateMinAttachmentPoint || "—"}</strong>
-                      )}
-                    </div>
-
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ color: "var(--text-muted)" }}>Run-in Limit</span>
-                        {!isInlineEditing && (
-                          <span>{formatRunInLimitDisplay(activeBAndE.aggregateRunInLimit)}</span>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                          <span style={{ color: "var(--text-muted)" }}>Monthly Accommodation</span>
+                          {!isInlineEditing && (() => {
+                            const parsed = parseMonthlyAccommodationDisplay(activeBAndE.monthlyAggregateAccommodation);
+                            if (parsed.isNo || !parsed.amountDisplay) {
+                              return <strong style={{ color: "var(--text-primary)" }}>No</strong>;
+                            }
+                            return (
+                              <div style={{ textAlign: "right" }}>
+                                <strong style={{ color: "var(--text-primary)", fontWeight: "800", fontSize: "0.85rem" }}>
+                                  {parsed.amountDisplay}
+                                </strong>
+                                {parsed.noteText && (
+                                  <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontStyle: "italic", marginTop: "0.15rem" }}>
+                                    {parsed.noteText}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })()}
+                        </div>
+                        {isInlineEditing && (
+                          <MonthlyAccommodationInput
+                            value={editFormData.monthlyAggregateAccommodation}
+                            onChange={(val) => setEditFormData({ ...editFormData, monthlyAggregateAccommodation: val })}
+                            compact={true}
+                          />
                         )}
                       </div>
-                      {isInlineEditing && (
-                        <AggregateRunInLimitInput
-                          value={editFormData.aggregateRunInLimit}
-                          onChange={(val) => setEditFormData({ ...editFormData, aggregateRunInLimit: val })}
-                          compact={true}
-                        />
-                      )}
-                    </div>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ color: "var(--text-muted)" }}>Benefits Covered</span>
-                        {!isInlineEditing && (
-                          <span>{activeBAndE.aggregateBenefitsCovered || "Med/Rx"}</span>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ color: "var(--text-muted)" }}>Terminal Liability Option (TLO)</span>
+                          {!isInlineEditing && (
+                            <span style={{ fontWeight: activeBAndE.terminalLiabilityOption?.toLowerCase().includes("separately") ? 600 : 400 }}>
+                              {formatTloDisplay(activeBAndE.terminalLiabilityOption)}
+                            </span>
+                          )}
+                        </div>
+                        {isInlineEditing && (
+                          <TerminalLiabilityInput
+                            value={editFormData.terminalLiabilityOption}
+                            onChange={(val) => setEditFormData({ ...editFormData, terminalLiabilityOption: val })}
+                            compact={true}
+                          />
                         )}
                       </div>
-                      {isInlineEditing && (
-                        <BenefitsCoveredSelect
-                          style={{ width: "160px" }}
-                          value={editFormData.aggregateBenefitsCovered}
-                          onChange={(val) => setEditFormData({ ...editFormData, aggregateBenefitsCovered: val })}
-                        />
-                      )}
-                    </div>
 
-                    {/* Aggregate Factors (Placed at bottom to align with Specific Premium Rates) */}
-                    <div style={{ marginTop: "auto", background: "rgba(192, 132, 252, 0.05)", padding: "0.75rem", borderRadius: "8px", border: "1px solid rgba(192, 132, 252, 0.2)" }}>
-                      <div style={{ fontSize: "0.75rem", fontWeight: "700", color: "#c084fc", marginBottom: "0.4rem" }}>
-                        Aggregate Factors
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                        <span style={{ color: "var(--text-muted)" }}>Min Attachment Point</span>
+                        {isInlineEditing ? (
+                          <CurrencyInput
+                            style={{ width: "160px" }}
+                            value={editFormData.aggregateMinAttachmentPoint}
+                            onChange={(val) => setEditFormData({ ...editFormData, aggregateMinAttachmentPoint: val })}
+                            placeholder="0.00"
+                          />
+                        ) : (
+                          <strong style={{ color: "#c084fc" }}>{activeBAndE.aggregateMinAttachmentPoint || "—"}</strong>
+                        )}
                       </div>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.5rem", fontSize: "0.8rem", textAlign: "center" }}>
-                        <div>
-                          <div style={{ color: "var(--text-muted)", fontSize: "0.7rem" }}>Single</div>
-                          {isInlineEditing ? (
-                            <CurrencyInput
-                              style={{ width: "100%" }}
-                              align="center"
-                              value={editFormData.aggregateFactorSingle}
-                              onChange={(val) => setEditFormData({ ...editFormData, aggregateFactorSingle: val })}
-                              placeholder="0.00"
-                            />
-                          ) : (
-                            <div style={{ fontWeight: "700" }}>{formatCurrencyDisplay(activeBAndE.aggregateFactorSingle)}</div>
+
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ color: "var(--text-muted)" }}>Run-in Limit</span>
+                          {!isInlineEditing && (
+                            <span>{formatRunInLimitDisplay(activeBAndE.aggregateRunInLimit)}</span>
                           )}
                         </div>
-                        <div>
-                          <div style={{ color: "var(--text-muted)", fontSize: "0.7rem" }}>Emp + 1</div>
-                          {isInlineEditing ? (
-                            <CurrencyInput
-                              style={{ width: "100%" }}
-                              align="center"
-                              value={editFormData.aggregateFactorEmployeePlusOne}
-                              onChange={(val) => setEditFormData({ ...editFormData, aggregateFactorEmployeePlusOne: val })}
-                              placeholder="0.00"
-                            />
-                          ) : (
-                            <div style={{ fontWeight: "700" }}>{formatCurrencyDisplay(activeBAndE.aggregateFactorEmployeePlusOne)}</div>
+                        {isInlineEditing && (
+                          <AggregateRunInLimitInput
+                            value={editFormData.aggregateRunInLimit}
+                            onChange={(val) => setEditFormData({ ...editFormData, aggregateRunInLimit: val })}
+                            compact={true}
+                          />
+                        )}
+                      </div>
+
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ color: "var(--text-muted)" }}>Benefits Covered</span>
+                          {!isInlineEditing && (
+                            <span>{activeBAndE.aggregateBenefitsCovered || "Med/Rx"}</span>
                           )}
                         </div>
-                        <div>
-                          <div style={{ color: "var(--text-muted)", fontSize: "0.7rem" }}>Family</div>
-                          {isInlineEditing ? (
-                            <CurrencyInput
-                              style={{ width: "100%" }}
-                              align="center"
-                              value={editFormData.aggregateFactorFamily}
-                              onChange={(val) => setEditFormData({ ...editFormData, aggregateFactorFamily: val })}
-                              placeholder="0.00"
-                            />
-                          ) : (
-                            <div style={{ fontWeight: "700" }}>{formatCurrencyDisplay(activeBAndE.aggregateFactorFamily)}</div>
-                          )}
+                        {isInlineEditing && (
+                          <BenefitsCoveredSelect
+                            style={{ width: "160px" }}
+                            value={editFormData.aggregateBenefitsCovered}
+                            onChange={(val) => setEditFormData({ ...editFormData, aggregateBenefitsCovered: val })}
+                          />
+                        )}
+                      </div>
+
+                      {/* Aggregate Factors (Placed at bottom to align with Specific Premium Rates) */}
+                      <div style={{ marginTop: "auto", background: "rgba(192, 132, 252, 0.05)", padding: "0.75rem", borderRadius: "8px", border: "1px solid rgba(192, 132, 252, 0.2)" }}>
+                        <div style={{ fontSize: "0.75rem", fontWeight: "700", color: "#c084fc", marginBottom: "0.4rem" }}>
+                          Aggregate Factors (PEPM)
                         </div>
+                        <AggregateFactorsInput
+                          tierStructure={isInlineEditing ? editFormData.specificTierStructure : activeBAndE.specificTierStructure}
+                          onTierStructureChange={isInlineEditing ? handleTierStructureChange : undefined}
+                          singleFactor={isInlineEditing ? editFormData.aggregateFactorSingle : activeBAndE.aggregateFactorSingle}
+                          onSingleFactorChange={(val) => setEditFormData((prev) => ({ ...prev, aggregateFactorSingle: val }))}
+                          eePlusOneFactor={isInlineEditing ? editFormData.aggregateFactorEmployeePlusOne : activeBAndE.aggregateFactorEmployeePlusOne}
+                          onEePlusOneFactorChange={(val) => setEditFormData((prev) => ({ ...prev, aggregateFactorEmployeePlusOne: val }))}
+                          eeSpouseFactor={isInlineEditing ? editFormData.aggregateFactorEmployeeSpouse : activeBAndE.aggregateFactorEmployeeSpouse}
+                          onEeSpouseFactorChange={(val) => setEditFormData((prev) => ({ ...prev, aggregateFactorEmployeeSpouse: val }))}
+                          eeChildrenFactor={isInlineEditing ? editFormData.aggregateFactorEmployeeChildren : activeBAndE.aggregateFactorEmployeeChildren}
+                          onEeChildrenFactorChange={(val) => setEditFormData((prev) => ({ ...prev, aggregateFactorEmployeeChildren: val }))}
+                          familyFactor={isInlineEditing ? editFormData.aggregateFactorFamily : activeBAndE.aggregateFactorFamily}
+                          onFamilyFactorChange={(val) => setEditFormData((prev) => ({ ...prev, aggregateFactorFamily: val }))}
+                          isEditing={isInlineEditing}
+                          compact={true}
+                        />
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
 
               {/* DEDICATED STOP-LOSS NOTES SECTION (Directly Below Aggregate and Specific Sections) */}
               <div

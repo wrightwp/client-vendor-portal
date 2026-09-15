@@ -241,7 +241,7 @@ export function LaseredIndividualsInput({
                   fontWeight: "600",
                 }}
               >
-                <Plus size={10} />Add Laser
+                <Plus size={10} />Add Individual
               </button>
             </div>
 
@@ -406,7 +406,7 @@ export function LaseredIndividualsInput({
             }}
           >
             <Plus size={13} style={{ color: "var(--accent-pink)" }} />
-            <span>Add Lasered Individual</span>
+            <span>Add Individual</span>
           </button>
         </div>
       )}
