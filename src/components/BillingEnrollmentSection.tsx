@@ -1453,47 +1453,58 @@ export default function BillingEnrollmentSection({
             />
           )}
 
-          {/* Administration Fees & PPO Network Information (Shown in BOTH and BILLING) */}
-          {showBilling && (
+          {/* Administration Fees, PPO Network & Additional Specs Grid Layout */}
+          {showBilling ? (
             <div
-              className="glass-card"
               style={{
-                padding: "1rem 1.15rem",
-                background: "rgba(255, 255, 255, 0.02)",
-                border: "1px solid var(--border)",
+                display: "grid",
+                gridTemplateColumns: "1.1fr 1fr",
+                gap: "1.25rem",
+                alignItems: "stretch",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.85rem" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                  <Network size={18} style={{ color: "var(--accent-yellow)" }} />
-                  <h3 style={{ fontSize: "1rem", fontWeight: "700" }}>
-                    Composite Administration & PPO Network Information
-                  </h3>
+              {/* Composite Administration & PPO Network Information (Stacked Single Column for Billing Portal Entry) */}
+              <div
+                className="glass-card"
+                style={{
+                  padding: "1rem 1.15rem",
+                  background: "rgba(255, 255, 255, 0.02)",
+                  border: "1px solid var(--border)",
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.85rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <Network size={18} style={{ color: "var(--accent-yellow)" }} />
+                    <h3 style={{ fontSize: "1rem", fontWeight: "700" }}>
+                      Composite Administration & PPO Network Information
+                    </h3>
+                  </div>
+                  {!isInlineEditing && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsExpanded(true);
+                        setIsInlineEditing(true);
+                      }}
+                      className="btn btn-secondary btn-sm"
+                      style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                      title="Edit section"
+                    >
+                      <Edit3 size={12} />
+                      <span>Edit</span>
+                    </button>
+                  )}
                 </div>
-                {!isInlineEditing && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsExpanded(true);
-                      setIsInlineEditing(true);
-                    }}
-                    className="btn btn-secondary btn-sm"
-                    style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
-                    title="Edit section"
-                  >
-                    <Edit3 size={12} />
-                    <span>Edit</span>
-                  </button>
-                )}
-              </div>
 
-              <div className="grid-cols-2" style={{ gap: "0.85rem", fontSize: "0.85rem" }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.85rem", flex: 1 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                     <span style={{ color: "var(--text-muted)" }}>Composite Admin Fee</span>
                     {isInlineEditing ? (
                       <CurrencyInput
-                        style={{ width: "170px" }}
+                        style={{ width: "160px" }}
                         value={editFormData.compositeAdminFee}
                         onChange={(val) => setEditFormData({ ...editFormData, compositeAdminFee: val })}
                         placeholder="0.00"
@@ -1508,7 +1519,7 @@ export default function BillingEnrollmentSection({
                     <span style={{ color: "var(--text-muted)" }}>Medical Administration</span>
                     {isInlineEditing ? (
                       <CurrencyInput
-                        style={{ width: "170px" }}
+                        style={{ width: "160px" }}
                         value={editFormData.medicalFee}
                         onChange={(val) => setEditFormData({ ...editFormData, medicalFee: val })}
                         placeholder="0.00"
@@ -1523,7 +1534,7 @@ export default function BillingEnrollmentSection({
                     <span style={{ color: "var(--text-muted)" }}>UR (Utilization Review)</span>
                     {isInlineEditing ? (
                       <CurrencyInput
-                        style={{ width: "170px" }}
+                        style={{ width: "160px" }}
                         value={editFormData.urFee}
                         onChange={(val) => setEditFormData({ ...editFormData, urFee: val })}
                         placeholder="0.00"
@@ -1538,7 +1549,7 @@ export default function BillingEnrollmentSection({
                     <span style={{ color: "var(--text-muted)" }}>Amwell Telehealth</span>
                     {isInlineEditing ? (
                       <CurrencyInput
-                        style={{ width: "170px" }}
+                        style={{ width: "160px" }}
                         value={editFormData.amwellFee}
                         onChange={(val) => setEditFormData({ ...editFormData, amwellFee: val })}
                         placeholder="0.00"
@@ -1553,7 +1564,7 @@ export default function BillingEnrollmentSection({
                     <span style={{ color: "var(--text-muted)" }}>Physicians Care / HAP</span>
                     {isInlineEditing ? (
                       <CurrencyInput
-                        style={{ width: "170px" }}
+                        style={{ width: "160px" }}
                         value={editFormData.physiciansCareHapFee}
                         onChange={(val) => setEditFormData({ ...editFormData, physiciansCareHapFee: val })}
                         placeholder="0.00"
@@ -1568,7 +1579,7 @@ export default function BillingEnrollmentSection({
                     <span style={{ color: "var(--text-muted)" }}>Aetna Signature Admin</span>
                     {isInlineEditing ? (
                       <CurrencyInput
-                        style={{ width: "170px" }}
+                        style={{ width: "160px" }}
                         value={editFormData.aetnaSignatureAdminFee}
                         onChange={(val) => setEditFormData({ ...editFormData, aetnaSignatureAdminFee: val })}
                         placeholder="0.00"
@@ -1578,14 +1589,12 @@ export default function BillingEnrollmentSection({
                       <span>{activeBAndE.aetnaSignatureAdminFee || "—"}</span>
                     )}
                   </div>
-                </div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                     <span style={{ color: "var(--text-muted)" }}>Network Access Fee</span>
                     {isInlineEditing ? (
                       <CurrencyInput
-                        style={{ width: "170px" }}
+                        style={{ width: "160px" }}
                         value={editFormData.networkAccessFee}
                         onChange={(val) => setEditFormData({ ...editFormData, networkAccessFee: val })}
                         placeholder="0.00"
@@ -1600,7 +1609,7 @@ export default function BillingEnrollmentSection({
                     <span style={{ color: "var(--text-muted)" }}>Reinsurance Fee</span>
                     {isInlineEditing ? (
                       <CurrencyInput
-                        style={{ width: "170px" }}
+                        style={{ width: "160px" }}
                         value={editFormData.reinsuranceFee}
                         onChange={(val) => setEditFormData({ ...editFormData, reinsuranceFee: val })}
                         placeholder="0.00"
@@ -1615,7 +1624,7 @@ export default function BillingEnrollmentSection({
                     <span style={{ color: "var(--text-muted)" }}>LCM / SPA (AHH)</span>
                     {isInlineEditing ? (
                       <CurrencyInput
-                        style={{ width: "170px" }}
+                        style={{ width: "160px" }}
                         value={editFormData.lcmSpaFee}
                         onChange={(val) => setEditFormData({ ...editFormData, lcmSpaFee: val })}
                         placeholder="0.00"
@@ -1630,7 +1639,7 @@ export default function BillingEnrollmentSection({
                     <span style={{ color: "var(--text-muted)" }}>Agent Fee</span>
                     {isInlineEditing ? (
                       <CurrencyInput
-                        style={{ width: "170px" }}
+                        style={{ width: "160px" }}
                         value={editFormData.agentFee}
                         onChange={(val) => setEditFormData({ ...editFormData, agentFee: val })}
                         placeholder="0.00"
@@ -1678,21 +1687,233 @@ export default function BillingEnrollmentSection({
                   </div>
                 </div>
               </div>
+
+              {/* Right Side Column Container for PBM, Commission, Transplant & Domestic */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", height: "100%" }}>
+                {/* PBM Specs */}
+                <div
+                  className="glass-card"
+                  style={{
+                    padding: "1.25rem",
+                    background: "rgba(255, 255, 255, 0.02)",
+                    border: "1px solid var(--border)",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                      <Pill size={18} style={{ color: "#34d399" }} />
+                      <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>PBM Information</h3>
+                    </div>
+                    {!isInlineEditing && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsExpanded(true);
+                          setIsInlineEditing(true);
+                        }}
+                        className="btn btn-secondary btn-sm"
+                        style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                        title="Edit section"
+                      >
+                        <Edit3 size={12} />
+                        <span>Edit</span>
+                      </button>
+                    )}
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem", flex: 1 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ color: "var(--text-muted)" }}>PBM Provider</span>
+                      {isInlineEditing ? (
+                        <input
+                          type="text"
+                          className="form-input"
+                          style={{ width: "120px", padding: "0.2rem 0.4rem", fontSize: "0.75rem", textAlign: "right" }}
+                          value={editFormData.pbmRx}
+                          onChange={(e) => setEditFormData({ ...editFormData, pbmRx: e.target.value })}
+                          placeholder="Express Scripts"
+                        />
+                      ) : (
+                        <strong style={{ color: "#34d399" }}>{activeBAndE.pbmRx || "—"}</strong>
+                      )}
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ color: "var(--text-muted)" }}>Rx in ASR Reporting?</span>
+                      {isInlineEditing ? (
+                        <YesNoToggle
+                          value={editFormData.rxIncludedInAsrReporting}
+                          onChange={(val) => setEditFormData({ ...editFormData, rxIncludedInAsrReporting: val })}
+                        />
+                      ) : (
+                        <span>{activeBAndE.rxIncludedInAsrReporting || "No"}</span>
+                      )}
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ color: "var(--text-muted)" }}>Rx ASR Contract?</span>
+                      {isInlineEditing ? (
+                        <YesNoToggle
+                          value={editFormData.isRxAsrContract}
+                          onChange={(val) => setEditFormData({ ...editFormData, isRxAsrContract: val })}
+                        />
+                      ) : (
+                        <span>{activeBAndE.isRxAsrContract || "No"}</span>
+                      )}
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ color: "var(--text-muted)" }}>Agent Comp</span>
+                      {isInlineEditing ? (
+                        <YesNoToggle
+                          value={editFormData.pbmAgentCompensation}
+                          onChange={(val) => setEditFormData({ ...editFormData, pbmAgentCompensation: val })}
+                        />
+                      ) : (
+                        <span>{activeBAndE.pbmAgentCompensation || "No"}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Commissions */}
+                <div
+                  className="glass-card"
+                  style={{
+                    padding: "1.25rem",
+                    background: "rgba(255, 255, 255, 0.02)",
+                    border: "1px solid var(--border)",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                      <DollarSign size={18} style={{ color: "#f472b6" }} />
+                      <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>Commission Info</h3>
+                    </div>
+                    {!isInlineEditing && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsExpanded(true);
+                          setIsInlineEditing(true);
+                        }}
+                        className="btn btn-secondary btn-sm"
+                        style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                        title="Edit section"
+                      >
+                        <Edit3 size={12} />
+                        <span>Edit</span>
+                      </button>
+                    )}
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem", flex: 1 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ color: "var(--text-muted)" }}>Stop-Loss Commission</span>
+                      {isInlineEditing ? (
+                        <PercentInput
+                          style={{ width: "110px", fontSize: "0.75rem", padding: "0.2rem 0.4rem" }}
+                          value={editFormData.stopLossCommission}
+                          onChange={(val) => setEditFormData({ ...editFormData, stopLossCommission: val })}
+                          placeholder="10"
+                        />
+                      ) : (
+                        <span>{activeBAndE.stopLossCommission || "0%"}</span>
+                      )}
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ color: "var(--text-muted)" }}>Stop-Loss Other Comp</span>
+                      {isInlineEditing ? (
+                        <PercentInput
+                          style={{ width: "110px", fontSize: "0.75rem", padding: "0.2rem 0.4rem" }}
+                          value={editFormData.stopLossOtherCompensation}
+                          onChange={(val) => setEditFormData({ ...editFormData, stopLossOtherCompensation: val })}
+                          placeholder="3"
+                        />
+                      ) : (
+                        <span>{activeBAndE.stopLossOtherCompensation || "—"}</span>
+                      )}
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ color: "var(--text-muted)" }}>Agent Compensation</span>
+                      {isInlineEditing ? (
+                        <YesNoToggle
+                          value={editFormData.commissionAgentCompensation}
+                          onChange={(val) => setEditFormData({ ...editFormData, commissionAgentCompensation: val })}
+                        />
+                      ) : (
+                        <span>{activeBAndE.commissionAgentCompensation || "No"}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Organ Transplant & Domestic Claims */}
+                {showStopLoss && (
+                  <div
+                    className="glass-card"
+                    style={{
+                      padding: "1.25rem",
+                      background: "rgba(255, 255, 255, 0.02)",
+                      border: "1px solid var(--border)",
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        <HeartHandshake size={18} style={{ color: "#60a5fa" }} />
+                        <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>Transplant & Domestic</h3>
+                      </div>
+                      {!isInlineEditing && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsExpanded(true);
+                            setIsInlineEditing(true);
+                          }}
+                          className="btn btn-secondary btn-sm"
+                          style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                          title="Edit section"
+                        >
+                          <Edit3 size={12} />
+                          <span>Edit</span>
+                        </button>
+                      )}
+                    </div>
+
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem", flex: 1 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ color: "var(--text-muted)" }}>Transplant Policy</span>
+                        {isInlineEditing ? (
+                          <YesNoToggle
+                            value={editFormData.organTransplantPolicy}
+                            onChange={(val) => setEditFormData({ ...editFormData, organTransplantPolicy: val })}
+                          />
+                        ) : (
+                          <span>{activeBAndE.organTransplantPolicy || "No"}</span>
+                        )}
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ color: "var(--text-muted)" }}>Domestic Claims?</span>
+                        {isInlineEditing ? (
+                          <YesNoToggle
+                            value={editFormData.domesticClaims}
+                            onChange={(val) => setEditFormData({ ...editFormData, domesticClaims: val })}
+                          />
+                        ) : (
+                          <span>{activeBAndE.domesticClaims || "No"}</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-          )}
-
-          {/* PBM, Commission & Additional Policies Grid */}
-          <div
-            className="grid-cols-3"
-            style={{
-              display: "grid",
-              gridTemplateColumns: showBilling && showStopLoss ? "repeat(3, 1fr)" : showBilling ? "repeat(2, 1fr)" : "1fr",
-              gap: "1.25rem",
-              alignItems: "stretch",
-            }}
-          >
-            {/* PBM Specs (Shown in BOTH and BILLING) */}
-            {showBilling && (
+          ) : (
+            /* Organ Transplant & Domestic Claims (Shown when ONLY STOP_LOSS is enabled) */
+            showStopLoss && (
               <div
                 className="glass-card"
                 style={{
@@ -1701,173 +1922,6 @@ export default function BillingEnrollmentSection({
                   border: "1px solid var(--border)",
                   display: "flex",
                   flexDirection: "column",
-                  height: "100%",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                    <Pill size={18} style={{ color: "#34d399" }} />
-                    <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>PBM Information</h3>
-                  </div>
-                  {!isInlineEditing && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsExpanded(true);
-                        setIsInlineEditing(true);
-                      }}
-                      className="btn btn-secondary btn-sm"
-                      style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
-                      title="Edit section"
-                    >
-                      <Edit3 size={12} />
-                      <span>Edit</span>
-                    </button>
-                  )}
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem", flex: 1 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ color: "var(--text-muted)" }}>PBM Provider</span>
-                    {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
-                        style={{ width: "120px", padding: "0.2rem 0.4rem", fontSize: "0.75rem", textAlign: "right" }}
-                        value={editFormData.pbmRx}
-                        onChange={(e) => setEditFormData({ ...editFormData, pbmRx: e.target.value })}
-                        placeholder="Express Scripts"
-                      />
-                    ) : (
-                      <strong style={{ color: "#34d399" }}>{activeBAndE.pbmRx || "—"}</strong>
-                    )}
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ color: "var(--text-muted)" }}>Rx in ASR Reporting?</span>
-                    {isInlineEditing ? (
-                      <YesNoToggle
-                        value={editFormData.rxIncludedInAsrReporting}
-                        onChange={(val) => setEditFormData({ ...editFormData, rxIncludedInAsrReporting: val })}
-                      />
-                    ) : (
-                      <span>{activeBAndE.rxIncludedInAsrReporting || "No"}</span>
-                    )}
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ color: "var(--text-muted)" }}>Rx ASR Contract?</span>
-                    {isInlineEditing ? (
-                      <YesNoToggle
-                        value={editFormData.isRxAsrContract}
-                        onChange={(val) => setEditFormData({ ...editFormData, isRxAsrContract: val })}
-                      />
-                    ) : (
-                      <span>{activeBAndE.isRxAsrContract || "No"}</span>
-                    )}
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ color: "var(--text-muted)" }}>Agent Comp</span>
-                    {isInlineEditing ? (
-                      <YesNoToggle
-                        value={editFormData.pbmAgentCompensation}
-                        onChange={(val) => setEditFormData({ ...editFormData, pbmAgentCompensation: val })}
-                      />
-                    ) : (
-                      <span>{activeBAndE.pbmAgentCompensation || "No"}</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Commissions (Shown in BOTH and BILLING) */}
-            {showBilling && (
-              <div
-                className="glass-card"
-                style={{
-                  padding: "1.25rem",
-                  background: "rgba(255, 255, 255, 0.02)",
-                  border: "1px solid var(--border)",
-                  display: "flex",
-                  flexDirection: "column",
-                  height: "100%",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                    <DollarSign size={18} style={{ color: "#f472b6" }} />
-                    <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>Commission Info</h3>
-                  </div>
-                  {!isInlineEditing && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsExpanded(true);
-                        setIsInlineEditing(true);
-                      }}
-                      className="btn btn-secondary btn-sm"
-                      style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
-                      title="Edit section"
-                    >
-                      <Edit3 size={12} />
-                      <span>Edit</span>
-                    </button>
-                  )}
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem", flex: 1 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ color: "var(--text-muted)" }}>Stop-Loss Commission</span>
-                    {isInlineEditing ? (
-                      <PercentInput
-                        style={{ width: "110px", fontSize: "0.75rem", padding: "0.2rem 0.4rem" }}
-                        value={editFormData.stopLossCommission}
-                        onChange={(val) => setEditFormData({ ...editFormData, stopLossCommission: val })}
-                        placeholder="10"
-                      />
-                    ) : (
-                      <span>{activeBAndE.stopLossCommission || "0%"}</span>
-                    )}
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ color: "var(--text-muted)" }}>Stop-Loss Other Comp</span>
-                    {isInlineEditing ? (
-                      <PercentInput
-                        style={{ width: "110px", fontSize: "0.75rem", padding: "0.2rem 0.4rem" }}
-                        value={editFormData.stopLossOtherCompensation}
-                        onChange={(val) => setEditFormData({ ...editFormData, stopLossOtherCompensation: val })}
-                        placeholder="3"
-                      />
-                    ) : (
-                      <span>{activeBAndE.stopLossOtherCompensation || "—"}</span>
-                    )}
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ color: "var(--text-muted)" }}>Agent Compensation</span>
-                    {isInlineEditing ? (
-                      <YesNoToggle
-                        value={editFormData.commissionAgentCompensation}
-                        onChange={(val) => setEditFormData({ ...editFormData, commissionAgentCompensation: val })}
-                      />
-                    ) : (
-                      <span>{activeBAndE.commissionAgentCompensation || "No"}</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Organ Transplant & Domestic Claims (Shown in BOTH and STOP_LOSS) */}
-            {showStopLoss && (
-              <div
-                className="glass-card"
-                style={{
-                  padding: "1.25rem",
-                  background: "rgba(255, 255, 255, 0.02)",
-                  border: "1px solid var(--border)",
-                  display: "flex",
-                  flexDirection: "column",
-                  height: "100%",
-                  gridColumn: !showBilling ? "span 3" : undefined,
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
@@ -1917,8 +1971,8 @@ export default function BillingEnrollmentSection({
                   </div>
                 </div>
               </div>
-            )}
-          </div>
+            )
+          )}
 
           {/* General Operational Notes (Shown in BOTH and BILLING) */}
           {showBilling && (
