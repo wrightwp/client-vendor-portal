@@ -288,20 +288,9 @@ function GroupsContent() {
                     </span>
                   </td>
                   <td className="nowrap" onClick={(e) => e.stopPropagation()}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                      <span className="badge badge-pink">
-                        {client.vendors?.length || 0} Vendors
-                      </span>
-                      <Link
-                        href="/vendors?action=new"
-                        className="btn btn-blue btn-xs"
-                        style={{ padding: "0.2rem 0.5rem", fontSize: "0.75rem" }}
-                        title="Quick add a new vendor profile"
-                      >
-                        <Plus size={12} />
-                        <span>Quick Add</span>
-                      </Link>
-                    </div>
+                    <span className="badge badge-pink">
+                      {client.vendors?.length || 0} Vendors
+                    </span>
                   </td>
                   <td style={{ textAlign: "right" }} className="nowrap" onClick={(e) => e.stopPropagation()}>
                     <Link
