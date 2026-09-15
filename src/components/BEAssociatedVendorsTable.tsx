@@ -219,7 +219,7 @@ export default function BEAssociatedVendorsTable({
     <div
       className="glass-card"
       style={{
-        padding: "1.25rem",
+        padding: "0.85rem 1rem",
         background: "rgba(255, 255, 255, 0.02)",
         border: "1px solid var(--border)",
       }}
@@ -232,7 +232,7 @@ export default function BEAssociatedVendorsTable({
           justifyContent: "space-between",
           flexWrap: "wrap",
           gap: "0.5rem",
-          marginBottom: "1rem",
+          marginBottom: "0.75rem",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
@@ -440,8 +440,8 @@ export default function BEAssociatedVendorsTable({
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-            gap: "0.75rem",
+            gridTemplateColumns: "repeat(auto-fill, minmax(260px, 340px))",
+            gap: "0.5rem",
           }}
         >
           {vendors.map((item: any) => {
@@ -454,36 +454,36 @@ export default function BEAssociatedVendorsTable({
                 style={{
                   background: "rgba(0, 174, 219, 0.03)",
                   border: "1px solid rgba(0, 174, 219, 0.22)",
-                  borderRadius: "8px",
-                  padding: "0.75rem 0.85rem",
+                  borderRadius: "6px",
+                  padding: "0.55rem 0.7rem",
                   display: "flex",
                   flexDirection: "column",
-                  gap: "0.5rem",
+                  gap: "0.4rem",
                   transition: "border-color 0.15s ease",
                 }}
               >
                 {/* Card Top: Vendor Name, Badge & Actions */}
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "0.5rem" }}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.2rem" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "0.4rem" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.3rem", flexWrap: "wrap" }}>
                       <Link
                         href={`/vendors/${vendor.id}`}
                         style={{
                           fontWeight: "700",
                           color: "var(--accent-blue)",
                           textDecoration: "none",
-                          fontSize: "0.88rem",
+                          fontSize: "0.82rem",
                           display: "inline-flex",
                           alignItems: "center",
-                          gap: "0.25rem",
+                          gap: "0.2rem",
                         }}
                       >
                         <span>{vendor.name}</span>
-                        <ArrowUpRight size={13} style={{ opacity: 0.6 }} />
+                        <ArrowUpRight size={12} style={{ opacity: 0.6 }} />
                       </Link>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.2rem" }}>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.15rem" }}>
                         {parseVendorCategories(vendor.vendorType).map((cat: string, ci: number) => (
-                          <span key={ci} className="badge badge-blue" style={{ fontSize: "0.68rem", padding: "0.1rem 0.35rem" }}>
+                          <span key={ci} className="badge badge-blue" style={{ fontSize: "0.64rem", padding: "0.08rem 0.3rem" }}>
                             {cat}
                           </span>
                         ))}
@@ -491,15 +491,15 @@ export default function BEAssociatedVendorsTable({
                     </div>
 
                     {vendor.city && vendor.state && (
-                      <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "0.2rem" }}>
-                        <MapPin size={11} />
+                      <span style={{ fontSize: "0.68rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "0.2rem" }}>
+                        <MapPin size={10} />
                         {vendor.city}, {vendor.state}
                       </span>
                     )}
                   </div>
 
                   {/* Micro Actions */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
                     <button
                       type="button"
                       onClick={() =>
@@ -511,10 +511,10 @@ export default function BEAssociatedVendorsTable({
                         })
                       }
                       className="btn btn-secondary btn-sm"
-                      style={{ fontSize: "0.7rem", padding: "0.2rem 0.4rem", display: "inline-flex", alignItems: "center", gap: "0.2rem" }}
+                      style={{ fontSize: "0.68rem", padding: "0.15rem 0.35rem", display: "inline-flex", alignItems: "center", gap: "0.15rem" }}
                       title="Edit Group Fee & Notes"
                     >
-                      <FileText size={12} style={{ color: "var(--accent-blue)" }} />
+                      <FileText size={11} style={{ color: "var(--accent-blue)" }} />
                       <span>Edit</span>
                     </button>
 
@@ -522,10 +522,10 @@ export default function BEAssociatedVendorsTable({
                       type="button"
                       onClick={() => setDeleteVendorTarget({ id: item.vendorId, name: vendor.name })}
                       className="btn btn-danger btn-sm"
-                      style={{ fontSize: "0.7rem", padding: "0.2rem 0.35rem" }}
+                      style={{ fontSize: "0.68rem", padding: "0.15rem 0.3rem" }}
                       title="Unlink Vendor"
                     >
-                      <Trash2 size={12} />
+                      <Trash2 size={11} />
                     </button>
                   </div>
                 </div>
@@ -535,32 +535,32 @@ export default function BEAssociatedVendorsTable({
                   style={{
                     background: item.fee ? "rgba(0, 174, 219, 0.12)" : "rgba(0, 174, 219, 0.03)",
                     border: item.fee ? "1px solid rgba(0, 174, 219, 0.4)" : "1px dashed rgba(0, 174, 219, 0.25)",
-                    borderRadius: "6px",
-                    padding: "0.4rem 0.6rem",
+                    borderRadius: "5px",
+                    padding: "0.25rem 0.45rem",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    gap: "0.5rem",
+                    gap: "0.4rem",
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
-                    <DollarSign size={14} style={{ color: "var(--accent-blue)" }} />
-                    <span style={{ fontSize: "0.72rem", color: "var(--accent-blue)", fontWeight: "700" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                    <DollarSign size={13} style={{ color: "var(--accent-blue)" }} />
+                    <span style={{ fontSize: "0.68rem", color: "var(--accent-blue)", fontWeight: "700" }}>
                       GROUP FEE:
                     </span>
                   </div>
 
                   {isEditingThisFee ? (
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
                       <input
                         type="text"
                         autoFocus
                         className="form-input"
                         style={{
-                          fontSize: "0.75rem",
-                          padding: "0.15rem 0.4rem",
-                          height: "24px",
-                          width: "120px",
+                          fontSize: "0.72rem",
+                          padding: "0.1rem 0.35rem",
+                          height: "22px",
+                          width: "110px",
                           borderColor: "var(--accent-blue)",
                         }}
                         placeholder="e.g. $2.50 PEPM"
@@ -577,23 +577,23 @@ export default function BEAssociatedVendorsTable({
                         onClick={() => handleSaveInlineFee(item.vendorId)}
                         className="btn btn-sm"
                         style={{
-                          padding: "0.15rem 0.35rem",
+                          padding: "0.1rem 0.3rem",
                           background: "var(--accent-blue)",
                           color: "#fff",
                           border: "none",
                         }}
                         title="Save Fee"
                       >
-                        <Check size={12} />
+                        <Check size={11} />
                       </button>
                       <button
                         type="button"
                         onClick={() => setEditingFeeVendorId(null)}
                         className="btn btn-secondary btn-sm"
-                        style={{ padding: "0.15rem 0.35rem" }}
+                        style={{ padding: "0.1rem 0.3rem" }}
                         title="Cancel"
                       >
-                        <X size={12} />
+                        <X size={11} />
                       </button>
                     </div>
                   ) : (
@@ -601,7 +601,7 @@ export default function BEAssociatedVendorsTable({
                       style={{
                         display: "inline-flex",
                         alignItems: "center",
-                        gap: "0.3rem",
+                        gap: "0.25rem",
                         cursor: "pointer",
                       }}
                       onClick={() => {
@@ -612,14 +612,14 @@ export default function BEAssociatedVendorsTable({
                     >
                       <strong
                         style={{
-                          fontSize: "0.85rem",
+                          fontSize: "0.78rem",
                           color: item.fee ? "var(--accent-blue)" : "var(--text-muted)",
                           fontWeight: "800",
                         }}
                       >
                         {item.fee || "+ Set Fee"}
                       </strong>
-                      <Edit3 size={11} style={{ opacity: 0.7, color: item.fee ? "var(--accent-blue)" : "var(--text-muted)" }} />
+                      <Edit3 size={10} style={{ opacity: 0.7, color: item.fee ? "var(--accent-blue)" : "var(--text-muted)" }} />
                     </div>
                   )}
                 </div>
@@ -628,13 +628,13 @@ export default function BEAssociatedVendorsTable({
                 {item.notes && (
                   <div
                     style={{
-                      fontSize: "0.75rem",
+                      fontSize: "0.7rem",
                       color: "var(--text-secondary)",
                       background: "rgba(255, 255, 255, 0.015)",
-                      padding: "0.3rem 0.5rem",
-                      borderRadius: "5px",
+                      padding: "0.25rem 0.4rem",
+                      borderRadius: "4px",
                       border: "1px solid rgba(255, 255, 255, 0.05)",
-                      lineHeight: "1.35",
+                      lineHeight: "1.3",
                     }}
                   >
                     <MarkdownNoteRenderer content={item.notes} />

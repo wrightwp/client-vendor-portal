@@ -244,7 +244,7 @@ export function SpecificPremiumRatesInput({
             align={compact ? "center" : "left"}
             value={singleRate}
             onChange={(val) => onSingleRateChange && onSingleRateChange(val)}
-            placeholder="165.00"
+            placeholder="0.00"
           />
         </div>
       )}
@@ -260,7 +260,7 @@ export function SpecificPremiumRatesInput({
               align={compact ? "center" : "left"}
               value={singleRate}
               onChange={(val) => onSingleRateChange && onSingleRateChange(val)}
-              placeholder="140.00"
+              placeholder="0.00"
             />
           </div>
           <div>
@@ -272,7 +272,7 @@ export function SpecificPremiumRatesInput({
               align={compact ? "center" : "left"}
               value={familyRate}
               onChange={(val) => onFamilyRateChange && onFamilyRateChange(val)}
-              placeholder="400.00"
+              placeholder="0.00"
             />
           </div>
         </div>
@@ -289,7 +289,7 @@ export function SpecificPremiumRatesInput({
               align={compact ? "center" : "left"}
               value={singleRate}
               onChange={(val) => onSingleRateChange && onSingleRateChange(val)}
-              placeholder="140.00"
+              placeholder="0.00"
             />
           </div>
           <div>
@@ -301,7 +301,7 @@ export function SpecificPremiumRatesInput({
               align={compact ? "center" : "left"}
               value={eePlusOneRate}
               onChange={(val) => onEePlusOneRateChange && onEePlusOneRateChange(val)}
-              placeholder="260.00"
+              placeholder="0.00"
             />
           </div>
           <div>
@@ -313,7 +313,7 @@ export function SpecificPremiumRatesInput({
               align={compact ? "center" : "left"}
               value={familyRate}
               onChange={(val) => onFamilyRateChange && onFamilyRateChange(val)}
-              placeholder="400.00"
+              placeholder="0.00"
             />
           </div>
         </div>
@@ -330,7 +330,7 @@ export function SpecificPremiumRatesInput({
               align={compact ? "center" : "left"}
               value={singleRate}
               onChange={(val) => onSingleRateChange && onSingleRateChange(val)}
-              placeholder="140.00"
+              placeholder="0.00"
             />
           </div>
           <div>
@@ -342,7 +342,7 @@ export function SpecificPremiumRatesInput({
               align={compact ? "center" : "left"}
               value={eeSpouseRate}
               onChange={(val) => onEeSpouseRateChange && onEeSpouseRateChange(val)}
-              placeholder="280.00"
+              placeholder="0.00"
             />
           </div>
           <div>
@@ -354,7 +354,7 @@ export function SpecificPremiumRatesInput({
               align={compact ? "center" : "left"}
               value={eeChildrenRate}
               onChange={(val) => onEeChildrenRateChange && onEeChildrenRateChange(val)}
-              placeholder="250.00"
+              placeholder="0.00"
             />
           </div>
           <div>
@@ -366,7 +366,7 @@ export function SpecificPremiumRatesInput({
               align={compact ? "center" : "left"}
               value={familyRate}
               onChange={(val) => onFamilyRateChange && onFamilyRateChange(val)}
-              placeholder="420.00"
+              placeholder="0.00"
             />
           </div>
         </div>

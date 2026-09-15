@@ -22,7 +22,7 @@ export function MonthlyAccommodationInput({
 
   const [isYes, setIsYes] = useState(!isNo);
   const [feeText, setFeeText] = useState(
-    !isNo && value.trim().toLowerCase() !== "yes" ? value : "$1.50 (not included in aggregate premium)"
+    !isNo && value.trim().toLowerCase() !== "yes" ? value : ""
   );
 
   useEffect(() => {
@@ -34,6 +34,8 @@ export function MonthlyAccommodationInput({
     setIsYes(!no);
     if (!no && value.trim().toLowerCase() !== "yes") {
       setFeeText(value);
+    } else if (value?.trim().toLowerCase() === "yes") {
+      setFeeText("");
     }
   }, [value]);
 
@@ -43,15 +45,15 @@ export function MonthlyAccommodationInput({
       onChange("No");
     } else {
       setIsYes(true);
-      const text = feeText.trim() || "$1.50 (not included in aggregate premium)";
-      onChange(text);
+      const text = feeText.trim();
+      onChange(text || "Yes");
     }
   };
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
     setFeeText(text);
-    onChange(text);
+    onChange(text || "Yes");
   };
 
   if (compact) {
@@ -65,7 +67,7 @@ export function MonthlyAccommodationInput({
             type="text"
             value={feeText}
             onChange={handleTextChange}
-            placeholder="e.g. $1.50 (not included in aggregate premium)"
+            placeholder="0.00"
             className="form-input"
             style={{ width: "100%", fontSize: "0.75rem", padding: "0.2rem 0.4rem", marginTop: "0.15rem" }}
           />
@@ -88,7 +90,7 @@ export function MonthlyAccommodationInput({
             type="text"
             value={feeText}
             onChange={handleTextChange}
-            placeholder="e.g. $1.50 (not included in aggregate premium)"
+            placeholder="0.00"
             className="form-input"
             style={{ fontSize: "0.8rem" }}
           />

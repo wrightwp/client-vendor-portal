@@ -29,9 +29,9 @@ function isNoIncrease(val: string): boolean {
  * Parses percent value out of raw text e.g. "30%", "Yes - 30%", "45"
  */
 function extractPercentText(val: string): string {
-  if (!val || isNoIncrease(val)) return "30%";
+  if (!val || isNoIncrease(val)) return "";
   const cleaned = val.replace(/^yes\s*[-:\(]?\s*/i, "").replace(/\)$/, "").trim();
-  return cleaned || "30%";
+  return cleaned === "yes" ? "" : cleaned;
 }
 
 export function MaxSpecificRenewalIncreaseInput({
@@ -56,18 +56,14 @@ export function MaxSpecificRenewalIncreaseInput({
       onChange("No");
     } else {
       setIsYes(true);
-      const text = percentText.trim() || "30%";
-      onChange(text);
+      const text = percentText.trim();
+      onChange(text || "Yes");
     }
   };
 
   const handlePercentChange = (val: string) => {
     setPercentText(val);
-    if (val.trim()) {
-      onChange(val);
-    } else {
-      onChange("No");
-    }
+    onChange(val || "Yes");
   };
 
   if (compact) {
@@ -80,7 +76,7 @@ export function MaxSpecificRenewalIncreaseInput({
           <PercentInput
             value={percentText}
             onChange={handlePercentChange}
-            placeholder="30"
+            placeholder="0"
             style={{ width: "110px", fontSize: "0.8rem", padding: "0.2rem 0.4rem", marginTop: "0.15rem" }}
           />
         )}
@@ -101,7 +97,7 @@ export function MaxSpecificRenewalIncreaseInput({
           <PercentInput
             value={percentText}
             onChange={handlePercentChange}
-            placeholder="30"
+            placeholder="0"
           />
         </div>
       )}

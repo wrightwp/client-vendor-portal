@@ -25,11 +25,11 @@ export function CurrencyInput({
   align = "right",
   suffix,
 }: CurrencyInputProps) {
-  // Determine if current value is purely numeric or empty (warrants a $ prefix)
+  // Determine if current value is numeric, empty, or in-progress typing (warrants a $ prefix)
   const isNumericOrEmpty =
     !value ||
     value.trim() === "" ||
-    /^\s*\$?-?\d+([.,]\d+)*\s*$/.test(value);
+    /^\s*\$?-?[\d,]*([.]\d*)?\s*$/.test(value.trim());
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     let raw = e.target.value;
@@ -37,18 +37,41 @@ export function CurrencyInput({
       onChange("");
       return;
     }
-    // If user typed/pasted leading $, strip it so we don't double up
+    // Strip leading $ if user types or pastes it, allowing non-restrictive typing
     if (raw.startsWith("$")) {
       raw = raw.substring(1).trimStart();
     }
     onChange(raw);
   };
 
+  const handleFocus = () => {
+    if (!value) return;
+    const trimmed = value.trim().replace(/^\$/, "").replace(/,/g, "");
+    // Wipe 0, 0.0, 0.00 on focus so input clears cleanly for typing
+    const num = parseFloat(trimmed);
+    if (!isNaN(num) && num === 0) {
+      onChange("");
+    }
+  };
+
   const handleBlur = () => {
     if (!value || !value.trim()) return;
-    const cleaned = value.trim().replace(/,/g, "").replace(/^\$/, "").trim();
-    const num = parseFloat(cleaned);
-    if (!isNaN(num) && /^-?\d+(\.\d+)?$/.test(cleaned)) {
+
+    const trimmed = value.trim();
+    // Strip leading $, commas, and extra whitespace
+    let clean = trimmed.replace(/^\$/, "").replace(/,/g, "").trim();
+
+    // Normalize leading decimal (e.g. ".5" -> "0.5")
+    if (clean.startsWith(".")) {
+      clean = `0${clean}`;
+    }
+    // Normalize trailing decimal (e.g. "1000." -> "1000")
+    if (clean.endsWith(".")) {
+      clean = clean.slice(0, -1);
+    }
+
+    const num = parseFloat(clean);
+    if (!isNaN(num) && /^-?\d+(\.\d+)?$/.test(clean)) {
       const formatted = num.toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
@@ -89,6 +112,7 @@ export function CurrencyInput({
         id={id}
         value={value}
         onChange={handleChange}
+        onFocus={handleFocus}
         onBlur={handleBlur}
         placeholder={placeholder}
         disabled={disabled}
@@ -127,14 +151,13 @@ export function formatCurrencyDisplay(val?: string | null): string {
   const lower = trimmed.toLowerCase();
   if (lower === "no" || lower === "none" || lower === "false") return "No";
   if (lower === "yes") return "Yes";
-  if (trimmed.startsWith("$")) return trimmed;
 
-  const clean = trimmed.replace(/,/g, "");
+  const clean = trimmed.replace(/^\$/, "").replace(/,/g, "").trim();
   const num = parseFloat(clean);
   if (!isNaN(num)) {
     return `$${num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }
-  return `$${trimmed}`;
+  return trimmed.startsWith("$") ? trimmed : `$${trimmed}`;
 }
 
 export default CurrencyInput;

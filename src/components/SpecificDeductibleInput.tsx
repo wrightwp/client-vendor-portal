@@ -94,7 +94,7 @@ export function SpecificDeductibleInput({
         <CurrencyInput
           value={amount}
           onChange={handleAmountChange}
-          placeholder="50,000.00"
+          placeholder="0.00"
           style={{ width: "140px", fontSize: "0.825rem", padding: "0.25rem 0.5rem" }}
         />
 
@@ -163,7 +163,7 @@ export function SpecificDeductibleInput({
       <CurrencyInput
         align="left"
         style={{ width: "100%" }}
-        placeholder="75,000.00"
+        placeholder="0.00"
         value={amount}
         onChange={handleAmountChange}
       />

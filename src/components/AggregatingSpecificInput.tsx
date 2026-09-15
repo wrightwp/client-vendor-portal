@@ -25,7 +25,7 @@ export function AggregatingSpecificInput({
 
   const [isYes, setIsYes] = useState(!isNo);
   const [amountText, setAmountText] = useState(
-    !isNo && value.trim().toLowerCase() !== "yes" ? value : "$10,000.00"
+    !isNo && value.trim().toLowerCase() !== "yes" ? value : ""
   );
 
   useEffect(() => {
@@ -39,6 +39,8 @@ export function AggregatingSpecificInput({
     setIsYes(!no);
     if (!no && value.trim().toLowerCase() !== "yes") {
       setAmountText(value);
+    } else if (value?.trim().toLowerCase() === "yes") {
+      setAmountText("");
     }
   }, [value]);
 
@@ -48,14 +50,14 @@ export function AggregatingSpecificInput({
       onChange("No");
     } else {
       setIsYes(true);
-      const text = amountText.trim() || "$10,000.00";
-      onChange(text);
+      const text = amountText.trim();
+      onChange(text || "Yes");
     }
   };
 
   const handleAmountChange = (val: string) => {
     setAmountText(val);
-    onChange(val);
+    onChange(val || "Yes");
   };
 
   if (compact) {
@@ -68,7 +70,7 @@ export function AggregatingSpecificInput({
           <CurrencyInput
             value={amountText}
             onChange={handleAmountChange}
-            placeholder="10,000.00"
+            placeholder="0.00"
             style={{ width: "100%", fontSize: "0.75rem", padding: "0.2rem 0.4rem", marginTop: "0.15rem" }}
           />
         )}
@@ -89,7 +91,7 @@ export function AggregatingSpecificInput({
           <CurrencyInput
             value={amountText}
             onChange={handleAmountChange}
-            placeholder="10,000.00"
+            placeholder="0.00"
           />
         </div>
       )}

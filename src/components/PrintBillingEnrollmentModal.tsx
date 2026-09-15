@@ -4,6 +4,8 @@ import { X, Printer, FileText, FileSpreadsheet, Calendar, CheckCircle2 } from "l
 import { exportBEToExcel } from "@/lib/exportBEExcel";
 import { formatDisplayDate } from "@/lib/dateUtils";
 import { formatCurrencyDisplay } from "./CurrencyInput";
+import { formatTloDisplay } from "./TerminalLiabilityInput";
+import { formatRunInLimitDisplay } from "./AggregateRunInLimitInput";
 
 interface PrintBillingEnrollmentModalProps {
   clientName: string;
@@ -201,8 +203,9 @@ export default function PrintBillingEnrollmentModal({
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", fontSize: "0.85rem" }}>
                   <div><strong>Aggregate Premium:</strong> {bAndE.aggregatePremium || "N/A"}</div>
                   <div><strong>Monthly Aggregate Accommodation:</strong> {bAndE.monthlyAggregateAccommodation || "N/A"}</div>
+                  <div><strong>Terminal Liability Option (TLO):</strong> {formatTloDisplay(bAndE.terminalLiabilityOption)}</div>
                   <div><strong>Min. Attachment Point:</strong> {bAndE.aggregateMinAttachmentPoint || "N/A"}</div>
-                  <div><strong>Aggregate Run-in Limit:</strong> {bAndE.aggregateRunInLimit || "No"}</div>
+                  <div><strong>Aggregate Run-in Limit:</strong> {formatRunInLimitDisplay(bAndE.aggregateRunInLimit)}</div>
                   <div><strong>Aggregate Benefits Covered:</strong> {bAndE.aggregateBenefitsCovered || "Med/Rx"}</div>
                   <div><strong>Aggregate Stop-Loss Contract:</strong> {bAndE.aggregateContract || "N/A"}</div>
                 </div>
@@ -210,9 +213,9 @@ export default function PrintBillingEnrollmentModal({
                 <div style={{ marginTop: "0.75rem", background: "#f8fafc", padding: "0.75rem 1rem", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
                   <div style={{ fontWeight: "700", fontSize: "0.8rem", color: "#475569", marginBottom: "0.3rem" }}>Aggregate Factors:</div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.5rem", fontSize: "0.85rem" }}>
-                    <div><strong>Single:</strong> {bAndE.aggregateFactorSingle || "N/A"}</div>
-                    <div><strong>Employee + 1:</strong> {bAndE.aggregateFactorEmployeePlusOne || "N/A"}</div>
-                    <div><strong>Family:</strong> {bAndE.aggregateFactorFamily || "N/A"}</div>
+                    <div><strong>Single:</strong> {formatCurrencyDisplay(bAndE.aggregateFactorSingle)}</div>
+                    <div><strong>Employee + 1:</strong> {formatCurrencyDisplay(bAndE.aggregateFactorEmployeePlusOne)}</div>
+                    <div><strong>Family:</strong> {formatCurrencyDisplay(bAndE.aggregateFactorFamily)}</div>
                   </div>
                 </div>
               </>

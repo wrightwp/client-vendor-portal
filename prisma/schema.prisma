@@ -140,6 +140,7 @@ model ClientBillingEnrollment {
   aggregateStopLossStatus             String?  @default("Included")
   aggregatePremium                    String?
   monthlyAggregateAccommodation       String?
+  terminalLiabilityOption             String?
   aggregateFactorSingle               String?
   aggregateFactorEmployeePlusOne      String?
   aggregateFactorFamily               String?

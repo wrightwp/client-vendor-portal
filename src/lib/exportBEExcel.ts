@@ -1,5 +1,8 @@
 import * as XLSX from "xlsx";
 import { formatDisplayDate } from "./dateUtils";
+import { formatTloDisplay } from "../components/TerminalLiabilityInput";
+import { formatCurrencyDisplay } from "../components/CurrencyInput";
+import { formatRunInLimitDisplay } from "../components/AggregateRunInLimitInput";
 
 export function exportBEToExcel(clientName: string, data: any) {
   const bAndE = data || {};
@@ -49,13 +52,14 @@ export function exportBEToExcel(clientName: string, data: any) {
     ["Aggregate Coverage Status", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None (No Aggregate Coverage)" : "Included"],
     ["Aggregate Premium", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : (bAndE.aggregatePremium || "—")],
     ["Monthly Aggregate Accommodation", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : (bAndE.monthlyAggregateAccommodation || "—")],
+    ["Terminal Liability Option (TLO)", formatTloDisplay(bAndE.terminalLiabilityOption)],
     ["Aggregate Contract", bAndE.aggregateContract || "12/12"],
     ["Min Attachment Point", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : (bAndE.aggregateMinAttachmentPoint || "—")],
-    ["Aggregate Run-In Limit", bAndE.aggregateRunInLimit || "No"],
+    ["Aggregate Run-In Limit", formatRunInLimitDisplay(bAndE.aggregateRunInLimit)],
     ["Aggregate Benefits Covered", bAndE.aggregateBenefitsCovered || "Med/Rx"],
-    ["Aggregate Factor - Single", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : (bAndE.aggregateFactorSingle || "—")],
-    ["Aggregate Factor - Employee + 1", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : (bAndE.aggregateFactorEmployeePlusOne || "—")],
-    ["Aggregate Factor - Family", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : (bAndE.aggregateFactorFamily || "—")],
+    ["Aggregate Factor - Single", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : formatCurrencyDisplay(bAndE.aggregateFactorSingle)],
+    ["Aggregate Factor - Employee + 1", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : formatCurrencyDisplay(bAndE.aggregateFactorEmployeePlusOne)],
+    ["Aggregate Factor - Family", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : formatCurrencyDisplay(bAndE.aggregateFactorFamily)],
     [""],
 
     ["5. COMPOSITE ADMINISTRATION & PPO NETWORK INFORMATION"],

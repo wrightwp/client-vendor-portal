@@ -46,6 +46,8 @@ import SpecificDeductibleInput, { formatDisplaySpecificDeductible } from "./Spec
 import SpecificPremiumRatesInput from "./SpecificPremiumRatesInput";
 import BenefitsCoveredSelect from "./BenefitsCoveredSelect";
 import IncludedNoneToggle from "./IncludedNoneToggle";
+import TerminalLiabilityInput, { formatTloDisplay } from "./TerminalLiabilityInput";
+import AggregateRunInLimitInput, { formatRunInLimitDisplay } from "./AggregateRunInLimitInput";
 
 interface BillingEnrollmentSectionProps {
   clientId: string;
@@ -130,6 +132,7 @@ export default function BillingEnrollmentSection({
     aggregateStopLossStatus: activeBAndE.aggregateStopLossStatus || (activeBAndE.aggregatePremium?.trim().toLowerCase() === "none" ? "None" : "Included"),
     aggregatePremium: activeBAndE.aggregatePremium || "",
     monthlyAggregateAccommodation: activeBAndE.monthlyAggregateAccommodation || "",
+    terminalLiabilityOption: activeBAndE.terminalLiabilityOption || "",
     aggregateFactorSingle: activeBAndE.aggregateFactorSingle || "",
     aggregateFactorEmployeePlusOne: activeBAndE.aggregateFactorEmployeePlusOne || "",
     aggregateFactorFamily: activeBAndE.aggregateFactorFamily || "",
@@ -203,6 +206,7 @@ export default function BillingEnrollmentSection({
       aggregateStopLossStatus: activeBAndE.aggregateStopLossStatus || (activeBAndE.aggregatePremium?.trim().toLowerCase() === "none" ? "None" : "Included"),
       aggregatePremium: activeBAndE.aggregatePremium || "",
       monthlyAggregateAccommodation: activeBAndE.monthlyAggregateAccommodation || "",
+      terminalLiabilityOption: activeBAndE.terminalLiabilityOption || "",
       aggregateFactorSingle: activeBAndE.aggregateFactorSingle || "",
       aggregateFactorEmployeePlusOne: activeBAndE.aggregateFactorEmployeePlusOne || "",
       aggregateFactorFamily: activeBAndE.aggregateFactorFamily || "",
@@ -1149,7 +1153,7 @@ export default function BillingEnrollmentSection({
                           style={{ width: "160px" }}
                           value={editFormData.aggregatePremium}
                           onChange={(val) => setEditFormData({ ...editFormData, aggregatePremium: val })}
-                          placeholder="15.00"
+                          placeholder="0.00"
                         />
                       ) : (
                         <strong style={{ color: "var(--text-primary)" }}>{activeBAndE.aggregatePremium || "—"}</strong>
@@ -1172,6 +1176,24 @@ export default function BillingEnrollmentSection({
                       )}
                     </div>
 
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ color: "var(--text-muted)" }}>Terminal Liability Option (TLO)</span>
+                        {!isInlineEditing && (
+                          <span style={{ fontWeight: activeBAndE.terminalLiabilityOption?.toLowerCase().includes("separately") ? 600 : 400 }}>
+                            {formatTloDisplay(activeBAndE.terminalLiabilityOption)}
+                          </span>
+                        )}
+                      </div>
+                      {isInlineEditing && (
+                        <TerminalLiabilityInput
+                          value={editFormData.terminalLiabilityOption}
+                          onChange={(val) => setEditFormData({ ...editFormData, terminalLiabilityOption: val })}
+                          compact={true}
+                        />
+                      )}
+                    </div>
+
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                       <span style={{ color: "var(--text-muted)" }}>Min Attachment Point</span>
                       {isInlineEditing ? (
@@ -1179,23 +1201,26 @@ export default function BillingEnrollmentSection({
                           style={{ width: "160px" }}
                           value={editFormData.aggregateMinAttachmentPoint}
                           onChange={(val) => setEditFormData({ ...editFormData, aggregateMinAttachmentPoint: val })}
-                          placeholder="1,000,000"
+                          placeholder="0.00"
                         />
                       ) : (
                         <strong style={{ color: "#c084fc" }}>{activeBAndE.aggregateMinAttachmentPoint || "—"}</strong>
                       )}
                     </div>
 
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <span style={{ color: "var(--text-muted)" }}>Run-in Limit</span>
-                      {isInlineEditing ? (
-                        <YesNoToggle
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ color: "var(--text-muted)" }}>Run-in Limit</span>
+                        {!isInlineEditing && (
+                          <span>{formatRunInLimitDisplay(activeBAndE.aggregateRunInLimit)}</span>
+                        )}
+                      </div>
+                      {isInlineEditing && (
+                        <AggregateRunInLimitInput
                           value={editFormData.aggregateRunInLimit}
                           onChange={(val) => setEditFormData({ ...editFormData, aggregateRunInLimit: val })}
-                          size="sm"
+                          compact={true}
                         />
-                      ) : (
-                        <span>{activeBAndE.aggregateRunInLimit || "No"}</span>
                       )}
                     </div>
 
@@ -1229,10 +1254,10 @@ export default function BillingEnrollmentSection({
                               align="center"
                               value={editFormData.aggregateFactorSingle}
                               onChange={(val) => setEditFormData({ ...editFormData, aggregateFactorSingle: val })}
-                              placeholder="380.00"
+                              placeholder="0.00"
                             />
                           ) : (
-                            <div style={{ fontWeight: "700" }}>{activeBAndE.aggregateFactorSingle || "—"}</div>
+                            <div style={{ fontWeight: "700" }}>{formatCurrencyDisplay(activeBAndE.aggregateFactorSingle)}</div>
                           )}
                         </div>
                         <div>
@@ -1243,10 +1268,10 @@ export default function BillingEnrollmentSection({
                               align="center"
                               value={editFormData.aggregateFactorEmployeePlusOne}
                               onChange={(val) => setEditFormData({ ...editFormData, aggregateFactorEmployeePlusOne: val })}
-                              placeholder="720.00"
+                              placeholder="0.00"
                             />
                           ) : (
-                            <div style={{ fontWeight: "700" }}>{activeBAndE.aggregateFactorEmployeePlusOne || "—"}</div>
+                            <div style={{ fontWeight: "700" }}>{formatCurrencyDisplay(activeBAndE.aggregateFactorEmployeePlusOne)}</div>
                           )}
                         </div>
                         <div>
@@ -1257,10 +1282,10 @@ export default function BillingEnrollmentSection({
                               align="center"
                               value={editFormData.aggregateFactorFamily}
                               onChange={(val) => setEditFormData({ ...editFormData, aggregateFactorFamily: val })}
-                              placeholder="1,100.00"
+                              placeholder="0.00"
                             />
                           ) : (
-                            <div style={{ fontWeight: "700" }}>{activeBAndE.aggregateFactorFamily || "—"}</div>
+                            <div style={{ fontWeight: "700" }}>{formatCurrencyDisplay(activeBAndE.aggregateFactorFamily)}</div>
                           )}
                         </div>
                       </div>
@@ -1335,19 +1360,19 @@ export default function BillingEnrollmentSection({
             <div
               className="glass-card"
               style={{
-                padding: "1.5rem",
+                padding: "1rem 1.15rem",
                 background: "rgba(255, 255, 255, 0.02)",
                 border: "1px solid var(--border)",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1.25rem" }}>
-                <Network size={20} style={{ color: "var(--accent-yellow)" }} />
-                <h3 style={{ fontSize: "1.05rem", fontWeight: "700" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.85rem" }}>
+                <Network size={18} style={{ color: "var(--accent-yellow)" }} />
+                <h3 style={{ fontSize: "1rem", fontWeight: "700" }}>
                   Composite Administration & PPO Network Information
                 </h3>
               </div>
 
-              <div className="grid-cols-2" style={{ gap: "1.25rem", fontSize: "0.85rem" }}>
+              <div className="grid-cols-2" style={{ gap: "0.85rem", fontSize: "0.85rem" }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
                     <span style={{ color: "var(--text-muted)" }}>Composite Admin Fee</span>
@@ -1356,7 +1381,7 @@ export default function BillingEnrollmentSection({
                         style={{ width: "170px" }}
                         value={editFormData.compositeAdminFee}
                         onChange={(val) => setEditFormData({ ...editFormData, compositeAdminFee: val })}
-                        placeholder="45.00"
+                        placeholder="0.00"
                         suffix="PEPM"
                       />
                     ) : (
@@ -1371,7 +1396,7 @@ export default function BillingEnrollmentSection({
                         style={{ width: "170px" }}
                         value={editFormData.medicalFee}
                         onChange={(val) => setEditFormData({ ...editFormData, medicalFee: val })}
-                        placeholder="35.00"
+                        placeholder="0.00"
                         suffix="PEPM"
                       />
                     ) : (
@@ -1386,7 +1411,7 @@ export default function BillingEnrollmentSection({
                         style={{ width: "170px" }}
                         value={editFormData.urFee}
                         onChange={(val) => setEditFormData({ ...editFormData, urFee: val })}
-                        placeholder="4.50"
+                        placeholder="0.00"
                         suffix="PEPM"
                       />
                     ) : (
@@ -1401,7 +1426,7 @@ export default function BillingEnrollmentSection({
                         style={{ width: "170px" }}
                         value={editFormData.amwellFee}
                         onChange={(val) => setEditFormData({ ...editFormData, amwellFee: val })}
-                        placeholder="1.25"
+                        placeholder="0.00"
                         suffix="PEPM"
                       />
                     ) : (
@@ -1416,7 +1441,7 @@ export default function BillingEnrollmentSection({
                         style={{ width: "170px" }}
                         value={editFormData.physiciansCareHapFee}
                         onChange={(val) => setEditFormData({ ...editFormData, physiciansCareHapFee: val })}
-                        placeholder="2.00"
+                        placeholder="0.00"
                         suffix="PEPM"
                       />
                     ) : (
@@ -1431,7 +1456,7 @@ export default function BillingEnrollmentSection({
                         style={{ width: "170px" }}
                         value={editFormData.aetnaSignatureAdminFee}
                         onChange={(val) => setEditFormData({ ...editFormData, aetnaSignatureAdminFee: val })}
-                        placeholder="8.50"
+                        placeholder="0.00"
                         suffix="PEPM"
                       />
                     ) : (
@@ -1448,7 +1473,7 @@ export default function BillingEnrollmentSection({
                         style={{ width: "170px" }}
                         value={editFormData.networkAccessFee}
                         onChange={(val) => setEditFormData({ ...editFormData, networkAccessFee: val })}
-                        placeholder="5.00"
+                        placeholder="0.00"
                         suffix="PEPM"
                       />
                     ) : (
@@ -1463,7 +1488,7 @@ export default function BillingEnrollmentSection({
                         style={{ width: "170px" }}
                         value={editFormData.reinsuranceFee}
                         onChange={(val) => setEditFormData({ ...editFormData, reinsuranceFee: val })}
-                        placeholder="1.00"
+                        placeholder="0.00"
                         suffix="PEPM"
                       />
                     ) : (
@@ -1478,7 +1503,7 @@ export default function BillingEnrollmentSection({
                         style={{ width: "170px" }}
                         value={editFormData.lcmSpaFee}
                         onChange={(val) => setEditFormData({ ...editFormData, lcmSpaFee: val })}
-                        placeholder="149.00"
+                        placeholder="0.00"
                         suffix="hr"
                       />
                     ) : (
@@ -1493,7 +1518,7 @@ export default function BillingEnrollmentSection({
                         style={{ width: "170px" }}
                         value={editFormData.agentFee}
                         onChange={(val) => setEditFormData({ ...editFormData, agentFee: val })}
-                        placeholder="10.00"
+                        placeholder="0.00"
                         suffix="PEPM"
                       />
                     ) : (

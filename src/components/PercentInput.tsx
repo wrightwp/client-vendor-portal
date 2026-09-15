@@ -28,6 +28,15 @@ export function PercentInput({
     onChange(cleaned);
   };
 
+  const handleFocus = () => {
+    if (!value) return;
+    const cleaned = value.trim().replace(/%/g, "");
+    const num = parseFloat(cleaned);
+    if (!isNaN(num) && num === 0) {
+      onChange("");
+    }
+  };
+
   const handleBlur = () => {
     if (!value || !value.trim()) return;
     const num = parseFloat(value.replace(/%/g, ""));
@@ -60,6 +69,7 @@ export function PercentInput({
         id={id}
         value={displayVal}
         onChange={handleChange}
+        onFocus={handleFocus}
         onBlur={handleBlur}
         placeholder={placeholder}
         disabled={disabled}

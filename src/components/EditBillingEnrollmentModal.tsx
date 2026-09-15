@@ -17,6 +17,8 @@ import MaxSpecificRenewalIncreaseInput from "./MaxSpecificRenewalIncreaseInput";
 import SpecificDeductibleInput from "./SpecificDeductibleInput";
 import SpecificPremiumRatesInput from "./SpecificPremiumRatesInput";
 import IncludedNoneToggle from "./IncludedNoneToggle";
+import TerminalLiabilityInput from "./TerminalLiabilityInput";
+import AggregateRunInLimitInput from "./AggregateRunInLimitInput";
 
 interface EditBillingEnrollmentModalProps {
   clientId: string;
@@ -76,6 +78,7 @@ export default function EditBillingEnrollmentModal({
     aggregateStopLossStatus: initialData?.aggregateStopLossStatus || (initialData?.aggregatePremium?.trim().toLowerCase() === "none" ? "None" : "Included"),
     aggregatePremium: initialData?.aggregatePremium || "",
     monthlyAggregateAccommodation: initialData?.monthlyAggregateAccommodation || "",
+    terminalLiabilityOption: initialData?.terminalLiabilityOption || "",
     aggregateFactorSingle: initialData?.aggregateFactorSingle || "",
     aggregateFactorEmployeePlusOne: initialData?.aggregateFactorEmployeePlusOne || "",
     aggregateFactorFamily: initialData?.aggregateFactorFamily || "",
@@ -166,6 +169,7 @@ export default function EditBillingEnrollmentModal({
       aggregateStopLossStatus: sourceRecord.aggregateStopLossStatus || (sourceRecord.aggregatePremium?.trim().toLowerCase() === "none" ? "None" : "Included"),
       aggregatePremium: sourceRecord.aggregatePremium || "",
       monthlyAggregateAccommodation: sourceRecord.monthlyAggregateAccommodation || "",
+      terminalLiabilityOption: sourceRecord.terminalLiabilityOption || "",
       aggregateFactorSingle: sourceRecord.aggregateFactorSingle || "",
       aggregateFactorEmployeePlusOne: sourceRecord.aggregateFactorEmployeePlusOne || "",
       aggregateFactorFamily: sourceRecord.aggregateFactorFamily || "",
@@ -626,7 +630,7 @@ export default function EditBillingEnrollmentModal({
                     <CurrencyInput
                       align="left"
                       style={{ width: "100%" }}
-                      placeholder="7.54"
+                      placeholder="0.00"
                       value={formData.aggregatePremium}
                       onChange={(val) => setFormData({ ...formData, aggregatePremium: val })}
                     />
@@ -641,21 +645,29 @@ export default function EditBillingEnrollmentModal({
                   </div>
                 </div>
 
+                <div className="form-group">
+                  <label className="form-label">Terminal Liability Option (TLO)</label>
+                  <TerminalLiabilityInput
+                    value={formData.terminalLiabilityOption}
+                    onChange={(val) => setFormData({ ...formData, terminalLiabilityOption: val })}
+                  />
+                </div>
+
                 <div className="grid-cols-2" style={{ alignItems: "center" }}>
                   <div className="form-group">
                     <label className="form-label">Min. Attachment Point</label>
                     <CurrencyInput
                       align="left"
                       style={{ width: "100%" }}
-                      placeholder="1,439,838.96"
+                      placeholder="0.00"
                       value={formData.aggregateMinAttachmentPoint}
                       onChange={(val) => setFormData({ ...formData, aggregateMinAttachmentPoint: val })}
                     />
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Run-in Limit</label>
-                    <YesNoToggle
+                    <label className="form-label">Aggregate Run-in Limit</label>
+                    <AggregateRunInLimitInput
                       value={formData.aggregateRunInLimit}
                       onChange={(val) => setFormData({ ...formData, aggregateRunInLimit: val })}
                     />
@@ -687,7 +699,7 @@ export default function EditBillingEnrollmentModal({
                       <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Single Factor</span>
                       <CurrencyInput
                         style={{ width: "100%" }}
-                        placeholder="425.84"
+                        placeholder="0.00"
                         value={formData.aggregateFactorSingle}
                         onChange={(val) => setFormData({ ...formData, aggregateFactorSingle: val })}
                       />
@@ -696,7 +708,7 @@ export default function EditBillingEnrollmentModal({
                       <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Employee + 1 Factor</span>
                       <CurrencyInput
                         style={{ width: "100%" }}
-                        placeholder="793.78"
+                        placeholder="0.00"
                         value={formData.aggregateFactorEmployeePlusOne}
                         onChange={(val) => setFormData({ ...formData, aggregateFactorEmployeePlusOne: val })}
                       />
@@ -705,7 +717,7 @@ export default function EditBillingEnrollmentModal({
                       <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Family Factor</span>
                       <CurrencyInput
                         style={{ width: "100%" }}
-                        placeholder="1,205.57"
+                        placeholder="0.00"
                         value={formData.aggregateFactorFamily}
                         onChange={(val) => setFormData({ ...formData, aggregateFactorFamily: val })}
                       />
@@ -723,7 +735,7 @@ export default function EditBillingEnrollmentModal({
                     <label className="form-label">Composite Admin Fee</label>
                     <CurrencyInput
                       style={{ width: "100%" }}
-                      placeholder="53.00"
+                      placeholder="0.00"
                       suffix="PEPM"
                       value={formData.compositeAdminFee}
                       onChange={(val) => setFormData({ ...formData, compositeAdminFee: val })}
@@ -734,7 +746,7 @@ export default function EditBillingEnrollmentModal({
                     <label className="form-label">Medical Fee</label>
                     <CurrencyInput
                       style={{ width: "100%" }}
-                      placeholder="52.55"
+                      placeholder="0.00"
                       suffix="PEPM"
                       value={formData.medicalFee}
                       onChange={(val) => setFormData({ ...formData, medicalFee: val })}
@@ -747,7 +759,7 @@ export default function EditBillingEnrollmentModal({
                     <label className="form-label">UR (AHH)</label>
                     <CurrencyInput
                       style={{ width: "100%" }}
-                      placeholder="2.85"
+                      placeholder="0.00"
                       suffix="PEPM"
                       value={formData.urFee}
                       onChange={(val) => setFormData({ ...formData, urFee: val })}
@@ -758,7 +770,7 @@ export default function EditBillingEnrollmentModal({
                     <label className="form-label">Amwell Telehealth</label>
                     <CurrencyInput
                       style={{ width: "100%" }}
-                      placeholder="0.45"
+                      placeholder="0.00"
                       suffix="PEPM"
                       value={formData.amwellFee}
                       onChange={(val) => setFormData({ ...formData, amwellFee: val })}
@@ -771,7 +783,7 @@ export default function EditBillingEnrollmentModal({
                     <label className="form-label">Physicians Care / HAP</label>
                     <CurrencyInput
                       style={{ width: "100%" }}
-                      placeholder="10.00"
+                      placeholder="0.00"
                       suffix="PEPM"
                       value={formData.physiciansCareHapFee}
                       onChange={(val) => setFormData({ ...formData, physiciansCareHapFee: val })}
@@ -795,7 +807,7 @@ export default function EditBillingEnrollmentModal({
                     <label className="form-label">Aetna Signature Admin</label>
                     <CurrencyInput
                       style={{ width: "100%" }}
-                      placeholder="17.00"
+                      placeholder="0.00"
                       suffix="PEPM"
                       value={formData.aetnaSignatureAdminFee}
                       onChange={(val) => setFormData({ ...formData, aetnaSignatureAdminFee: val })}
@@ -806,7 +818,7 @@ export default function EditBillingEnrollmentModal({
                     <label className="form-label">Network Access Fee</label>
                     <CurrencyInput
                       style={{ width: "100%" }}
-                      placeholder="16.25"
+                      placeholder="0.00"
                       suffix="PEPM"
                       value={formData.networkAccessFee}
                       onChange={(val) => setFormData({ ...formData, networkAccessFee: val })}
@@ -819,7 +831,7 @@ export default function EditBillingEnrollmentModal({
                     <label className="form-label">Reinsurance Fee</label>
                     <CurrencyInput
                       style={{ width: "100%" }}
-                      placeholder="0.75"
+                      placeholder="0.00"
                       suffix="PEPM"
                       value={formData.reinsuranceFee}
                       onChange={(val) => setFormData({ ...formData, reinsuranceFee: val })}
@@ -830,7 +842,7 @@ export default function EditBillingEnrollmentModal({
                     <label className="form-label">LCM / SPA (AHH)</label>
                     <CurrencyInput
                       style={{ width: "100%" }}
-                      placeholder="149.00"
+                      placeholder="0.00"
                       suffix="hr"
                       value={formData.lcmSpaFee}
                       onChange={(val) => setFormData({ ...formData, lcmSpaFee: val })}
@@ -843,7 +855,7 @@ export default function EditBillingEnrollmentModal({
                     <label className="form-label">Agent Fee</label>
                     <CurrencyInput
                       style={{ width: "100%" }}
-                      placeholder="32.00"
+                      placeholder="0.00"
                       suffix="PEPM"
                       value={formData.agentFee}
                       onChange={(val) => setFormData({ ...formData, agentFee: val })}
@@ -921,7 +933,7 @@ export default function EditBillingEnrollmentModal({
                   <div className="form-group">
                     <label className="form-label">Stop-Loss Other Compensation</label>
                     <PercentInput
-                      placeholder="3"
+                      placeholder="0"
                       value={formData.stopLossOtherCompensation}
                       onChange={(val) => setFormData({ ...formData, stopLossOtherCompensation: val })}
                     />
@@ -964,7 +976,7 @@ export default function EditBillingEnrollmentModal({
                       type="number"
                       min="0"
                       className="form-input"
-                      placeholder="126"
+                      placeholder="0"
                       value={formData.figuresSingle}
                       onChange={(e) => handleUpdateCensusTier("figuresSingle", e.target.value)}
                     />
@@ -976,7 +988,7 @@ export default function EditBillingEnrollmentModal({
                       type="number"
                       min="0"
                       className="form-input"
-                      placeholder="38"
+                      placeholder="0"
                       value={formData.figuresEmployeePlusOne}
                       onChange={(e) => handleUpdateCensusTier("figuresEmployeePlusOne", e.target.value)}
                     />
@@ -988,7 +1000,7 @@ export default function EditBillingEnrollmentModal({
                       type="number"
                       min="0"
                       className="form-input"
-                      placeholder="30"
+                      placeholder="0"
                       value={formData.figuresFamily}
                       onChange={(e) => handleUpdateCensusTier("figuresFamily", e.target.value)}
                     />
@@ -1000,7 +1012,7 @@ export default function EditBillingEnrollmentModal({
                       type="number"
                       min="0"
                       className="form-input"
-                      placeholder="194"
+                      placeholder="0"
                       value={formData.figuresTotal}
                       onChange={(e) => setFormData({ ...formData, figuresTotal: e.target.value })}
                     />
