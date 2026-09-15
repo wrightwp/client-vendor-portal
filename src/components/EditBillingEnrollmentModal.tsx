@@ -648,7 +648,7 @@ export default function EditBillingEnrollmentModal({
                         <label className="form-label">Monthly Accommodation</label>
                         <MonthlyAccommodationInput
                           value={formData.monthlyAggregateAccommodation}
-                          onChange={(val) => setFormData({ ...formData, monthlyAggregateAccommodation: val })}
+                          onChange={(val) => setFormData((prev) => ({ ...prev, monthlyAggregateAccommodation: val }))}
                         />
                       </div>
 

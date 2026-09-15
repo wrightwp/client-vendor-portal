@@ -26,7 +26,7 @@ export function CurrencyInput({
   className = "form-input",
   style = {},
   disabled = false,
-  align = "right",
+  align = "left",
   suffix,
 }: CurrencyInputProps) {
   // Determine if current value is numeric, empty, or in-progress typing (warrants a $ prefix)
@@ -100,6 +100,7 @@ export function CurrencyInput({
         alignItems: "center",
         position: "relative",
         width: style.width || "auto",
+        maxWidth: "100%",
         ...style,
       }}
     >
@@ -107,9 +108,10 @@ export function CurrencyInput({
         <span
           style={{
             position: "absolute",
-            left: "0.5rem",
+            left: "0.6rem",
             color: "var(--text-muted)",
-            fontSize: "0.8rem",
+            fontSize: "0.82rem",
+            fontWeight: 600,
             pointerEvents: "none",
             zIndex: 1,
           }}
@@ -133,8 +135,8 @@ export function CurrencyInput({
           textAlign: align,
           fontSize: "0.85rem",
           ...style,
-          paddingLeft: showDollar ? "1.4rem" : "0.5rem",
-          paddingRight: suffix ? "3.25rem" : "0.5rem",
+          paddingLeft: showDollar ? "1.45rem" : "0.6rem",
+          paddingRight: suffix ? "3.6rem" : "0.6rem",
         }}
       />
 
@@ -142,10 +144,11 @@ export function CurrencyInput({
         <span
           style={{
             position: "absolute",
-            right: "0.5rem",
+            right: "0.6rem",
             color: "var(--text-muted)",
             fontSize: "0.72rem",
-            fontWeight: "600",
+            fontWeight: "700",
+            letterSpacing: "0.02em",
             pointerEvents: "none",
           }}
         >

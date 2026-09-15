@@ -3,6 +3,7 @@ import { formatDisplayDate } from "./dateUtils";
 import { formatTloDisplay } from "../components/TerminalLiabilityInput";
 import { formatCurrencyDisplay } from "../components/CurrencyInput";
 import { formatRunInLimitDisplay } from "../components/AggregateRunInLimitInput";
+import { formatMonthlyAccommodationDisplay } from "../components/MonthlyAccommodationInput";
 
 export function exportBEToExcel(clientName: string, data: any) {
   const bAndE = data || {};
@@ -58,7 +59,7 @@ export function exportBEToExcel(clientName: string, data: any) {
     ["4. AGGREGATE STOP-LOSS INFORMATION"],
     ["Aggregate Coverage Status", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None (No Aggregate Coverage)" : "Included"],
     ["Aggregate Premium", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : (bAndE.aggregatePremium || "—")],
-    ["Monthly Aggregate Accommodation", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : (bAndE.monthlyAggregateAccommodation || "—")],
+    ["Monthly Aggregate Accommodation", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : formatMonthlyAccommodationDisplay(bAndE.monthlyAggregateAccommodation)],
     ["Terminal Liability Option (TLO)", formatTloDisplay(bAndE.terminalLiabilityOption)],
     ["Aggregate Contract", bAndE.aggregateContract || "12/12"],
     ["Min Attachment Point", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : (bAndE.aggregateMinAttachmentPoint || "—")],

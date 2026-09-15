@@ -97,7 +97,7 @@ export function TerminalLiabilityInput({
     setSelectedOption(p.option);
     const cleanCurrent = feeAmount.replace(/pepm/gi, "").replace(/^\$/, "").replace(/,/g, "").trim();
     const cleanP = p.fee.replace(/pepm/gi, "").replace(/^\$/, "").replace(/,/g, "").trim();
-    if (cleanP !== cleanCurrent) {
+    if (cleanP !== cleanCurrent && cleanP !== cleanCurrent.replace(/\.$/, "") && `${cleanP}.` !== cleanCurrent) {
       setFeeAmount(p.fee);
     }
   }, [value]);

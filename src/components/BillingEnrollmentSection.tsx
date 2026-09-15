@@ -1284,7 +1284,7 @@ export default function BillingEnrollmentSection({
                         {isInlineEditing && (
                           <MonthlyAccommodationInput
                             value={editFormData.monthlyAggregateAccommodation}
-                            onChange={(val) => setEditFormData({ ...editFormData, monthlyAggregateAccommodation: val })}
+                            onChange={(val) => setEditFormData((prev) => ({ ...prev, monthlyAggregateAccommodation: val }))}
                             compact={true}
                           />
                         )}
