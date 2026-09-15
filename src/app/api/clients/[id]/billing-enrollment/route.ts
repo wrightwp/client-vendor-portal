@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { createSnapshot } from "@/lib/history";
+import {
+  createSnapshot,
+  computeBillingEnrollmentDiff,
+  generateBillingEnrollmentDiffSummary,
+} from "@/lib/history";
 
 export async function GET(
   request: Request,
@@ -50,6 +54,29 @@ export async function PATCH(
 
     let targetPlanYear = planYear || "2026";
 
+    // Find existing record for diff comparison
+    let existingRecord = null;
+    if (recordId) {
+      existingRecord = await db.clientBillingEnrollment.findUnique({
+        where: { id: recordId },
+      });
+    } else {
+      existingRecord = await db.clientBillingEnrollment.findFirst({
+        where: { clientId, planYear: targetPlanYear },
+      });
+    }
+
+    const isNewPlanYear = !existingRecord;
+
+    // Compute field-level diffs
+    const diffs = computeBillingEnrollmentDiff(existingRecord, {
+      ...updateData,
+      planYear: targetPlanYear,
+      ...(isCurrent !== undefined ? { isCurrent } : {}),
+    });
+
+    const summary = generateBillingEnrollmentDiffSummary(diffs, targetPlanYear, isNewPlanYear);
+
     // If making this record current, set isCurrent = false for all other plan years of this client
     if (isCurrent) {
       await db.clientBillingEnrollment.updateMany({
@@ -69,16 +96,11 @@ export async function PATCH(
         },
       });
     } else {
-      // Check if record exists for clientId and targetPlanYear
-      const existing = await db.clientBillingEnrollment.findFirst({
-        where: { clientId, planYear: targetPlanYear },
-      });
-
-      if (existing) {
+      if (existingRecord) {
         record = await db.clientBillingEnrollment.update({
-          where: { id: existing.id },
+          where: { id: existingRecord.id },
           data: {
-            isCurrent: isCurrent ?? existing.isCurrent,
+            isCurrent: isCurrent ?? existingRecord.isCurrent,
             ...updateData,
           },
         });
@@ -100,7 +122,7 @@ export async function PATCH(
       orderBy: { planYear: "desc" },
     });
 
-    // Log history update for client profile
+    // Log history update for client profile if there are changes or new plan year
     const client = await db.client.findUnique({
       where: { id: clientId },
       include: {
@@ -110,14 +132,15 @@ export async function PATCH(
       },
     });
 
-    if (client) {
+    if (client && (diffs.length > 0 || isNewPlanYear)) {
       await db.changeHistory.create({
         data: {
           entityType: "CLIENT",
           entityId: clientId,
           clientId: clientId,
-          action: "UPDATE",
-          summary: `Updated Billing & Enrollment Summary (Plan Year ${record.planYear})`,
+          action: isNewPlanYear ? "CREATE" : "UPDATE",
+          summary,
+          changes: JSON.stringify(diffs),
           snapshot: createSnapshot(client),
         },
       });

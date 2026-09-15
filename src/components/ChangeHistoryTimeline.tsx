@@ -361,7 +361,7 @@ export default function ChangeHistoryTimeline({
                             borderRadius: "6px",
                           }}
                         >
-                          <span style={{ fontWeight: "600", color: "var(--text-secondary)", width: "160px", flexShrink: 0 }}>
+                          <span style={{ fontWeight: "600", color: "var(--text-secondary)", minWidth: "170px", flexShrink: 0 }}>
                             {diff.label || FIELD_LABELS[diff.field] || diff.field}
                           </span>
 

@@ -477,6 +477,48 @@ export default function HistoryWalkthroughModal({
                     </div>
                   )}
                 </div>
+
+                {/* B&E Historical Snapshot Details (If present) */}
+                {parsedSnapshot.billingEnrollments && parsedSnapshot.billingEnrollments.length > 0 && (
+                  <div style={{ marginTop: "0.5rem", paddingTop: "0.75rem", borderTop: "1px solid var(--border)", gridColumn: "span 2" }}>
+                    <div style={{ fontSize: "0.8rem", fontWeight: "700", color: primaryThemeColor, marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                      <Calendar size={14} />
+                      <span>Billing & Enrollment Snapshot (Plan Year {parsedSnapshot.billingEnrollments[0].planYear || "2026"})</span>
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "0.6rem", fontSize: "0.8rem" }}>
+                      {parsedSnapshot.billingEnrollments[0].currentStopLossCarrier && (
+                        <div>
+                          <span style={{ color: "var(--text-muted)", fontSize: "0.7rem", display: "block" }}>Carrier</span>
+                          <strong style={{ color: "var(--text-primary)" }}>{parsedSnapshot.billingEnrollments[0].currentStopLossCarrier}</strong>
+                        </div>
+                      )}
+                      {parsedSnapshot.billingEnrollments[0].specificDeductible && (
+                        <div>
+                          <span style={{ color: "var(--text-muted)", fontSize: "0.7rem", display: "block" }}>Specific Deductible</span>
+                          <strong style={{ color: "var(--text-primary)" }}>{parsedSnapshot.billingEnrollments[0].specificDeductible}</strong>
+                        </div>
+                      )}
+                      {parsedSnapshot.billingEnrollments[0].compositeAdminFee && (
+                        <div>
+                          <span style={{ color: "var(--text-muted)", fontSize: "0.7rem", display: "block" }}>Composite Admin</span>
+                          <strong style={{ color: "#ffc20e" }}>{parsedSnapshot.billingEnrollments[0].compositeAdminFee}</strong>
+                        </div>
+                      )}
+                      {parsedSnapshot.billingEnrollments[0].aggregateContract && (
+                        <div>
+                          <span style={{ color: "var(--text-muted)", fontSize: "0.7rem", display: "block" }}>Agg Contract</span>
+                          <span>{parsedSnapshot.billingEnrollments[0].aggregateContract}</span>
+                        </div>
+                      )}
+                      {parsedSnapshot.billingEnrollments[0].pbmRx && (
+                        <div>
+                          <span style={{ color: "var(--text-muted)", fontSize: "0.7rem", display: "block" }}>PBM Provider</span>
+                          <span style={{ color: "#34d399" }}>{parsedSnapshot.billingEnrollments[0].pbmRx}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div style={{ padding: "1rem", color: "var(--text-muted)", fontSize: "0.85rem", fontStyle: "italic" }}>
