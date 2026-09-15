@@ -3,10 +3,67 @@
 import React, { useState, useEffect } from "react";
 import YesNoToggle from "./YesNoToggle";
 
+import CurrencyInput from "./CurrencyInput";
+
 interface MonthlyAccommodationInputProps {
   value: string;
   onChange: (value: string) => void;
   compact?: boolean;
+}
+
+export function parseMonthlyAccommodationDisplay(val: string | null | undefined): {
+  isNo: boolean;
+  amountDisplay: string;
+  noteText: string;
+} {
+  if (!val || !val.trim()) {
+    return { isNo: true, amountDisplay: "", noteText: "" };
+  }
+  const raw = val.trim();
+  const lower = raw.toLowerCase();
+
+  if (lower === "no" || lower === "none" || lower === "false" || lower === "not included") {
+    return { isNo: true, amountDisplay: "No", noteText: "" };
+  }
+
+  if (lower === "yes" || lower === "true") {
+    return { isNo: false, amountDisplay: "Included", noteText: "Not included in stop-loss rate" };
+  }
+
+  // Matches leading numeric string with optional $, decimal, and optional PEPM
+  const match = raw.match(/^(\$?\s*[\d,]+(?:\.\d+)?(?:\s*pepm)?)(.*)$/i);
+  if (match) {
+    let rawAmount = match[1].trim();
+    let rawNote = match[2].trim().replace(/^[\s\-:]+/, "").trim();
+
+    const cleanNum = rawAmount.replace(/pepm/gi, "").replace(/^\$/, "").replace(/,/g, "").trim();
+    const num = parseFloat(cleanNum);
+    let amountDisplay = rawAmount;
+    if (!isNaN(num)) {
+      const formattedNum = num.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      const hasPepm = rawAmount.toLowerCase().includes("pepm");
+      amountDisplay = `$${formattedNum}${hasPepm || !rawAmount.includes("$") ? " PEPM" : ""}`;
+    } else if (!amountDisplay.startsWith("$")) {
+      amountDisplay = `$${amountDisplay}`;
+    }
+
+    const noteText = rawNote || "Not included in stop-loss rate";
+    return { isNo: false, amountDisplay, noteText };
+  }
+
+  return { isNo: false, amountDisplay: raw, noteText: "Not included in stop-loss rate" };
+}
+
+export function formatMonthlyAccommodationDisplay(val: string | null | undefined): string {
+  const parsed = parseMonthlyAccommodationDisplay(val);
+  if (parsed.isNo || !parsed.amountDisplay) return "No";
+  if (parsed.noteText) {
+    return `${parsed.amountDisplay} (${parsed.noteText})`;
+  }
+  return parsed.amountDisplay;
 }
 
 export function MonthlyAccommodationInput({
@@ -63,13 +120,15 @@ export function MonthlyAccommodationInput({
           <YesNoToggle value={isYes ? "Yes" : "No"} onChange={handleToggle} size="sm" />
         </div>
         {isYes && (
-          <input
-            type="text"
+          <CurrencyInput
             value={feeText}
-            onChange={handleTextChange}
+            onChange={(val) => {
+              setFeeText(val);
+              onChange(val || "Yes");
+            }}
             placeholder="0.00"
-            className="form-input"
-            style={{ width: "100%", fontSize: "0.75rem", padding: "0.2rem 0.4rem", marginTop: "0.15rem" }}
+            suffix="PEPM"
+            style={{ width: "160px", fontSize: "0.75rem" }}
           />
         )}
       </div>

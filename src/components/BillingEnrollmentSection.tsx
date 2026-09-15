@@ -39,7 +39,7 @@ import CurrencyInput, { formatCurrencyDisplay } from "./CurrencyInput";
 import PercentInput from "./PercentInput";
 import ContractSelect from "./ContractSelect";
 import LaseredIndividualsInput, { LaseredIndividualsView, parseLaserString } from "./LaseredIndividualsInput";
-import MonthlyAccommodationInput from "./MonthlyAccommodationInput";
+import MonthlyAccommodationInput, { parseMonthlyAccommodationDisplay } from "./MonthlyAccommodationInput";
 import AggregatingSpecificInput from "./AggregatingSpecificInput";
 import MaxSpecificRenewalIncreaseInput from "./MaxSpecificRenewalIncreaseInput";
 import SpecificDeductibleInput, { formatDisplaySpecificDeductible } from "./SpecificDeductibleInput";
@@ -1161,11 +1161,26 @@ export default function BillingEnrollmentSection({
                     </div>
 
                     <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                         <span style={{ color: "var(--text-muted)" }}>Monthly Accommodation</span>
-                        {!isInlineEditing && (
-                          <span>{activeBAndE.monthlyAggregateAccommodation || "—"}</span>
-                        )}
+                        {!isInlineEditing && (() => {
+                          const parsed = parseMonthlyAccommodationDisplay(activeBAndE.monthlyAggregateAccommodation);
+                          if (parsed.isNo || !parsed.amountDisplay) {
+                            return <strong style={{ color: "var(--text-primary)" }}>No</strong>;
+                          }
+                          return (
+                            <div style={{ textAlign: "right" }}>
+                              <strong style={{ color: "var(--text-primary)", fontWeight: "800", fontSize: "0.85rem" }}>
+                                {parsed.amountDisplay}
+                              </strong>
+                              {parsed.noteText && (
+                                <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontStyle: "italic", marginTop: "0.15rem" }}>
+                                  {parsed.noteText}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
                       {isInlineEditing && (
                         <MonthlyAccommodationInput

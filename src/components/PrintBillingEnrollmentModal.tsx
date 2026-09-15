@@ -6,6 +6,7 @@ import { formatDisplayDate } from "@/lib/dateUtils";
 import { formatCurrencyDisplay } from "./CurrencyInput";
 import { formatTloDisplay } from "./TerminalLiabilityInput";
 import { formatRunInLimitDisplay } from "./AggregateRunInLimitInput";
+import { formatMonthlyAccommodationDisplay } from "./MonthlyAccommodationInput";
 
 interface PrintBillingEnrollmentModalProps {
   clientName: string;
@@ -202,7 +203,7 @@ export default function PrintBillingEnrollmentModal({
               <>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", fontSize: "0.85rem" }}>
                   <div><strong>Aggregate Premium:</strong> {bAndE.aggregatePremium || "N/A"}</div>
-                  <div><strong>Monthly Aggregate Accommodation:</strong> {bAndE.monthlyAggregateAccommodation || "N/A"}</div>
+                  <div><strong>Monthly Aggregate Accommodation:</strong> {formatMonthlyAccommodationDisplay(bAndE.monthlyAggregateAccommodation)}</div>
                   <div><strong>Terminal Liability Option (TLO):</strong> {formatTloDisplay(bAndE.terminalLiabilityOption)}</div>
                   <div><strong>Min. Attachment Point:</strong> {bAndE.aggregateMinAttachmentPoint || "N/A"}</div>
                   <div><strong>Aggregate Run-in Limit:</strong> {formatRunInLimitDisplay(bAndE.aggregateRunInLimit)}</div>
