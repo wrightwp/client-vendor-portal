@@ -204,6 +204,7 @@ function GroupsContent() {
           >
             <option value="ALL">All Statuses</option>
             <option value="ACTIVE">Active</option>
+            <option value="PENDING_TERM">Pending Term</option>
             <option value="TERMINATED">Terminated</option>
           </select>
 
@@ -279,12 +280,15 @@ function GroupsContent() {
                   <td>{client.specialty || "General"}</td>
                   <td className="nowrap">
                     <span
-                      className={`badge ${client.status === "ACTIVE"
-                        ? "badge-active"
-                        : "badge-inactive"
-                        }`}
+                      className={`badge ${
+                        client.status === "ACTIVE"
+                          ? "badge-active"
+                          : client.status === "PENDING_TERM"
+                          ? "badge-yellow"
+                          : "badge-inactive"
+                      }`}
                     >
-                      {client.status}
+                      {client.status === "PENDING_TERM" ? "Pending Term" : client.status}
                     </span>
                   </td>
                   <td className="nowrap" onClick={(e) => e.stopPropagation()}>
@@ -449,6 +453,7 @@ function GroupsContent() {
                     onChange={(e) => setNewClient({ ...newClient, status: e.target.value })}
                   >
                     <option value="ACTIVE">ACTIVE</option>
+                    <option value="PENDING_TERM">PENDING TERM</option>
                     <option value="TERMINATED">TERMINATED</option>
                   </select>
                 </div>

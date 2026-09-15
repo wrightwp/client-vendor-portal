@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   FileText,
   Edit3,
@@ -80,19 +80,25 @@ export default function BillingEnrollmentSection({
   const [copySourceYear, setCopySourceYear] = useState("");
 
   // Normalize data into array of plan year records
-  const enrollmentsList: any[] = Array.isArray(data)
-    ? data
-    : data
-    ? [data]
-    : [];
+  const enrollmentsList: any[] = useMemo(
+    () => (Array.isArray(data) ? data : data ? [data] : []),
+    [data]
+  );
 
   // Sort descending by planYear
-  const sortedEnrollments = [...enrollmentsList].sort((a, b) =>
-    (b.planYear || "").localeCompare(a.planYear || "")
+  const sortedEnrollments = useMemo(
+    () =>
+      [...enrollmentsList].sort((a, b) =>
+        (b.planYear || "").localeCompare(a.planYear || "")
+      ),
+    [enrollmentsList]
   );
 
   // Determine active plan year
-  const currentRecord = sortedEnrollments.find((e) => e.isCurrent) || sortedEnrollments[0];
+  const currentRecord = useMemo(
+    () => sortedEnrollments.find((e) => e.isCurrent) || sortedEnrollments[0],
+    [sortedEnrollments]
+  );
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
 
   const activeYear =
@@ -100,8 +106,11 @@ export default function BillingEnrollmentSection({
       ? selectedYear
       : currentRecord?.planYear || "2026";
 
-  const activeBAndE =
-    sortedEnrollments.find((e) => e.planYear === activeYear) || currentRecord || {};
+  const activeBAndE = useMemo(
+    () =>
+      sortedEnrollments.find((e) => e.planYear === activeYear) || currentRecord || {},
+    [sortedEnrollments, activeYear, currentRecord]
+  );
 
   // Form State for Inline Editing
   const [editFormData, setEditFormData] = useState({
@@ -178,78 +187,80 @@ export default function BillingEnrollmentSection({
 
   // Sync edit form state whenever active record changes
   useEffect(() => {
+    if (isInlineEditing) return;
+    const rec = activeBAndE || {};
     setEditFormData({
-      planYear: activeBAndE.planYear || "2026",
-      startDate: formatDisplayDate(activeBAndE.startDate),
-      endDate: formatDisplayDate(activeBAndE.endDate),
-      isCurrent: activeBAndE.isCurrent ?? true,
+      planYear: rec.planYear || activeYear || "2026",
+      startDate: formatDisplayDate(rec.startDate),
+      endDate: formatDisplayDate(rec.endDate),
+      isCurrent: rec.isCurrent ?? true,
 
-      currentStopLossCarrier: activeBAndE.currentStopLossCarrier || "",
-      currentManagingGeneralUnderwriter: activeBAndE.currentManagingGeneralUnderwriter || "",
-      priorStopLossCarrier: activeBAndE.priorStopLossCarrier || "",
-      priorManagingGeneralUnderwriter: activeBAndE.priorManagingGeneralUnderwriter || "",
+      currentStopLossCarrier: rec.currentStopLossCarrier || "",
+      currentManagingGeneralUnderwriter: rec.currentManagingGeneralUnderwriter || "",
+      priorStopLossCarrier: rec.priorStopLossCarrier || "",
+      priorManagingGeneralUnderwriter: rec.priorManagingGeneralUnderwriter || "",
 
-      specificDeductible: activeBAndE.specificDeductible || "",
-      aggregatingSpecificDeductible: activeBAndE.aggregatingSpecificDeductible || "",
-      noLaserRenewalGuarantee: activeBAndE.noLaserRenewalGuarantee || "",
-      maxSpecificPremiumRenewalIncrease: activeBAndE.maxSpecificPremiumRenewalIncrease || "",
-      laseredIndividuals: activeBAndE.laseredIndividuals || "",
-      specificTierStructure: activeBAndE.specificTierStructure || "",
-      specificPremiumSingle: activeBAndE.specificPremiumSingle || "",
-      specificPremiumEmployeePlusOne: activeBAndE.specificPremiumEmployeePlusOne || "",
-      specificPremiumEmployeeSpouse: activeBAndE.specificPremiumEmployeeSpouse || "",
-      specificPremiumEmployeeChildren: activeBAndE.specificPremiumEmployeeChildren || "",
-      specificPremiumFamily: activeBAndE.specificPremiumFamily || "",
-      specificBenefitsCovered: activeBAndE.specificBenefitsCovered || "",
-      specificContract: activeBAndE.specificContract || "",
+      specificDeductible: rec.specificDeductible || "",
+      aggregatingSpecificDeductible: rec.aggregatingSpecificDeductible || "",
+      noLaserRenewalGuarantee: rec.noLaserRenewalGuarantee || "",
+      maxSpecificPremiumRenewalIncrease: rec.maxSpecificPremiumRenewalIncrease || "",
+      laseredIndividuals: rec.laseredIndividuals || "",
+      specificTierStructure: rec.specificTierStructure || "",
+      specificPremiumSingle: rec.specificPremiumSingle || "",
+      specificPremiumEmployeePlusOne: rec.specificPremiumEmployeePlusOne || "",
+      specificPremiumEmployeeSpouse: rec.specificPremiumEmployeeSpouse || "",
+      specificPremiumEmployeeChildren: rec.specificPremiumEmployeeChildren || "",
+      specificPremiumFamily: rec.specificPremiumFamily || "",
+      specificBenefitsCovered: rec.specificBenefitsCovered || "",
+      specificContract: rec.specificContract || "",
 
-      aggregateStopLossStatus: activeBAndE.aggregateStopLossStatus || (activeBAndE.aggregatePremium?.trim().toLowerCase() === "none" ? "None" : "Included"),
-      aggregatePremium: activeBAndE.aggregatePremium || "",
-      monthlyAggregateAccommodation: activeBAndE.monthlyAggregateAccommodation || "",
-      terminalLiabilityOption: activeBAndE.terminalLiabilityOption || "",
-      aggregateFactorSingle: activeBAndE.aggregateFactorSingle || "",
-      aggregateFactorEmployeePlusOne: activeBAndE.aggregateFactorEmployeePlusOne || "",
-      aggregateFactorFamily: activeBAndE.aggregateFactorFamily || "",
-      aggregateMinAttachmentPoint: activeBAndE.aggregateMinAttachmentPoint || "",
-      aggregateBenefitsCovered: activeBAndE.aggregateBenefitsCovered || "",
-      aggregateContract: activeBAndE.aggregateContract || "",
-      aggregateRunInLimit: activeBAndE.aggregateRunInLimit || "",
+      aggregateStopLossStatus: rec.aggregateStopLossStatus || (rec.aggregatePremium?.trim().toLowerCase() === "none" ? "None" : "Included"),
+      aggregatePremium: rec.aggregatePremium || "",
+      monthlyAggregateAccommodation: rec.monthlyAggregateAccommodation || "",
+      terminalLiabilityOption: rec.terminalLiabilityOption || "",
+      aggregateFactorSingle: rec.aggregateFactorSingle || "",
+      aggregateFactorEmployeePlusOne: rec.aggregateFactorEmployeePlusOne || "",
+      aggregateFactorFamily: rec.aggregateFactorFamily || "",
+      aggregateMinAttachmentPoint: rec.aggregateMinAttachmentPoint || "",
+      aggregateBenefitsCovered: rec.aggregateBenefitsCovered || "",
+      aggregateContract: rec.aggregateContract || "",
+      aggregateRunInLimit: rec.aggregateRunInLimit || "",
 
-      stopLossNotes: activeBAndE.stopLossNotes || "",
+      stopLossNotes: rec.stopLossNotes || "",
 
-      organTransplantPolicy: activeBAndE.organTransplantPolicy || "",
+      organTransplantPolicy: rec.organTransplantPolicy || "",
 
-      compositeAdminFee: activeBAndE.compositeAdminFee || "",
-      medicalFee: activeBAndE.medicalFee || "",
-      urFee: activeBAndE.urFee || "",
-      amwellFee: activeBAndE.amwellFee || "",
-      physiciansCareHapFee: activeBAndE.physiciansCareHapFee || "",
-      wrapNetwork: activeBAndE.wrapNetwork || "",
-      aetnaSignatureAdminFee: activeBAndE.aetnaSignatureAdminFee || "",
-      networkAccessFee: activeBAndE.networkAccessFee || "",
-      reinsuranceFee: activeBAndE.reinsuranceFee || "",
-      lcmSpaFee: activeBAndE.lcmSpaFee || "",
-      agentFee: activeBAndE.agentFee || "",
-      ppoFee: activeBAndE.ppoFee || "",
+      compositeAdminFee: rec.compositeAdminFee || "",
+      medicalFee: rec.medicalFee || "",
+      urFee: rec.urFee || "",
+      amwellFee: rec.amwellFee || "",
+      physiciansCareHapFee: rec.physiciansCareHapFee || "",
+      wrapNetwork: rec.wrapNetwork || "",
+      aetnaSignatureAdminFee: rec.aetnaSignatureAdminFee || "",
+      networkAccessFee: rec.networkAccessFee || "",
+      reinsuranceFee: rec.reinsuranceFee || "",
+      lcmSpaFee: rec.lcmSpaFee || "",
+      agentFee: rec.agentFee || "",
+      ppoFee: rec.ppoFee || "",
 
-      pbmRx: activeBAndE.pbmRx || "",
-      rxIncludedInAsrReporting: activeBAndE.rxIncludedInAsrReporting || "",
-      isRxAsrContract: activeBAndE.isRxAsrContract || "",
-      pbmAgentCompensation: activeBAndE.pbmAgentCompensation || "",
+      pbmRx: rec.pbmRx || "",
+      rxIncludedInAsrReporting: rec.rxIncludedInAsrReporting || "",
+      isRxAsrContract: rec.isRxAsrContract || "",
+      pbmAgentCompensation: rec.pbmAgentCompensation || "",
 
-      stopLossCommission: activeBAndE.stopLossCommission || "",
-      stopLossOtherCompensation: activeBAndE.stopLossOtherCompensation || "",
-      commissionAgentCompensation: activeBAndE.commissionAgentCompensation || "",
+      stopLossCommission: rec.stopLossCommission || "",
+      stopLossOtherCompensation: rec.stopLossOtherCompensation || "",
+      commissionAgentCompensation: rec.commissionAgentCompensation || "",
 
-      figuresSingle: activeBAndE.figuresSingle || "",
-      figuresEmployeePlusOne: activeBAndE.figuresEmployeePlusOne || "",
-      figuresFamily: activeBAndE.figuresFamily || "",
-      figuresTotal: activeBAndE.figuresTotal || "",
+      figuresSingle: rec.figuresSingle || "",
+      figuresEmployeePlusOne: rec.figuresEmployeePlusOne || "",
+      figuresFamily: rec.figuresFamily || "",
+      figuresTotal: rec.figuresTotal || "",
 
-      domesticClaims: activeBAndE.domesticClaims || "",
-      notes: activeBAndE.notes || "",
+      domesticClaims: rec.domesticClaims || "",
+      notes: rec.notes || "",
     });
-  }, [activeBAndE]);
+  }, [activeBAndE, activeYear, isInlineEditing]);
 
   // Live auto-calculation of Census Total: Single + Emp+1 + Family
   const handleUpdateCensusTier = (

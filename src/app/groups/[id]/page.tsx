@@ -388,10 +388,12 @@ export default function GroupDetailPage({
                 className={`badge ${
                   client.status === "ACTIVE"
                     ? "badge-active"
+                    : client.status === "PENDING_TERM"
+                    ? "badge-yellow"
                     : "badge-inactive"
                 }`}
               >
-                {client.status}
+                {client.status === "PENDING_TERM" ? "Pending Term" : client.status}
               </span>
             </div>
 
@@ -704,6 +706,7 @@ export default function GroupDetailPage({
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
               >
                 <option value="ACTIVE">ACTIVE</option>
+                <option value="PENDING_TERM">PENDING TERM</option>
                 <option value="TERMINATED">TERMINATED</option>
               </select>
             </div>

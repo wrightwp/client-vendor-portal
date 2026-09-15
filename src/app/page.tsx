@@ -1,13 +1,8 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
-import {
-  Plus,
-  Building,
-  Store,
-} from "lucide-react";
+import { Plus } from "lucide-react";
 import DashboardQuickNav from "@/components/DashboardQuickNav";
 import DashboardKpis from "@/components/DashboardKpis";
-import DashboardAlerts from "@/components/DashboardAlerts";
 import DashboardBenefitsAnalytics from "@/components/DashboardBenefitsAnalytics";
 import DashboardDirectoryInsights from "@/components/DashboardDirectoryInsights";
 
@@ -45,58 +40,29 @@ export default async function DashboardPage() {
   let singleCensus = 0;
   let emp1Census = 0;
   let familyCensus = 0;
-  let totalAttachmentPoint = 0;
   let pbmAsrContractCount = 0;
 
   const carrierFrequency: Record<string, number> = {};
   const pbmFrequency: Record<string, number> = {};
 
-  const pendingGroups: Array<{
-    id: string;
-    name: string;
-    npiNumber: string | null;
-    specialty: string | null;
-    city: string | null;
-    state: string | null;
-  }> = [];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-  const laseredGroups: Array<{
-    id: string;
-    name: string;
-    npiNumber: string | null;
-    laser: string;
-    deductible: string | null;
-  }> = [];
-
-  const coverageGapGroups: Array<{
-    id: string;
-    name: string;
-    npiNumber: string | null;
-    vendorCount: number;
-  }> = [];
+  let activeGroupCount = 0;
+  let pendingTermCount = 0;
 
   for (const client of clients) {
-    if (client.status !== "ACTIVE") {
-      pendingGroups.push({
-        id: client.id,
-        name: client.name,
-        npiNumber: client.npiNumber,
-        specialty: client.specialty,
-        city: client.city,
-        state: client.state,
-      });
-    }
-
-    if (client.status === "ACTIVE" && client.vendors.length < 2) {
-      coverageGapGroups.push({
-        id: client.id,
-        name: client.name,
-        npiNumber: client.npiNumber,
-        vendorCount: client.vendors.length,
-      });
-    }
-
     const be = client.billingEnrollments[0];
+
+    // Status / Term date calculations
+    if (client.status === "PENDING_TERM") {
+      pendingTermCount++;
+    } else if (client.status === "TERMINATED") {
+      // Past term / terminated
+    } else {
+      activeGroupCount++;
+    }
+
     if (be) {
       const tot = parseInt(be.figuresTotal || "0", 10) || 0;
       const sgl = parseInt(be.figuresSingle || "0", 10) || 0;
@@ -108,12 +74,6 @@ export default async function DashboardPage() {
       emp1Census += e1;
       familyCensus += fam;
 
-      if (be.aggregateMinAttachmentPoint) {
-        const cleaned = be.aggregateMinAttachmentPoint.replace(/[^0-9.]/g, "");
-        const num = parseFloat(cleaned);
-        if (!isNaN(num)) totalAttachmentPoint += num;
-      }
-
       if (be.currentStopLossCarrier) {
         carrierFrequency[be.currentStopLossCarrier] =
           (carrierFrequency[be.currentStopLossCarrier] || 0) + 1;
@@ -124,16 +84,6 @@ export default async function DashboardPage() {
         if (be.isRxAsrContract === "Yes") {
           pbmAsrContractCount++;
         }
-      }
-
-      if (be.laseredIndividuals && be.laseredIndividuals !== "No") {
-        laseredGroups.push({
-          id: client.id,
-          name: client.name,
-          npiNumber: client.npiNumber,
-          laser: be.laseredIndividuals,
-          deductible: be.specificDeductible,
-        });
       }
     }
   }
@@ -187,8 +137,6 @@ export default async function DashboardPage() {
     .sort((a, b) => b.census - a.census)
     .slice(0, 5);
 
-  const activeGroupCount = clients.filter((c) => c.status === "ACTIVE").length;
-
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
       {/* 1. Header Banner */}
@@ -237,8 +185,8 @@ export default async function DashboardPage() {
           vendorType: v.vendorType,
           status: v.status,
         }))}
-        hasPendingGroups={pendingGroups.length > 0}
-        hasLaseredPlans={laseredGroups.length > 0}
+        hasPendingTerm={pendingTermCount > 0}
+        pendingTermCount={pendingTermCount}
       />
 
       {/* 3. Executive KPI Metric Cards */}
@@ -248,23 +196,13 @@ export default async function DashboardPage() {
         emp1Census={emp1Census}
         familyCensus={familyCensus}
         activeGroupCount={activeGroupCount}
-        pendingGroupCount={pendingGroups.length}
+        pendingTermCount={pendingTermCount}
         totalGroupCount={clients.length}
         totalVendors={vendors.length}
         totalAssociations={associationCount}
-        totalAttachmentPoint={totalAttachmentPoint}
-        laserCount={laseredGroups.length}
-        coverageGapCount={coverageGapGroups.length}
       />
 
-      {/* 4. Action & Risk Alert Center (Pending Onboarding, Lasered Plans, Coverage Gaps) */}
-      <DashboardAlerts
-        pendingGroups={pendingGroups}
-        laseredGroups={laseredGroups}
-        coverageGapGroups={coverageGapGroups}
-      />
-
-      {/* 5. Benefits & Stop-Loss Portfolio Analytics (Option B) */}
+      {/* 4. Benefits & Stop-Loss Portfolio Analytics */}
       <DashboardBenefitsAnalytics
         carrierCounts={carrierCounts}
         pbmCounts={pbmCounts}
@@ -276,7 +214,7 @@ export default async function DashboardPage() {
         totalCurrentPlans={activePlanCount}
       />
 
-      {/* 6. Strategic Directory Insights (Top Utilized Vendors & Largest Groups) */}
+      {/* 5. Strategic Directory Insights (Top Utilized Vendors & Largest Groups) */}
       <DashboardDirectoryInsights topVendors={topVendors} topGroups={topGroups} />
     </div>
   );

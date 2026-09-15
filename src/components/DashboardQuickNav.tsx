@@ -22,15 +22,17 @@ interface QuickNavVendor {
 interface DashboardQuickNavProps {
   groups: QuickNavGroup[];
   vendors: QuickNavVendor[];
-  hasPendingGroups: boolean;
-  hasLaseredPlans: boolean;
+  hasPendingTerm?: boolean;
+  pendingTermCount?: number;
+  hasLaseredPlans?: boolean;
 }
 
 export default function DashboardQuickNav({
   groups,
   vendors,
-  hasPendingGroups,
-  hasLaseredPlans,
+  hasPendingTerm = false,
+  pendingTermCount = 0,
+  hasLaseredPlans = false,
 }: DashboardQuickNavProps) {
   const [query, setQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"all" | "groups" | "vendors">("all");
@@ -135,9 +137,9 @@ export default function DashboardQuickNav({
             <Building size={14} style={{ color: "var(--accent-pink)" }} />
             <span>Active Groups ({groups.filter((g) => g.status === "ACTIVE").length})</span>
           </Link>
-          {hasPendingGroups && (
+          {(hasPendingTerm || pendingTermCount > 0) && (
             <Link
-              href="/groups?status=PENDING"
+              href="/groups?status=PENDING_TERM"
               className="btn btn-outline btn-sm"
               style={{
                 fontSize: "0.8rem",
@@ -147,7 +149,7 @@ export default function DashboardQuickNav({
               }}
             >
               <Clock size={14} />
-              <span>Pending Onboarding</span>
+              <span>Pending Term ({pendingTermCount})</span>
             </Link>
           )}
           <Link

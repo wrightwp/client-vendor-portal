@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Users, Building, ShieldAlert, Link as LinkIcon, AlertTriangle, TrendingUp } from "lucide-react";
+import { Users, Building, Link as LinkIcon, Clock } from "lucide-react";
 
 interface DashboardKpisProps {
   totalCensus: number;
@@ -7,13 +7,10 @@ interface DashboardKpisProps {
   emp1Census: number;
   familyCensus: number;
   activeGroupCount: number;
-  pendingGroupCount: number;
+  pendingTermCount: number;
   totalGroupCount: number;
   totalVendors: number;
   totalAssociations: number;
-  totalAttachmentPoint: number;
-  laserCount: number;
-  coverageGapCount: number;
 }
 
 export default function DashboardKpis({
@@ -22,26 +19,12 @@ export default function DashboardKpis({
   emp1Census,
   familyCensus,
   activeGroupCount,
-  pendingGroupCount,
+  pendingTermCount,
   totalGroupCount,
   totalVendors,
   totalAssociations,
-  totalAttachmentPoint,
-  laserCount,
-  coverageGapCount,
 }: DashboardKpisProps) {
   const avgVendorsPerGroup = totalGroupCount > 0 ? (totalAssociations / totalGroupCount).toFixed(1) : "0";
-  const attentionCount = pendingGroupCount + laserCount + coverageGapCount;
-
-  const formattedAttachmentPoint =
-    totalAttachmentPoint >= 1_000_000
-      ? `$${(totalAttachmentPoint / 1_000_000).toFixed(1)}M`
-      : `$${(totalAttachmentPoint / 1_000).toFixed(0)}K`;
-
-  const avgAttachmentPoint =
-    totalGroupCount > 0 && totalAttachmentPoint > 0
-      ? `$${(totalAttachmentPoint / totalGroupCount / 1_000_000).toFixed(2)}M`
-      : "$0";
 
   return (
     <div
@@ -95,80 +78,98 @@ export default function DashboardKpis({
         </div>
       </div>
 
-      {/* 2. Managed Employer Groups */}
+      {/* 2. Active Employer Groups */}
       <div
         className="glass-card"
         style={{
           padding: "1.5rem",
-          borderTop: "4px solid var(--accent-blue)",
+          borderTop: "4px solid #10b981",
           position: "relative",
           overflow: "hidden",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem" }}>
           <span style={{ fontSize: "0.85rem", fontWeight: "700", color: "var(--text-secondary)" }}>
-            Managed Groups
+            Active Groups
           </span>
           <div
             style={{
               width: "38px",
               height: "38px",
               borderRadius: "10px",
-              background: "var(--accent-blue-light)",
+              background: "rgba(16, 185, 129, 0.15)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <Building size={19} style={{ color: "var(--accent-blue)" }} />
+            <Building size={19} style={{ color: "#10b981" }} />
           </div>
         </div>
-        <div style={{ fontSize: "2.25rem", fontWeight: "800", color: "#38bdf8", lineHeight: 1.1 }}>
-          {totalGroupCount}
+        <div style={{ fontSize: "2.25rem", fontWeight: "800", color: "#10b981", lineHeight: 1.1 }}>
+          {activeGroupCount}
         </div>
         <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "0.6rem" }}>
-          <span style={{ color: "var(--status-active)", fontWeight: "700" }}>{activeGroupCount} Active</span>
-          {pendingGroupCount > 0 && (
-            <span>
-              {" "}• <span style={{ color: "var(--accent-yellow)", fontWeight: "700" }}>{pendingGroupCount} Pending Onboarding</span>
-            </span>
-          )}
+          <Link
+            href="/groups?status=ACTIVE"
+            style={{ color: "var(--text-secondary)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+          >
+            <span>Active employer client groups</span>
+            <span style={{ color: "#10b981", fontWeight: "600" }}>&rarr;</span>
+          </Link>
         </div>
       </div>
 
-      {/* 3. Stop-Loss Portfolio Exposure */}
+      {/* 3. Pending Term Groups (Future Term Date) */}
       <div
         className="glass-card"
         style={{
           padding: "1.5rem",
-          borderTop: "4px solid var(--accent-yellow)",
+          borderTop: `4px solid ${pendingTermCount > 0 ? "var(--accent-yellow)" : "var(--border)"}`,
           position: "relative",
           overflow: "hidden",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem" }}>
           <span style={{ fontSize: "0.85rem", fontWeight: "700", color: "var(--text-secondary)" }}>
-            Stop-Loss Protection
+            Pending Term Groups
           </span>
           <div
             style={{
               width: "38px",
               height: "38px",
               borderRadius: "10px",
-              background: "var(--accent-yellow-light)",
+              background: pendingTermCount > 0 ? "var(--accent-yellow-light)" : "rgba(255, 255, 255, 0.05)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <ShieldAlert size={19} style={{ color: "var(--accent-yellow)" }} />
+            <Clock size={19} style={{ color: pendingTermCount > 0 ? "var(--accent-yellow)" : "var(--text-muted)" }} />
           </div>
         </div>
-        <div style={{ fontSize: "2.25rem", fontWeight: "800", color: "#ffc20e", lineHeight: 1.1 }}>
-          {formattedAttachmentPoint}
+        <div
+          style={{
+            fontSize: "2.25rem",
+            fontWeight: "800",
+            color: pendingTermCount > 0 ? "#ffc20e" : "var(--text-muted)",
+            lineHeight: 1.1,
+          }}
+        >
+          {pendingTermCount}
         </div>
         <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "0.6rem" }}>
-          Min attachment volume • Avg {avgAttachmentPoint} / group
+          {pendingTermCount > 0 ? (
+            <Link
+              href="/groups?status=PENDING_TERM"
+              style={{ color: "var(--accent-yellow)", fontWeight: "600", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+            >
+              <span>{pendingTermCount} group{pendingTermCount !== 1 ? "s" : ""} with future term date</span>
+              <span>&rarr;</span>
+            </Link>
+          ) : (
+            <span>No groups with future term date</span>
+          )}
         </div>
       </div>
 
@@ -177,7 +178,7 @@ export default function DashboardKpis({
         className="glass-card"
         style={{
           padding: "1.5rem",
-          borderTop: "4px solid #10b981",
+          borderTop: "4px solid var(--accent-blue)",
           position: "relative",
           overflow: "hidden",
         }}
@@ -191,63 +192,25 @@ export default function DashboardKpis({
               width: "38px",
               height: "38px",
               borderRadius: "10px",
-              background: "rgba(16, 185, 129, 0.15)",
+              background: "var(--accent-blue-light)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <LinkIcon size={19} style={{ color: "#10b981" }} />
+            <LinkIcon size={19} style={{ color: "var(--accent-blue)" }} />
           </div>
         </div>
-        <div style={{ fontSize: "2.25rem", fontWeight: "800", color: "#34d399", lineHeight: 1.1 }}>
+        <div style={{ fontSize: "2.25rem", fontWeight: "800", color: "#38bdf8", lineHeight: 1.1 }}>
           {totalAssociations}
         </div>
         <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "0.6rem" }}>
-          {avgVendorsPerGroup} avg / group across {totalVendors} vendor partners
-        </div>
-      </div>
-
-      {/* 5. Operational Risk / Attention Needed */}
-      <div
-        className="glass-card"
-        style={{
-          padding: "1.5rem",
-          borderTop: `4px solid ${attentionCount > 0 ? "var(--accent-yellow)" : "var(--border)"}`,
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem" }}>
-          <span style={{ fontSize: "0.85rem", fontWeight: "700", color: "var(--text-secondary)" }}>
-            Attention Required
-          </span>
-          <div
-            style={{
-              width: "38px",
-              height: "38px",
-              borderRadius: "10px",
-              background: attentionCount > 0 ? "var(--accent-yellow-light)" : "rgba(255,255,255,0.06)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+          <Link
+            href="/vendors"
+            style={{ color: "var(--text-secondary)", textDecoration: "none" }}
           >
-            <AlertTriangle size={19} style={{ color: attentionCount > 0 ? "var(--accent-yellow)" : "var(--text-muted)" }} />
-          </div>
-        </div>
-        <div
-          style={{
-            fontSize: "2.25rem",
-            fontWeight: "800",
-            color: attentionCount > 0 ? "#ffc20e" : "var(--text-muted)",
-            lineHeight: 1.1,
-          }}
-        >
-          {attentionCount}
-        </div>
-        <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "0.6rem" }}>
-          {pendingGroupCount} pending • {laserCount} lasered plans
+            {avgVendorsPerGroup} avg / group across {totalVendors} vendor partners &rarr;
+          </Link>
         </div>
       </div>
     </div>
