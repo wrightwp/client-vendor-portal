@@ -62,6 +62,7 @@ export default function EditBillingEnrollmentModal({
     priorStopLossCarrier: initialData?.priorStopLossCarrier || "",
     priorManagingGeneralUnderwriter: initialData?.priorManagingGeneralUnderwriter || "",
 
+    specificStopLossStatus: initialData?.specificStopLossStatus || (initialData?.specificContract?.trim().toLowerCase() === "none" ? "None" : "Included"),
     specificDeductible: initialData?.specificDeductible || "",
     aggregatingSpecificDeductible: initialData?.aggregatingSpecificDeductible || "",
     noLaserRenewalGuarantee: initialData?.noLaserRenewalGuarantee || "",
@@ -160,6 +161,7 @@ export default function EditBillingEnrollmentModal({
       priorStopLossCarrier: sourceRecord.priorStopLossCarrier || "",
       priorManagingGeneralUnderwriter: sourceRecord.priorManagingGeneralUnderwriter || "",
 
+      specificStopLossStatus: sourceRecord.specificStopLossStatus || (sourceRecord.specificContract?.trim().toLowerCase() === "none" ? "None" : "Included"),
       specificDeductible: sourceRecord.specificDeductible || "",
       aggregatingSpecificDeductible: sourceRecord.aggregatingSpecificDeductible || "",
       noLaserRenewalGuarantee: sourceRecord.noLaserRenewalGuarantee || "",
@@ -492,104 +494,117 @@ export default function EditBillingEnrollmentModal({
             {/* TAB 2: Specific Stop-Loss */}
             {activeTab === "SPECIFIC" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                <div className="grid-cols-2">
-                  <div className="form-group">
-                    <label className="form-label">Specific Deductible</label>
-                    <SpecificDeductibleInput
-                      value={formData.specificDeductible}
-                      onChange={(val) => setFormData({ ...formData, specificDeductible: val })}
-                      compact={false}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Aggregating Specific Deductible</label>
-                    <AggregatingSpecificInput
-                      value={formData.aggregatingSpecificDeductible}
-                      onChange={(val) => setFormData({ ...formData, aggregatingSpecificDeductible: val })}
-                      compact={false}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid-cols-2" style={{ alignItems: "flex-start" }}>
-                  <div className="form-group">
-                    <label className="form-label">No-Laser Renewal Guarantee</label>
-                    <YesNoToggle
-                      value={formData.noLaserRenewalGuarantee}
-                      onChange={(val) => setFormData({ ...formData, noLaserRenewalGuarantee: val })}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Max Specific Premium Renewal Increase</label>
-                    <MaxSpecificRenewalIncreaseInput
-                      value={formData.maxSpecificPremiumRenewalIncrease}
-                      onChange={(val) => setFormData({ ...formData, maxSpecificPremiumRenewalIncrease: val })}
-                      compact={false}
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Lasered Individuals</label>
-                  <LaseredIndividualsInput
-                    value={formData.laseredIndividuals}
-                    onChange={(val) => setFormData({ ...formData, laseredIndividuals: val })}
-                    compact={false}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>Specific Stop-Loss Protection</h3>
+                  <IncludedNoneToggle
+                    colorScheme="blue"
+                    value={formData.specificStopLossStatus}
+                    onChange={(val) => setFormData((prev) => ({ ...prev, specificStopLossStatus: val }))}
                   />
                 </div>
 
-                <div className="grid-cols-2">
-                  <div className="form-group">
-                    <label className="form-label">Benefits Covered</label>
-                    <BenefitsCoveredSelect
-                      value={formData.specificBenefitsCovered}
-                      onChange={(val) => setFormData({ ...formData, specificBenefitsCovered: val })}
-                    />
-                  </div>
+                {formData.specificStopLossStatus !== "None" && (
+                  <>
+                    <div className="grid-cols-2">
+                      <div className="form-group">
+                        <label className="form-label">Specific Deductible</label>
+                        <SpecificDeductibleInput
+                          value={formData.specificDeductible}
+                          onChange={(val) => setFormData((prev) => ({ ...prev, specificDeductible: val }))}
+                          compact={false}
+                        />
+                      </div>
 
-                  <div className="form-group">
-                    <label className="form-label">Specific Contract Type</label>
-                    <ContractSelect
-                      value={formData.specificContract}
-                      onChange={(val) => setFormData({ ...formData, specificContract: val })}
-                    />
-                  </div>
-                </div>
+                      <div className="form-group">
+                        <label className="form-label">Aggregating Specific Deductible</label>
+                        <AggregatingSpecificInput
+                          value={formData.aggregatingSpecificDeductible}
+                          onChange={(val) => setFormData((prev) => ({ ...prev, aggregatingSpecificDeductible: val }))}
+                          compact={false}
+                        />
+                      </div>
+                    </div>
 
-                <div style={{ background: "rgba(0, 174, 219, 0.04)", padding: "1rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
-                  <SpecificPremiumRatesInput
-                    tierStructure={formData.specificTierStructure}
-                    onTierStructureChange={handleTierStructureChange}
-                    singleRate={formData.specificPremiumSingle}
-                    onSingleRateChange={(val) => setFormData((prev) => ({ ...prev, specificPremiumSingle: val }))}
-                    eePlusOneRate={formData.specificPremiumEmployeePlusOne}
-                    onEePlusOneRateChange={(val) => setFormData((prev) => ({ ...prev, specificPremiumEmployeePlusOne: val }))}
-                    eeSpouseRate={formData.specificPremiumEmployeeSpouse}
-                    onEeSpouseRateChange={(val) => setFormData((prev) => ({ ...prev, specificPremiumEmployeeSpouse: val }))}
-                    eeChildrenRate={formData.specificPremiumEmployeeChildren}
-                    onEeChildrenRateChange={(val) => setFormData((prev) => ({ ...prev, specificPremiumEmployeeChildren: val }))}
-                    familyRate={formData.specificPremiumFamily}
-                    onFamilyRateChange={(val) => setFormData((prev) => ({ ...prev, specificPremiumFamily: val }))}
-                    isEditing={true}
-                    compact={false}
-                  />
-                </div>
+                    <div className="grid-cols-2" style={{ alignItems: "flex-start" }}>
+                      <div className="form-group">
+                        <label className="form-label">No-Laser Renewal Guarantee</label>
+                        <YesNoToggle
+                          value={formData.noLaserRenewalGuarantee}
+                          onChange={(val) => setFormData((prev) => ({ ...prev, noLaserRenewalGuarantee: val }))}
+                        />
+                      </div>
 
-                <div className="form-group" style={{ marginTop: "0.25rem" }}>
-                  <label className="form-label" style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
-                    <ShieldAlert size={15} style={{ color: "#c084fc" }} />
-                    <span>Stop-Loss Notes & Contract Specifications</span>
-                  </label>
-                  <textarea
-                    rows={3}
-                    className="form-textarea"
-                    placeholder="Enter stop-loss contract terms, laser specifics, renewal caps, or carrier clauses..."
-                    value={formData.stopLossNotes}
-                    onChange={(e) => setFormData({ ...formData, stopLossNotes: e.target.value })}
-                  />
-                </div>
+                      <div className="form-group">
+                        <label className="form-label">Max Specific Premium Renewal Increase</label>
+                        <MaxSpecificRenewalIncreaseInput
+                          value={formData.maxSpecificPremiumRenewalIncrease}
+                          onChange={(val) => setFormData((prev) => ({ ...prev, maxSpecificPremiumRenewalIncrease: val }))}
+                          compact={false}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Lasered Individuals</label>
+                      <LaseredIndividualsInput
+                        value={formData.laseredIndividuals}
+                        onChange={(val) => setFormData((prev) => ({ ...prev, laseredIndividuals: val }))}
+                        compact={false}
+                      />
+                    </div>
+
+                    <div className="grid-cols-2">
+                      <div className="form-group">
+                        <label className="form-label">Benefits Covered</label>
+                        <BenefitsCoveredSelect
+                          value={formData.specificBenefitsCovered}
+                          onChange={(val) => setFormData((prev) => ({ ...prev, specificBenefitsCovered: val }))}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Specific Contract Type</label>
+                        <ContractSelect
+                          value={formData.specificContract}
+                          onChange={(val) => setFormData((prev) => ({ ...prev, specificContract: val }))}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ background: "rgba(0, 174, 219, 0.04)", padding: "1rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
+                      <SpecificPremiumRatesInput
+                        tierStructure={formData.specificTierStructure}
+                        onTierStructureChange={handleTierStructureChange}
+                        singleRate={formData.specificPremiumSingle}
+                        onSingleRateChange={(val) => setFormData((prev) => ({ ...prev, specificPremiumSingle: val }))}
+                        eePlusOneRate={formData.specificPremiumEmployeePlusOne}
+                        onEePlusOneRateChange={(val) => setFormData((prev) => ({ ...prev, specificPremiumEmployeePlusOne: val }))}
+                        eeSpouseRate={formData.specificPremiumEmployeeSpouse}
+                        onEeSpouseRateChange={(val) => setFormData((prev) => ({ ...prev, specificPremiumEmployeeSpouse: val }))}
+                        eeChildrenRate={formData.specificPremiumEmployeeChildren}
+                        onEeChildrenRateChange={(val) => setFormData((prev) => ({ ...prev, specificPremiumEmployeeChildren: val }))}
+                        familyRate={formData.specificPremiumFamily}
+                        onFamilyRateChange={(val) => setFormData((prev) => ({ ...prev, specificPremiumFamily: val }))}
+                        isEditing={true}
+                        compact={false}
+                      />
+                    </div>
+
+                    <div className="form-group" style={{ marginTop: "0.25rem" }}>
+                      <label className="form-label" style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                        <ShieldAlert size={15} style={{ color: "#c084fc" }} />
+                        <span>Stop-Loss Notes & Contract Specifications</span>
+                      </label>
+                      <textarea
+                        rows={3}
+                        className="form-textarea"
+                        placeholder="Enter stop-loss contract terms, laser specifics, renewal caps, or carrier clauses..."
+                        value={formData.stopLossNotes}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, stopLossNotes: e.target.value }))}
+                      />
+                    </div>
+                  </>
+                )}
               </div>
             )}
 

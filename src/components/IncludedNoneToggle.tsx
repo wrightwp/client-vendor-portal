@@ -10,6 +10,7 @@ interface IncludedNoneToggleProps {
   className?: string;
   style?: React.CSSProperties;
   disabled?: boolean;
+  colorScheme?: "purple" | "blue";
 }
 
 export function IncludedNoneToggle({
@@ -19,6 +20,7 @@ export function IncludedNoneToggle({
   className = "",
   style = {},
   disabled = false,
+  colorScheme = "purple",
 }: IncludedNoneToggleProps) {
   const isNone =
     String(value || "")
@@ -35,6 +37,15 @@ export function IncludedNoneToggle({
 
   const isSmall = size === "sm";
   const isLarge = size === "lg";
+
+  const isBlue = colorScheme === "blue";
+  const includedBorder = isBlue ? "1px solid #0284c7" : "1px solid #7c3aed";
+  const includedBg = isBlue
+    ? "linear-gradient(135deg, #00aedb 0%, #0284c7 100%)"
+    : "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)";
+  const includedShadow = isBlue
+    ? "0 2px 8px rgba(2, 132, 199, 0.35)"
+    : "0 2px 8px rgba(124, 58, 237, 0.35)";
 
   return (
     <div
@@ -61,10 +72,8 @@ export function IncludedNoneToggle({
           alignItems: "center",
           justifyContent: "center",
           gap: isSmall ? "0.25rem" : "0.4rem",
-          border: isIncluded ? "1px solid #7c3aed" : "1px solid transparent",
-          background: isIncluded
-            ? "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)"
-            : "transparent",
+          border: isIncluded ? includedBorder : "1px solid transparent",
+          background: isIncluded ? includedBg : "transparent",
           color: isIncluded ? "#ffffff" : "var(--text-secondary, #475569)",
           fontWeight: isIncluded ? "700" : "600",
           fontSize: isSmall ? "0.72rem" : isLarge ? "0.88rem" : "0.78rem",
@@ -77,7 +86,7 @@ export function IncludedNoneToggle({
           cursor: disabled ? "not-allowed" : "pointer",
           transition: "all 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
           lineHeight: "1.2",
-          boxShadow: isIncluded ? "0 2px 8px rgba(124, 58, 237, 0.35)" : "none",
+          boxShadow: isIncluded ? includedShadow : "none",
         }}
       >
         <Shield size={isSmall ? 11 : isLarge ? 15 : 13} />

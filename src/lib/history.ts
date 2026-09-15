@@ -34,6 +34,7 @@ export const FIELD_LABELS: Record<string, string> = {
   priorManagingGeneralUnderwriter: "Prior Managing General Underwriter",
 
   // B&E - Specific Stop-Loss Information
+  specificStopLossStatus: "Specific Stop-Loss Status",
   specificContract: "Specific Contract Basis",
   specificDeductible: "Specific Deductible",
   aggregatingSpecificDeductible: "Aggregating Specific Deductible",

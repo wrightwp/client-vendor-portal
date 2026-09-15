@@ -170,28 +170,36 @@ export default function PrintBillingEnrollmentModal({
             <h2 style={{ fontSize: "1rem", fontWeight: "700", color: "#0f172a", borderBottom: "1px solid #e2e8f0", paddingBottom: "0.3rem", marginBottom: "0.75rem" }}>
               Specific Stop-Loss Information
             </h2>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", fontSize: "0.85rem" }}>
-              <div><strong>Specific Stop-Loss Deductible:</strong> {bAndE.specificDeductible || "N/A"}</div>
-              <div><strong>Aggregating Specific Deductible:</strong> {formatCurrencyDisplay(bAndE.aggregatingSpecificDeductible)}</div>
-              <div><strong>No-Laser Renewal Guarantee:</strong> {bAndE.noLaserRenewalGuarantee || "N/A"}</div>
-              <div><strong>Max Specific Premium Renewal Increase:</strong> {bAndE.maxSpecificPremiumRenewalIncrease || "N/A"}</div>
-              <div><strong>Lasered Individuals:</strong> {bAndE.laseredIndividuals || "No"}</div>
-              <div><strong>Specific Stop-Loss Benefits Covered:</strong> {bAndE.specificBenefitsCovered || "Med/Rx"}</div>
-              <div><strong>Specific Stop-Loss Contract:</strong> {bAndE.specificContract || "N/A"}</div>
-            </div>
+            {(bAndE.specificStopLossStatus === "None" || bAndE.specificContract?.trim().toLowerCase() === "none") ? (
+              <div style={{ background: "#f8fafc", padding: "0.75rem 1rem", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.85rem", color: "#64748b" }}>
+                <strong>Specific Coverage:</strong> None (No Specific Stop-Loss Coverage Included)
+              </div>
+            ) : (
+              <>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", fontSize: "0.85rem" }}>
+                  <div><strong>Specific Stop-Loss Deductible:</strong> {bAndE.specificDeductible || "N/A"}</div>
+                  <div><strong>Aggregating Specific Deductible:</strong> {formatCurrencyDisplay(bAndE.aggregatingSpecificDeductible)}</div>
+                  <div><strong>No-Laser Renewal Guarantee:</strong> {bAndE.noLaserRenewalGuarantee || "N/A"}</div>
+                  <div><strong>Max Specific Premium Renewal Increase:</strong> {bAndE.maxSpecificPremiumRenewalIncrease || "N/A"}</div>
+                  <div><strong>Lasered Individuals:</strong> {bAndE.laseredIndividuals || "No"}</div>
+                  <div><strong>Specific Stop-Loss Benefits Covered:</strong> {bAndE.specificBenefitsCovered || "Med/Rx"}</div>
+                  <div><strong>Specific Stop-Loss Contract:</strong> {bAndE.specificContract || "N/A"}</div>
+                </div>
 
-            <div style={{ marginTop: "0.75rem", background: "#f8fafc", padding: "0.75rem 1rem", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
-              <div style={{ fontWeight: "700", fontSize: "0.8rem", color: "#475569", marginBottom: "0.3rem" }}>
-                Specific Premium Rates ({bAndE.specificTierStructure || "3-Tier"}):
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "0.5rem", fontSize: "0.85rem" }}>
-                <div><strong>Single:</strong> {bAndE.specificPremiumSingle || "N/A"}</div>
-                {bAndE.specificPremiumEmployeePlusOne && <div><strong>EE + 1:</strong> {bAndE.specificPremiumEmployeePlusOne}</div>}
-                {bAndE.specificPremiumEmployeeSpouse && <div><strong>EE + Spouse:</strong> {bAndE.specificPremiumEmployeeSpouse}</div>}
-                {bAndE.specificPremiumEmployeeChildren && <div><strong>EE + Child:</strong> {bAndE.specificPremiumEmployeeChildren}</div>}
-                {bAndE.specificPremiumFamily && <div><strong>Family:</strong> {bAndE.specificPremiumFamily}</div>}
-              </div>
-            </div>
+                <div style={{ marginTop: "0.75rem", background: "#f8fafc", padding: "0.75rem 1rem", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
+                  <div style={{ fontWeight: "700", fontSize: "0.8rem", color: "#475569", marginBottom: "0.3rem" }}>
+                    Specific Premium Rates ({bAndE.specificTierStructure || "3-Tier"}):
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "0.5rem", fontSize: "0.85rem" }}>
+                    <div><strong>Single:</strong> {bAndE.specificPremiumSingle || "N/A"}</div>
+                    {bAndE.specificPremiumEmployeePlusOne && <div><strong>EE + 1:</strong> {bAndE.specificPremiumEmployeePlusOne}</div>}
+                    {bAndE.specificPremiumEmployeeSpouse && <div><strong>EE + Spouse:</strong> {bAndE.specificPremiumEmployeeSpouse}</div>}
+                    {bAndE.specificPremiumEmployeeChildren && <div><strong>EE + Child:</strong> {bAndE.specificPremiumEmployeeChildren}</div>}
+                    {bAndE.specificPremiumFamily && <div><strong>Family:</strong> {bAndE.specificPremiumFamily}</div>}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Section 3: Aggregate Stop-Loss Information */}

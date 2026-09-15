@@ -127,6 +127,7 @@ export default function BillingEnrollmentSection({
     priorStopLossCarrier: activeBAndE.priorStopLossCarrier || "",
     priorManagingGeneralUnderwriter: activeBAndE.priorManagingGeneralUnderwriter || "",
 
+    specificStopLossStatus: activeBAndE.specificStopLossStatus || (activeBAndE.specificContract?.trim().toLowerCase() === "none" ? "None" : "Included"),
     specificDeductible: activeBAndE.specificDeductible || "",
     aggregatingSpecificDeductible: activeBAndE.aggregatingSpecificDeductible || "",
     noLaserRenewalGuarantee: activeBAndE.noLaserRenewalGuarantee || "",
@@ -207,6 +208,7 @@ export default function BillingEnrollmentSection({
       priorStopLossCarrier: rec.priorStopLossCarrier || "",
       priorManagingGeneralUnderwriter: rec.priorManagingGeneralUnderwriter || "",
 
+      specificStopLossStatus: rec.specificStopLossStatus || (rec.specificContract?.trim().toLowerCase() === "none" ? "None" : "Included"),
       specificDeductible: rec.specificDeductible || "",
       aggregatingSpecificDeductible: rec.aggregatingSpecificDeductible || "",
       noLaserRenewalGuarantee: rec.noLaserRenewalGuarantee || "",
@@ -303,6 +305,7 @@ export default function BillingEnrollmentSection({
       priorStopLossCarrier: sourceRecord.priorStopLossCarrier || "",
       priorManagingGeneralUnderwriter: sourceRecord.priorManagingGeneralUnderwriter || "",
 
+      specificStopLossStatus: sourceRecord.specificStopLossStatus || (sourceRecord.specificContract?.trim().toLowerCase() === "none" ? "None" : "Included"),
       specificDeductible: sourceRecord.specificDeductible || "",
       aggregatingSpecificDeductible: sourceRecord.aggregatingSpecificDeductible || "",
       noLaserRenewalGuarantee: sourceRecord.noLaserRenewalGuarantee || "",
@@ -957,15 +960,31 @@ export default function BillingEnrollmentSection({
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                       {isInlineEditing ? (
-                        <ContractSelect
-                          value={editFormData.specificContract}
-                          onChange={(val) => setEditFormData({ ...editFormData, specificContract: val })}
-                        />
+                        <>
+                          {editFormData.specificStopLossStatus !== "None" && (
+                            <ContractSelect
+                              value={editFormData.specificContract}
+                              onChange={(val) => setEditFormData((prev) => ({ ...prev, specificContract: val }))}
+                            />
+                          )}
+                          <IncludedNoneToggle
+                            size="sm"
+                            colorScheme="blue"
+                            value={editFormData.specificStopLossStatus}
+                            onChange={(val) => setEditFormData((prev) => ({ ...prev, specificStopLossStatus: val }))}
+                          />
+                        </>
                       ) : (
                         <>
-                          <span className="badge badge-blue" style={{ fontSize: "0.7rem" }}>
-                            {activeBAndE.specificContract || "12/12"}
-                          </span>
+                          {(activeBAndE.specificStopLossStatus === "None" || activeBAndE.specificContract?.trim().toLowerCase() === "none") ? (
+                            <span className="badge" style={{ background: "rgba(148, 163, 184, 0.15)", color: "#64748b", border: "1px solid #cbd5e1", fontSize: "0.7rem" }}>
+                              No Spec Coverage
+                            </span>
+                          ) : (
+                            <span className="badge badge-blue" style={{ fontSize: "0.7rem" }}>
+                              {activeBAndE.specificContract || "12/12"}
+                            </span>
+                          )}
                           <button
                             type="button"
                             onClick={() => {
@@ -984,130 +1003,158 @@ export default function BillingEnrollmentSection({
                     </div>
                   </div>
 
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.85rem", flex: 1 }}>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ color: "var(--text-muted)" }}>Specific Deductible</span>
-                        {!isInlineEditing && (
-                          <strong style={{ color: "var(--text-primary)" }}>
-                            {formatDisplaySpecificDeductible(activeBAndE.specificDeductible)}
-                          </strong>
+                  {/* If View Mode & Specific is set to None, display notice message */}
+                  {!isInlineEditing && (activeBAndE.specificStopLossStatus === "None" || activeBAndE.specificContract?.trim().toLowerCase() === "none") ? (
+                    <div
+                      style={{
+                        flex: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        padding: "2rem 1rem",
+                        background: "rgba(148, 163, 184, 0.05)",
+                        borderRadius: "8px",
+                        border: "1px dashed var(--border)",
+                        textAlign: "center",
+                        gap: "0.5rem",
+                        margin: "0.5rem 0",
+                      }}
+                    >
+                      <ShieldAlert size={28} style={{ color: "#94a3b8" }} />
+                      <div style={{ fontWeight: "700", fontSize: "0.95rem", color: "var(--text-primary)" }}>
+                        No Specific Stop-Loss Coverage
+                      </div>
+                      <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", maxWidth: "280px", lineHeight: "1.4" }}>
+                        There is no Specific Stop-Loss coverage included for this plan year specification.
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.85rem", flex: 1 }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ color: "var(--text-muted)" }}>Specific Deductible</span>
+                          {!isInlineEditing && (
+                            <strong style={{ color: "var(--text-primary)" }}>
+                              {formatDisplaySpecificDeductible(activeBAndE.specificDeductible)}
+                            </strong>
+                          )}
+                        </div>
+                        {isInlineEditing && (
+                          <SpecificDeductibleInput
+                            value={editFormData.specificDeductible}
+                            onChange={(val) => setEditFormData((prev) => ({ ...prev, specificDeductible: val }))}
+                            compact={true}
+                          />
                         )}
                       </div>
-                      {isInlineEditing && (
-                        <SpecificDeductibleInput
-                          value={editFormData.specificDeductible}
-                          onChange={(val) => setEditFormData({ ...editFormData, specificDeductible: val })}
+
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ color: "var(--text-muted)" }}>Aggregating Specific Deductible</span>
+                          {!isInlineEditing && (
+                            <strong style={{ color: "var(--text-primary)" }}>
+                              {formatCurrencyDisplay(activeBAndE.aggregatingSpecificDeductible)}
+                            </strong>
+                          )}
+                        </div>
+                        {isInlineEditing && (
+                          <AggregatingSpecificInput
+                            value={editFormData.aggregatingSpecificDeductible}
+                            onChange={(val) => setEditFormData((prev) => ({ ...prev, aggregatingSpecificDeductible: val }))}
+                            compact={true}
+                          />
+                        )}
+                      </div>
+
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                        <span style={{ color: "var(--text-muted)" }}>No-Laser Renewal Guarantee</span>
+                        {isInlineEditing ? (
+                          <YesNoToggle
+                            value={editFormData.noLaserRenewalGuarantee}
+                            onChange={(val) => setEditFormData((prev) => ({ ...prev, noLaserRenewalGuarantee: val }))}
+                            size="sm"
+                          />
+                        ) : (
+                          <span>{activeBAndE.noLaserRenewalGuarantee || "No"}</span>
+                        )}
+                      </div>
+
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ color: "var(--text-muted)" }}>Max Specific Renewal Increase</span>
+                          {!isInlineEditing && (
+                            <span>{activeBAndE.maxSpecificPremiumRenewalIncrease || "—"}</span>
+                          )}
+                        </div>
+                        {isInlineEditing && (
+                          <MaxSpecificRenewalIncreaseInput
+                            value={editFormData.maxSpecificPremiumRenewalIncrease}
+                            onChange={(val) => setEditFormData((prev) => ({ ...prev, maxSpecificPremiumRenewalIncrease: val }))}
+                            compact={true}
+                          />
+                        )}
+                      </div>
+
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ color: "var(--text-muted)" }}>Lasered Individuals</span>
+                          {!isInlineEditing && (
+                            <span>{parseLaserString(activeBAndE.laseredIndividuals).isYes ? "Yes" : "No"}</span>
+                          )}
+                        </div>
+                        {!isInlineEditing && (
+                          <LaseredIndividualsView value={activeBAndE.laseredIndividuals} />
+                        )}
+                        {isInlineEditing && (
+                          <LaseredIndividualsInput
+                            value={editFormData.laseredIndividuals}
+                            onChange={(val) => setEditFormData((prev) => ({ ...prev, laseredIndividuals: val }))}
+                            compact={true}
+                          />
+                        )}
+                      </div>
+
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ color: "var(--text-muted)" }}>Benefits Covered</span>
+                          {!isInlineEditing && (
+                            <span>{activeBAndE.specificBenefitsCovered || "Med/Rx"}</span>
+                          )}
+                        </div>
+                        {isInlineEditing && (
+                          <BenefitsCoveredSelect
+                            style={{ width: "160px" }}
+                            value={editFormData.specificBenefitsCovered}
+                            onChange={(val) => setEditFormData((prev) => ({ ...prev, specificBenefitsCovered: val }))}
+                          />
+                        )}
+                      </div>
+
+                      {/* Specific Rates (Placed at bottom to align with Aggregate Factors) */}
+                      <div style={{ marginTop: "auto", background: "rgba(0, 174, 219, 0.05)", padding: "0.75rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
+                        <div style={{ fontSize: "0.75rem", fontWeight: "700", color: "var(--accent-blue)", marginBottom: "0.4rem" }}>
+                          Specific Premium Rates (PEPM)
+                        </div>
+                        <SpecificPremiumRatesInput
+                          tierStructure={isInlineEditing ? editFormData.specificTierStructure : activeBAndE.specificTierStructure}
+                          onTierStructureChange={isInlineEditing ? handleTierStructureChange : undefined}
+                          singleRate={isInlineEditing ? editFormData.specificPremiumSingle : activeBAndE.specificPremiumSingle}
+                          onSingleRateChange={(val) => setEditFormData((prev) => ({ ...prev, specificPremiumSingle: val }))}
+                          eePlusOneRate={isInlineEditing ? editFormData.specificPremiumEmployeePlusOne : activeBAndE.specificPremiumEmployeePlusOne}
+                          onEePlusOneRateChange={(val) => setEditFormData((prev) => ({ ...prev, specificPremiumEmployeePlusOne: val }))}
+                          eeSpouseRate={isInlineEditing ? editFormData.specificPremiumEmployeeSpouse : activeBAndE.specificPremiumEmployeeSpouse}
+                          onEeSpouseRateChange={(val) => setEditFormData((prev) => ({ ...prev, specificPremiumEmployeeSpouse: val }))}
+                          eeChildrenRate={isInlineEditing ? editFormData.specificPremiumEmployeeChildren : activeBAndE.specificPremiumEmployeeChildren}
+                          onEeChildrenRateChange={(val) => setEditFormData((prev) => ({ ...prev, specificPremiumEmployeeChildren: val }))}
+                          familyRate={isInlineEditing ? editFormData.specificPremiumFamily : activeBAndE.specificPremiumFamily}
+                          onFamilyRateChange={(val) => setEditFormData((prev) => ({ ...prev, specificPremiumFamily: val }))}
+                          isEditing={isInlineEditing}
                           compact={true}
                         />
-                      )}
-                    </div>
-
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ color: "var(--text-muted)" }}>Aggregating Specific Deductible</span>
-                        {!isInlineEditing && (
-                          <strong style={{ color: "var(--text-primary)" }}>
-                            {formatCurrencyDisplay(activeBAndE.aggregatingSpecificDeductible)}
-                          </strong>
-                        )}
                       </div>
-                      {isInlineEditing && (
-                        <AggregatingSpecificInput
-                          value={editFormData.aggregatingSpecificDeductible}
-                          onChange={(val) => setEditFormData({ ...editFormData, aggregatingSpecificDeductible: val })}
-                          compact={true}
-                        />
-                      )}
                     </div>
-
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <span style={{ color: "var(--text-muted)" }}>No-Laser Renewal Guarantee</span>
-                      {isInlineEditing ? (
-                        <YesNoToggle
-                          value={editFormData.noLaserRenewalGuarantee}
-                          onChange={(val) => setEditFormData({ ...editFormData, noLaserRenewalGuarantee: val })}
-                          size="sm"
-                        />
-                      ) : (
-                        <span>{activeBAndE.noLaserRenewalGuarantee || "No"}</span>
-                      )}
-                    </div>
-
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ color: "var(--text-muted)" }}>Max Specific Renewal Increase</span>
-                        {!isInlineEditing && (
-                          <span>{activeBAndE.maxSpecificPremiumRenewalIncrease || "—"}</span>
-                        )}
-                      </div>
-                      {isInlineEditing && (
-                        <MaxSpecificRenewalIncreaseInput
-                          value={editFormData.maxSpecificPremiumRenewalIncrease}
-                          onChange={(val) => setEditFormData({ ...editFormData, maxSpecificPremiumRenewalIncrease: val })}
-                          compact={true}
-                        />
-                      )}
-                    </div>
-
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ color: "var(--text-muted)" }}>Lasered Individuals</span>
-                        {!isInlineEditing && (
-                          <span>{parseLaserString(activeBAndE.laseredIndividuals).isYes ? "Yes" : "No"}</span>
-                        )}
-                      </div>
-                      {!isInlineEditing && (
-                        <LaseredIndividualsView value={activeBAndE.laseredIndividuals} />
-                      )}
-                      {isInlineEditing && (
-                        <LaseredIndividualsInput
-                          value={editFormData.laseredIndividuals}
-                          onChange={(val) => setEditFormData({ ...editFormData, laseredIndividuals: val })}
-                          compact={true}
-                        />
-                      )}
-                    </div>
-
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ color: "var(--text-muted)" }}>Benefits Covered</span>
-                        {!isInlineEditing && (
-                          <span>{activeBAndE.specificBenefitsCovered || "Med/Rx"}</span>
-                        )}
-                      </div>
-                      {isInlineEditing && (
-                        <BenefitsCoveredSelect
-                          style={{ width: "160px" }}
-                          value={editFormData.specificBenefitsCovered}
-                          onChange={(val) => setEditFormData({ ...editFormData, specificBenefitsCovered: val })}
-                        />
-                      )}
-                    </div>
-
-                    {/* Specific Rates (Placed at bottom to align with Aggregate Factors) */}
-                    <div style={{ marginTop: "auto", background: "rgba(0, 174, 219, 0.05)", padding: "0.75rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
-                      <div style={{ fontSize: "0.75rem", fontWeight: "700", color: "var(--accent-blue)", marginBottom: "0.4rem" }}>
-                        Specific Premium Rates (PEPM)
-                      </div>
-                      <SpecificPremiumRatesInput
-                        tierStructure={isInlineEditing ? editFormData.specificTierStructure : activeBAndE.specificTierStructure}
-                        onTierStructureChange={isInlineEditing ? handleTierStructureChange : undefined}
-                        singleRate={isInlineEditing ? editFormData.specificPremiumSingle : activeBAndE.specificPremiumSingle}
-                        onSingleRateChange={(val) => setEditFormData((prev) => ({ ...prev, specificPremiumSingle: val }))}
-                        eePlusOneRate={isInlineEditing ? editFormData.specificPremiumEmployeePlusOne : activeBAndE.specificPremiumEmployeePlusOne}
-                        onEePlusOneRateChange={(val) => setEditFormData((prev) => ({ ...prev, specificPremiumEmployeePlusOne: val }))}
-                        eeSpouseRate={isInlineEditing ? editFormData.specificPremiumEmployeeSpouse : activeBAndE.specificPremiumEmployeeSpouse}
-                        onEeSpouseRateChange={(val) => setEditFormData((prev) => ({ ...prev, specificPremiumEmployeeSpouse: val }))}
-                        eeChildrenRate={isInlineEditing ? editFormData.specificPremiumEmployeeChildren : activeBAndE.specificPremiumEmployeeChildren}
-                        onEeChildrenRateChange={(val) => setEditFormData((prev) => ({ ...prev, specificPremiumEmployeeChildren: val }))}
-                        familyRate={isInlineEditing ? editFormData.specificPremiumFamily : activeBAndE.specificPremiumFamily}
-                        onFamilyRateChange={(val) => setEditFormData((prev) => ({ ...prev, specificPremiumFamily: val }))}
-                        isEditing={isInlineEditing}
-                        compact={true}
-                      />
-                    </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Aggregate Stop-Loss */}

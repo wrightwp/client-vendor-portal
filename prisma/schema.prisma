@@ -122,6 +122,7 @@ model ClientBillingEnrollment {
   priorManagingGeneralUnderwriter     String?
 
   // Specific Stop-Loss Information
+  specificStopLossStatus              String?  @default("Included")
   specificDeductible                  String?
   aggregatingSpecificDeductible       String?
   noLaserRenewalGuarantee            String?
