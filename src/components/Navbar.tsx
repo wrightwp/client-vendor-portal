@@ -111,6 +111,14 @@ export default function Navbar() {
             <Store size={18} />
             <span>Vendors</span>
           </Link>
+          <Link
+            href="/admin/be-masters"
+            className={`nav-link ${pathname.startsWith("/admin") ? "active" : ""}`}
+            style={pathname.startsWith("/admin") ? { background: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)", color: "#fff" } : {}}
+          >
+            <ShieldCheck size={18} />
+            <span>Admin</span>
+          </Link>
         </nav>
 
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
