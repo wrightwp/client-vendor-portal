@@ -12,12 +12,18 @@ import {
   Layers,
   GripVertical,
 } from "lucide-react";
+import {
+  CustomFieldColorPicker,
+  CustomFieldColorDropdown,
+  normalizeFieldColor,
+} from "./CustomFieldColorPicker";
 
 export interface BEMasterField {
   id: string;
   label: string;
   defaultValue?: string;
   placeholder?: string;
+  color?: string;
 }
 
 export interface BEMasterSection {
@@ -39,6 +45,7 @@ export function BEMasterSectionCard({
 }: BEMasterSectionCardProps) {
   const [isAddingField, setIsAddingField] = useState(false);
   const [newFieldLabel, setNewFieldLabel] = useState("");
+  const [newFieldColor, setNewFieldColor] = useState("#000000");
   const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
   const [editingFieldLabel, setEditingFieldLabel] = useState("");
 
@@ -52,6 +59,7 @@ export function BEMasterSectionCard({
       id: `fld_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       label: newFieldLabel.trim(),
       defaultValue: "",
+      color: newFieldColor || "#000000",
     };
 
     onUpdateSection({
@@ -60,6 +68,7 @@ export function BEMasterSectionCard({
     });
 
     setNewFieldLabel("");
+    setNewFieldColor("#000000");
     setIsAddingField(false);
   };
 
@@ -192,6 +201,7 @@ export function BEMasterSectionCard({
             background: "var(--bg-card-hover, #f8fafc)",
             border: `1px dashed ${accentColor}`,
             display: "flex",
+            flexWrap: "wrap",
             alignItems: "center",
             gap: "0.6rem",
           }}
@@ -199,7 +209,13 @@ export function BEMasterSectionCard({
           <input
             type="text"
             className="form-input"
-            style={{ flex: 1, fontSize: "0.85rem", padding: "0.45rem 0.75rem" }}
+            style={{
+              flex: "1 1 200px",
+              fontSize: "0.85rem",
+              padding: "0.45rem 0.75rem",
+              color: newFieldColor.toLowerCase() === "#000000" ? "inherit" : newFieldColor,
+              fontWeight: newFieldColor.toLowerCase() === "#000000" ? "normal" : "600",
+            }}
             placeholder="Enter field label (e.g. Dental Fee, PPO Network, Reinsurance)..."
             value={newFieldLabel}
             onChange={(e) => setNewFieldLabel(e.target.value)}
@@ -209,35 +225,47 @@ export function BEMasterSectionCard({
               if (e.key === "Escape") {
                 setIsAddingField(false);
                 setNewFieldLabel("");
+                setNewFieldColor("#000000");
               }
             }}
           />
-          <button
-            type="button"
-            onClick={handleAddField}
-            disabled={!newFieldLabel.trim()}
-            className="btn btn-primary"
-            style={{
-              padding: "0.45rem 0.85rem",
-              fontSize: "0.8rem",
-              background: accentColor,
-              borderColor: accentColor,
-            }}
-          >
-            <Check size={14} />
-            <span>Add</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setIsAddingField(false);
-              setNewFieldLabel("");
-            }}
-            className="btn btn-secondary"
-            style={{ padding: "0.45rem 0.65rem", fontSize: "0.8rem" }}
-          >
-            <X size={14} />
-          </button>
+
+          {/* Color Picker */}
+          <CustomFieldColorPicker
+            selectedColor={newFieldColor}
+            onChange={(c) => setNewFieldColor(c)}
+            size="sm"
+          />
+
+          <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+            <button
+              type="button"
+              onClick={handleAddField}
+              disabled={!newFieldLabel.trim()}
+              className="btn btn-primary"
+              style={{
+                padding: "0.45rem 0.85rem",
+                fontSize: "0.8rem",
+                background: accentColor,
+                borderColor: accentColor,
+              }}
+            >
+              <Check size={14} />
+              <span>Add</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsAddingField(false);
+                setNewFieldLabel("");
+                setNewFieldColor("#000000");
+              }}
+              className="btn btn-secondary"
+              style={{ padding: "0.45rem 0.65rem", fontSize: "0.8rem" }}
+            >
+              <X size={14} />
+            </button>
+          </div>
         </div>
       )}
 
@@ -261,6 +289,8 @@ export function BEMasterSectionCard({
           {section.fields.map((field, idx) => {
             const isDragging = draggedIndex === idx;
             const isOver = dragOverIndex === idx && draggedIndex !== idx;
+            const fieldColor = normalizeFieldColor(field.color);
+            const isStandardBlack = fieldColor.toLowerCase() === "#000000";
 
             return (
               <div
@@ -297,7 +327,7 @@ export function BEMasterSectionCard({
                 }}
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "32px 240px 1fr auto",
+                  gridTemplateColumns: "32px 240px 1fr auto auto",
                   alignItems: "center",
                   gap: "0.65rem",
                   padding: "0.6rem 0.85rem",
@@ -350,7 +380,13 @@ export function BEMasterSectionCard({
                       <input
                         type="text"
                         className="form-input"
-                        style={{ fontSize: "0.825rem", padding: "0.25rem 0.5rem", width: "100%" }}
+                        style={{
+                          fontSize: "0.825rem",
+                          padding: "0.25rem 0.5rem",
+                          width: "100%",
+                          color: isStandardBlack ? "inherit" : fieldColor,
+                          fontWeight: isStandardBlack ? "normal" : "600",
+                        }}
                         value={editingFieldLabel}
                         onChange={(e) => setEditingFieldLabel(e.target.value)}
                         autoFocus
@@ -379,8 +415,8 @@ export function BEMasterSectionCard({
                       <span
                         style={{
                           fontSize: "0.85rem",
-                          fontWeight: 600,
-                          color: "var(--text-primary)",
+                          fontWeight: isStandardBlack ? 600 : 700,
+                          color: isStandardBlack ? "var(--text-primary)" : fieldColor,
                           wordBreak: "break-word",
                         }}
                       >
@@ -411,9 +447,23 @@ export function BEMasterSectionCard({
                   <input
                     type="text"
                     className="form-input"
-                    style={{ width: "100%", fontSize: "0.85rem", padding: "0.4rem 0.65rem" }}
+                    style={{
+                      width: "100%",
+                      fontSize: "0.85rem",
+                      padding: "0.4rem 0.65rem",
+                      color: isStandardBlack ? "inherit" : fieldColor,
+                      fontWeight: isStandardBlack ? "normal" : "600",
+                    }}
                     value={field.defaultValue || ""}
                     onChange={(e) => handleFieldChange(field.id, { defaultValue: e.target.value })}
+                  />
+                </div>
+
+                {/* Color Dropdown Swatch */}
+                <div>
+                  <CustomFieldColorDropdown
+                    color={fieldColor}
+                    onChange={(color) => handleFieldChange(field.id, { color })}
                   />
                 </div>
 

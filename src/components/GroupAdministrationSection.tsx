@@ -21,6 +21,11 @@ import {
 } from "lucide-react";
 import { BEMasterField, BEMasterSection } from "./BEMasterSectionCard";
 import CurrencyInput, { formatCurrencyDisplay } from "./CurrencyInput";
+import {
+  CustomFieldColorPicker,
+  CustomFieldColorDropdown,
+  normalizeFieldColor,
+} from "./CustomFieldColorPicker";
 
 export interface GroupAdministrationSectionProps {
   adminMasterType?: string | null;
@@ -168,6 +173,7 @@ export function GroupAdministrationSection({
 
   const [activeAddingSectionId, setActiveAddingSectionId] = useState<string | null>(null);
   const [newFieldLabel, setNewFieldLabel] = useState("");
+  const [newFieldColor, setNewFieldColor] = useState("#000000");
   const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
   const [editingFieldLabel, setEditingFieldLabel] = useState("");
 
@@ -312,6 +318,7 @@ export function GroupAdministrationSection({
       id: `fld_grp_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       label: newFieldLabel.trim(),
       defaultValue: "$0.00",
+      color: newFieldColor || "#000000",
     };
 
     const newSections = sections.map((sec) =>
@@ -320,7 +327,22 @@ export function GroupAdministrationSection({
 
     emitSectionsChange(newSections);
     setNewFieldLabel("");
+    setNewFieldColor("#000000");
     setActiveAddingSectionId(null);
+  };
+
+  const handleFieldColorChange = (sectionId: string, fieldId: string, color: string) => {
+    const newSections = sections.map((sec) =>
+      sec.id === sectionId
+        ? {
+            ...sec,
+            fields: sec.fields.map((f) =>
+              f.id === fieldId ? { ...f, color } : f
+            ),
+          }
+        : sec
+    );
+    emitSectionsChange(newSections);
   };
 
   const handleRemoveField = (sectionId: string, fieldId: string) => {
@@ -480,24 +502,41 @@ export function GroupAdministrationSection({
                   No fields configured.
                 </div>
               ) : (
-                sec.fields.map((field) => (
-                  <div
-                    key={field.id}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      borderBottom: "1px dashed var(--border)",
-                      paddingBottom: "0.35rem",
-                      fontSize: "0.85rem",
-                    }}
-                  >
-                    <span style={{ color: "var(--text-muted)" }}>{field.label}</span>
-                    <strong style={{ color: "var(--text-primary)", fontWeight: 600 }}>
-                      {field.defaultValue && field.defaultValue.trim() !== "" ? field.defaultValue : "—"}
-                    </strong>
-                  </div>
-                ))
+                sec.fields.map((field) => {
+                  const fontColor = field.color || "#000000";
+                  const isStandardBlack = !field.color || field.color.toLowerCase() === "#000000";
+
+                  return (
+                    <div
+                      key={field.id}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        borderBottom: "1px dashed var(--border)",
+                        paddingBottom: "0.35rem",
+                        fontSize: "0.85rem",
+                      }}
+                    >
+                      <span
+                        style={{
+                          color: isStandardBlack ? "var(--text-muted)" : fontColor,
+                          fontWeight: isStandardBlack ? 500 : 700,
+                        }}
+                      >
+                        {field.label}
+                      </span>
+                      <strong
+                        style={{
+                          color: isStandardBlack ? "var(--text-primary)" : fontColor,
+                          fontWeight: 600,
+                        }}
+                      >
+                        {field.defaultValue && field.defaultValue.trim() !== "" ? field.defaultValue : "—"}
+                      </strong>
+                    </div>
+                  );
+                })
               )}
             </div>
           ))}
@@ -644,9 +683,10 @@ export function GroupAdministrationSection({
               <div
                 style={{
                   display: "flex",
+                  flexWrap: "wrap",
                   alignItems: "center",
-                  gap: "0.4rem",
-                  padding: "0.5rem",
+                  gap: "0.5rem",
+                  padding: "0.5rem 0.65rem",
                   borderRadius: "6px",
                   background: "#fff7ed",
                   border: "1px dashed #f97316",
@@ -655,7 +695,13 @@ export function GroupAdministrationSection({
                 <input
                   type="text"
                   className="form-input"
-                  style={{ flex: 1, fontSize: "0.8rem", padding: "0.3rem 0.5rem" }}
+                  style={{
+                    flex: "1 1 180px",
+                    fontSize: "0.8rem",
+                    padding: "0.3rem 0.5rem",
+                    color: newFieldColor.toLowerCase() === "#000000" ? "inherit" : newFieldColor,
+                    fontWeight: newFieldColor.toLowerCase() === "#000000" ? "normal" : "600",
+                  }}
                   placeholder="Field label (e.g. Vision Admin Fee)..."
                   value={newFieldLabel}
                   onChange={(e) => setNewFieldLabel(e.target.value)}
@@ -665,29 +711,40 @@ export function GroupAdministrationSection({
                     if (e.key === "Escape") {
                       setActiveAddingSectionId(null);
                       setNewFieldLabel("");
+                      setNewFieldColor("#000000");
                     }
                   }}
                 />
-                <button
-                  type="button"
-                  onClick={() => handleAddField(sec.id)}
-                  disabled={!newFieldLabel.trim()}
-                  className="btn btn-primary btn-sm"
-                  style={{ background: "#ea580c", borderColor: "#ea580c", padding: "0.3rem 0.6rem" }}
-                >
-                  <Check size={13} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveAddingSectionId(null);
-                    setNewFieldLabel("");
-                  }}
-                  className="btn btn-secondary btn-sm"
-                  style={{ padding: "0.3rem 0.5rem" }}
-                >
-                  <X size={13} />
-                </button>
+
+                <CustomFieldColorPicker
+                  selectedColor={newFieldColor}
+                  onChange={(c) => setNewFieldColor(c)}
+                  size="sm"
+                />
+
+                <div style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                  <button
+                    type="button"
+                    onClick={() => handleAddField(sec.id)}
+                    disabled={!newFieldLabel.trim()}
+                    className="btn btn-primary btn-sm"
+                    style={{ background: "#ea580c", borderColor: "#ea580c", padding: "0.3rem 0.6rem" }}
+                  >
+                    <Check size={13} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveAddingSectionId(null);
+                      setNewFieldLabel("");
+                      setNewFieldColor("#000000");
+                    }}
+                    className="btn btn-secondary btn-sm"
+                    style={{ padding: "0.3rem 0.5rem" }}
+                  >
+                    <X size={13} />
+                  </button>
+                </div>
               </div>
             )}
 
@@ -701,6 +758,8 @@ export function GroupAdministrationSection({
                 {sec.fields.map((field, idx) => {
                   const isDragging = draggedIndex === idx && draggedSectionId === sec.id;
                   const isOver = dragOverIndex === idx && draggedSectionId === sec.id && draggedIndex !== idx;
+                  const fieldColor = normalizeFieldColor(field.color);
+                  const isStandardBlack = fieldColor.toLowerCase() === "#000000";
 
                   return (
                     <div
@@ -741,7 +800,7 @@ export function GroupAdministrationSection({
                       }}
                       style={{
                         display: "grid",
-                        gridTemplateColumns: "24px minmax(130px, 190px) 1fr auto",
+                        gridTemplateColumns: "24px minmax(130px, 190px) 1fr auto auto",
                         alignItems: "center",
                         gap: "0.5rem",
                         padding: "0.45rem 0.65rem",
@@ -781,7 +840,13 @@ export function GroupAdministrationSection({
                             <input
                               type="text"
                               className="form-input"
-                              style={{ fontSize: "0.75rem", padding: "0.2rem 0.35rem", width: "100%" }}
+                              style={{
+                                fontSize: "0.75rem",
+                                padding: "0.2rem 0.35rem",
+                                width: "100%",
+                                color: isStandardBlack ? "inherit" : fieldColor,
+                                fontWeight: isStandardBlack ? "normal" : "600",
+                              }}
                               value={editingFieldLabel}
                               onChange={(e) => setEditingFieldLabel(e.target.value)}
                               autoFocus
@@ -833,8 +898,8 @@ export function GroupAdministrationSection({
                             <span
                               style={{
                                 fontSize: "0.78rem",
-                                fontWeight: 600,
-                                color: "var(--text-primary)",
+                                fontWeight: isStandardBlack ? 600 : 700,
+                                color: isStandardBlack ? "var(--text-primary)" : fieldColor,
                                 overflow: "hidden",
                                 textOverflow: "ellipsis",
                                 whiteSpace: "nowrap",
@@ -863,9 +928,23 @@ export function GroupAdministrationSection({
                         <input
                           type="text"
                           className="form-input"
-                          style={{ width: "100%", fontSize: "0.8rem", padding: "0.3rem 0.5rem" }}
+                          style={{
+                            width: "100%",
+                            fontSize: "0.8rem",
+                            padding: "0.3rem 0.5rem",
+                            color: isStandardBlack ? "inherit" : fieldColor,
+                            fontWeight: isStandardBlack ? "normal" : "600",
+                          }}
                           value={field.defaultValue || ""}
                           onChange={(e) => handleFieldValueChange(sec.id, field.id, e.target.value)}
+                        />
+                      </div>
+
+                      {/* Color Dropdown Swatch */}
+                      <div>
+                        <CustomFieldColorDropdown
+                          color={fieldColor}
+                          onChange={(color) => handleFieldColorChange(sec.id, field.id, color)}
                         />
                       </div>
 

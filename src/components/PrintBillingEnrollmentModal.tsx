@@ -167,9 +167,14 @@ export default function PrintBillingEnrollmentModal({
                 try {
                   const fields = JSON.parse(bAndE.stopLossCustomFields);
                   if (Array.isArray(fields)) {
-                    return fields.map((f: any) => (
-                      <div key={f.id}><strong>{f.label}:</strong> {f.defaultValue || "N/A"}</div>
-                    ));
+                    return fields.map((f: any) => {
+                      const fontColor = f.color && f.color.toLowerCase() !== "#000000" ? f.color : undefined;
+                      return (
+                        <div key={f.id} style={{ color: fontColor }}>
+                          <strong style={{ color: fontColor }}>{f.label}:</strong> {f.defaultValue || "N/A"}
+                        </div>
+                      );
+                    });
                   }
                 } catch (e) {}
                 return null;
@@ -201,9 +206,14 @@ export default function PrintBillingEnrollmentModal({
                     try {
                       const fields = JSON.parse(bAndE.specificCustomFields);
                       if (Array.isArray(fields)) {
-                        return fields.map((f: any) => (
-                          <div key={f.id}><strong>{f.label}:</strong> {f.defaultValue || "N/A"}</div>
-                        ));
+                        return fields.map((f: any) => {
+                          const fontColor = f.color && f.color.toLowerCase() !== "#000000" ? f.color : undefined;
+                          return (
+                            <div key={f.id} style={{ color: fontColor }}>
+                              <strong style={{ color: fontColor }}>{f.label}:</strong> {f.defaultValue || "N/A"}
+                            </div>
+                          );
+                        });
                       }
                     } catch (e) {}
                     return null;
@@ -250,9 +260,14 @@ export default function PrintBillingEnrollmentModal({
                     try {
                       const fields = JSON.parse(bAndE.aggregateCustomFields);
                       if (Array.isArray(fields)) {
-                        return fields.map((f: any) => (
-                          <div key={f.id}><strong>{f.label}:</strong> {f.defaultValue || "N/A"}</div>
-                        ));
+                        return fields.map((f: any) => {
+                          const fontColor = f.color && f.color.toLowerCase() !== "#000000" ? f.color : undefined;
+                          return (
+                            <div key={f.id} style={{ color: fontColor }}>
+                              <strong style={{ color: fontColor }}>{f.label}:</strong> {f.defaultValue || "N/A"}
+                            </div>
+                          );
+                        });
                       }
                     } catch (e) {}
                     return null;
@@ -324,11 +339,14 @@ export default function PrintBillingEnrollmentModal({
                         </div>
                       )}
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", fontSize: "0.85rem" }}>
-                        {(sec.fields || []).map((f: any, fIdx: number) => (
-                          <div key={f.id || fIdx}>
-                            <strong>{f.label}:</strong> {f.defaultValue && f.defaultValue.trim() !== "" ? f.defaultValue : "N/A"}
-                          </div>
-                        ))}
+                        {(sec.fields || []).map((f: any, fIdx: number) => {
+                          const fontColor = f.color && f.color.toLowerCase() !== "#000000" ? f.color : undefined;
+                          return (
+                            <div key={f.id || fIdx} style={{ color: fontColor }}>
+                              <strong style={{ color: fontColor }}>{f.label}:</strong> {f.defaultValue && f.defaultValue.trim() !== "" ? f.defaultValue : "N/A"}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   ))}

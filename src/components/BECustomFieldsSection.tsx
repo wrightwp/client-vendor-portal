@@ -11,11 +11,17 @@ import {
   ArrowDown,
   GripVertical,
 } from "lucide-react";
+import {
+  CustomFieldColorPicker,
+  CustomFieldColorDropdown,
+  normalizeFieldColor,
+} from "./CustomFieldColorPicker";
 
 export interface BECustomField {
   id: string;
   label: string;
   defaultValue: string;
+  color?: string;
 }
 
 interface BECustomFieldsSectionProps {
@@ -35,6 +41,7 @@ export function parseBECustomFields(rawJson?: string | null): BECustomField[] {
         id: item.id || `fld_${Math.random().toString(36).substring(2, 9)}`,
         label: item.label || "Custom Field",
         defaultValue: item.defaultValue !== undefined ? item.defaultValue : item.value || "",
+        color: item.color || "#000000",
       }));
     }
   } catch (e) {
@@ -52,6 +59,7 @@ export default function BECustomFieldsSection({
 }: BECustomFieldsSectionProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [newLabel, setNewLabel] = useState("");
+  const [newColor, setNewColor] = useState("#000000");
   const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
   const [editingLabel, setEditingLabel] = useState("");
 
@@ -65,9 +73,11 @@ export default function BECustomFieldsSection({
       id: `fld_cst_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       label: newLabel.trim(),
       defaultValue: "",
+      color: newColor || "#000000",
     };
     onChange([...fields, newField]);
     setNewLabel("");
+    setNewColor("#000000");
     setIsAdding(false);
   };
 
@@ -79,6 +89,11 @@ export default function BECustomFieldsSection({
   const handleFieldValueChange = (fieldId: string, value: string) => {
     if (!onChange) return;
     onChange(fields.map((f) => (f.id === fieldId ? { ...f, defaultValue: value } : f)));
+  };
+
+  const handleFieldColorChange = (fieldId: string, color: string) => {
+    if (!onChange) return;
+    onChange(fields.map((f) => (f.id === fieldId ? { ...f, color } : f)));
   };
 
   const handleStartEditLabel = (field: BECustomField) => {
@@ -120,24 +135,41 @@ export default function BECustomFieldsSection({
 
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", width: "100%" }}>
-        {fields.map((field) => (
-          <div
-            key={field.id}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              borderBottom: "1px dashed var(--border)",
-              paddingBottom: "0.4rem",
-              fontSize: "0.85rem",
-            }}
-          >
-            <span style={{ color: "var(--text-muted)" }}>{field.label}</span>
-            <strong style={{ color: "var(--text-primary)", fontWeight: 600 }}>
-              {field.defaultValue && field.defaultValue.trim() !== "" ? field.defaultValue : "—"}
-            </strong>
-          </div>
-        ))}
+        {fields.map((field) => {
+          const fontColor = field.color || "#000000";
+          const isStandardBlack = !field.color || field.color.toLowerCase() === "#000000";
+
+          return (
+            <div
+              key={field.id}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                borderBottom: "1px dashed var(--border)",
+                paddingBottom: "0.4rem",
+                fontSize: "0.85rem",
+              }}
+            >
+              <span
+                style={{
+                  color: isStandardBlack ? "var(--text-muted)" : fontColor,
+                  fontWeight: isStandardBlack ? 500 : 700,
+                }}
+              >
+                {field.label}
+              </span>
+              <strong
+                style={{
+                  color: isStandardBlack ? "var(--text-primary)" : fontColor,
+                  fontWeight: 600,
+                }}
+              >
+                {field.defaultValue && field.defaultValue.trim() !== "" ? field.defaultValue : "—"}
+              </strong>
+            </div>
+          );
+        })}
       </div>
     );
   }
@@ -153,6 +185,8 @@ export default function BECustomFieldsSection({
           {fields.map((field, idx) => {
             const isDragging = draggedIndex === idx;
             const isOver = dragOverIndex === idx && draggedIndex !== idx;
+            const fieldColor = normalizeFieldColor(field.color);
+            const isStandardBlack = fieldColor.toLowerCase() === "#000000";
 
             return (
               <div
@@ -180,7 +214,7 @@ export default function BECustomFieldsSection({
                 }}
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "22px minmax(130px, 190px) 1fr auto",
+                  gridTemplateColumns: "22px minmax(130px, 190px) 1fr auto auto",
                   alignItems: "center",
                   gap: "0.5rem",
                   padding: "0.45rem 0.6rem",
@@ -220,7 +254,13 @@ export default function BECustomFieldsSection({
                       <input
                         type="text"
                         className="form-input"
-                        style={{ fontSize: "0.8rem", padding: "0.2rem 0.4rem", width: "100%" }}
+                        style={{
+                          fontSize: "0.8rem",
+                          padding: "0.2rem 0.4rem",
+                          width: "100%",
+                          color: isStandardBlack ? "inherit" : fieldColor,
+                          fontWeight: isStandardBlack ? "normal" : "600",
+                        }}
                         value={editingLabel}
                         onChange={(e) => setEditingLabel(e.target.value)}
                         autoFocus
@@ -249,8 +289,8 @@ export default function BECustomFieldsSection({
                       <span
                         style={{
                           fontSize: "0.825rem",
-                          fontWeight: 600,
-                          color: "var(--text-primary)",
+                          fontWeight: isStandardBlack ? 600 : 700,
+                          color: isStandardBlack ? "var(--text-primary)" : fieldColor,
                           overflow: "hidden",
                           textOverflow: "ellipsis",
                           whiteSpace: "nowrap",
@@ -271,14 +311,28 @@ export default function BECustomFieldsSection({
                   )}
                 </div>
 
-                {/* Field Value Textbox (No placeholder) */}
+                {/* Field Value Textbox */}
                 <div>
                   <input
                     type="text"
                     className="form-input"
-                    style={{ width: "100%", fontSize: "0.8rem", padding: "0.3rem 0.5rem" }}
+                    style={{
+                      width: "100%",
+                      fontSize: "0.8rem",
+                      padding: "0.3rem 0.5rem",
+                      color: isStandardBlack ? "inherit" : fieldColor,
+                      fontWeight: isStandardBlack ? "normal" : "600",
+                    }}
                     value={field.defaultValue || ""}
                     onChange={(e) => handleFieldValueChange(field.id, e.target.value)}
+                  />
+                </div>
+
+                {/* Font Color Dropdown Swatch */}
+                <div>
+                  <CustomFieldColorDropdown
+                    color={fieldColor}
+                    onChange={(color) => handleFieldColorChange(field.id, color)}
                   />
                 </div>
 
@@ -341,11 +395,12 @@ export default function BECustomFieldsSection({
         <div
           style={{
             display: "flex",
+            flexWrap: "wrap",
             alignItems: "center",
-            gap: "0.4rem",
-            padding: "0.4rem 0.5rem",
+            gap: "0.5rem",
+            padding: "0.5rem 0.65rem",
             borderRadius: "6px",
-            background: "rgba(148, 163, 184, 0.05)",
+            background: "rgba(148, 163, 184, 0.08)",
             border: "1px dashed var(--border-light, #cbd5e1)",
             marginTop: "0.25rem",
           }}
@@ -353,7 +408,14 @@ export default function BECustomFieldsSection({
           <input
             type="text"
             className="form-input"
-            style={{ flex: 1, fontSize: "0.8rem", padding: "0.32rem 0.55rem" }}
+            placeholder="Field name / label..."
+            style={{
+              flex: "1 1 140px",
+              fontSize: "0.8rem",
+              padding: "0.32rem 0.55rem",
+              color: newColor.toLowerCase() === "#000000" ? "inherit" : newColor,
+              fontWeight: newColor.toLowerCase() === "#000000" ? "normal" : "600",
+            }}
             value={newLabel}
             onChange={(e) => setNewLabel(e.target.value)}
             autoFocus
@@ -362,43 +424,55 @@ export default function BECustomFieldsSection({
               if (e.key === "Escape") {
                 setIsAdding(false);
                 setNewLabel("");
+                setNewColor("#000000");
               }
             }}
           />
-          <button
-            type="button"
-            onClick={handleAddField}
-            disabled={!newLabel.trim()}
-            className="btn btn-sm"
-            style={{
-              padding: "0.32rem 0.65rem",
-              fontSize: "0.75rem",
-              background: newLabel.trim() ? accentColor : "#e2e8f0",
-              color: newLabel.trim() ? "#ffffff" : "#94a3b8",
-              border: `1px solid ${newLabel.trim() ? accentColor : "#cbd5e1"}`,
-              cursor: newLabel.trim() ? "pointer" : "not-allowed",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.25rem",
-              fontWeight: 600,
-              boxShadow: newLabel.trim() ? "0 2px 6px rgba(0, 0, 0, 0.12)" : "none",
-            }}
-          >
-            <Check size={13} />
-            <span>Add</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setIsAdding(false);
-              setNewLabel("");
-            }}
-            className="btn btn-secondary btn-sm"
-            style={{ padding: "0.32rem 0.5rem", fontSize: "0.75rem", display: "inline-flex", alignItems: "center" }}
-            title="Cancel"
-          >
-            <X size={13} />
-          </button>
+
+          {/* Font Color Picker (Black, Pink, Blue, Green) */}
+          <CustomFieldColorPicker
+            selectedColor={newColor}
+            onChange={(color) => setNewColor(color)}
+            size="sm"
+          />
+
+          <div style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
+            <button
+              type="button"
+              onClick={handleAddField}
+              disabled={!newLabel.trim()}
+              className="btn btn-sm"
+              style={{
+                padding: "0.32rem 0.65rem",
+                fontSize: "0.75rem",
+                background: newLabel.trim() ? accentColor : "#e2e8f0",
+                color: newLabel.trim() ? "#ffffff" : "#94a3b8",
+                border: `1px solid ${newLabel.trim() ? accentColor : "#cbd5e1"}`,
+                cursor: newLabel.trim() ? "pointer" : "not-allowed",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.25rem",
+                fontWeight: 600,
+                boxShadow: newLabel.trim() ? "0 2px 6px rgba(0, 0, 0, 0.12)" : "none",
+              }}
+            >
+              <Check size={13} />
+              <span>Add</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsAdding(false);
+                setNewLabel("");
+                setNewColor("#000000");
+              }}
+              className="btn btn-secondary btn-sm"
+              style={{ padding: "0.32rem 0.5rem", fontSize: "0.75rem", display: "inline-flex", alignItems: "center" }}
+              title="Cancel"
+            >
+              <X size={13} />
+            </button>
+          </div>
         </div>
       ) : (
         <button
