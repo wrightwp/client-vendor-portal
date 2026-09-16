@@ -199,3 +199,12 @@ model ClientBillingEnrollment {
   @@index([clientId])
 }
 
+model BEMasterTemplate {
+  id        String   @id @default(uuid())
+  type      String   @unique // "COMPOSITE" | "NON_COMPOSITE" | "NON_MED"
+  name      String   // "Composite", "Non-Composite", "Non-Med"
+  sections  String   // JSON stringified array of sections and fields
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
