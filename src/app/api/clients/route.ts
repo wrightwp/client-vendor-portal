@@ -86,6 +86,11 @@ export async function POST(request: Request) {
       );
     }
 
+    // Fetch latest COMPOSITE master template from database
+    const compositeTemplate = await db.bEMasterTemplate.findUnique({
+      where: { type: "COMPOSITE" },
+    });
+
     const client = await db.client.create({
       data: {
         name,
@@ -100,6 +105,17 @@ export async function POST(request: Request) {
         specialty: specialty || null,
         notes: notes || null,
         status: status || "ACTIVE",
+        billingEnrollments: {
+          create: {
+            planYear: "2026",
+            isCurrent: true,
+            adminMasterType: "COMPOSITE",
+            adminSections: compositeTemplate?.sections || null,
+          },
+        },
+      },
+      include: {
+        billingEnrollments: true,
       },
     });
 
@@ -109,7 +125,7 @@ export async function POST(request: Request) {
         entityId: client.id,
         clientId: client.id,
         action: "CREATE",
-        summary: "Initial client profile created",
+        summary: "Initial client profile created with default Composite plan structure",
         snapshot: createSnapshot(client),
       },
     });

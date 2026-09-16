@@ -32,6 +32,22 @@ export async function GET(
       return NextResponse.json({ success: false, error: "Client not found" }, { status: 404 });
     }
 
+    if (client.billingEnrollments.length === 0) {
+      const compositeTemplate = await db.bEMasterTemplate.findUnique({
+        where: { type: "COMPOSITE" },
+      });
+      const newBe = await db.clientBillingEnrollment.create({
+        data: {
+          clientId: client.id,
+          planYear: "2026",
+          isCurrent: true,
+          adminMasterType: "COMPOSITE",
+          adminSections: compositeTemplate?.sections || null,
+        },
+      });
+      client.billingEnrollments = [newBe];
+    }
+
     return NextResponse.json({ success: true, client });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

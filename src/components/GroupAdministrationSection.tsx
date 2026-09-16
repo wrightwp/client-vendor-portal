@@ -174,9 +174,38 @@ export function GroupAdministrationSection({
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [draggedSectionId, setDraggedSectionId] = useState<string | null>(null);
 
-  // Sync internal state when external props change
+  // Sync internal state when external props change, or fetch latest DB master template if empty
   useEffect(() => {
-    setSections(parseGroupAdminSections(adminSections, currentType, legacyData));
+    if (adminSections && adminSections.trim() && adminSections !== "[]") {
+      setSections(parseGroupAdminSections(adminSections, currentType, legacyData));
+    } else {
+      let isCancelled = false;
+      fetch("/api/admin/be-masters/templates")
+        .then((res) => res.json())
+        .then((data) => {
+          if (!isCancelled && data.success && Array.isArray(data.templates)) {
+            const found = data.templates.find((t: any) => t.type === currentType);
+            if (found && Array.isArray(found.sections) && found.sections.length > 0) {
+              setSections(found.sections);
+              if (onChangeSections) {
+                onChangeSections(JSON.stringify(found.sections));
+              }
+              return;
+            }
+          }
+          if (!isCancelled) {
+            setSections(parseGroupAdminSections(adminSections, currentType, legacyData));
+          }
+        })
+        .catch(() => {
+          if (!isCancelled) {
+            setSections(parseGroupAdminSections(adminSections, currentType, legacyData));
+          }
+        });
+      return () => {
+        isCancelled = true;
+      };
+    }
   }, [adminSections, currentType]);
 
   const emitSectionsChange = (newSections: BEMasterSection[]) => {

@@ -19,12 +19,18 @@ export async function GET(
     });
 
     if (records.length === 0) {
-      // Create a blank B&E summary record for current year 2026 if none exists yet
+      const compositeTemplate = await db.bEMasterTemplate.findUnique({
+        where: { type: "COMPOSITE" },
+      });
+
+      // Create a default B&E record with latest COMPOSITE master template from database
       const newRecord = await db.clientBillingEnrollment.create({
         data: {
           clientId: id,
           planYear: "2026",
           isCurrent: true,
+          adminMasterType: "COMPOSITE",
+          adminSections: compositeTemplate?.sections || null,
         },
       });
       records = [newRecord];
