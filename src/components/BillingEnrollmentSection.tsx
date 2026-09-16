@@ -51,6 +51,7 @@ import BenefitsCoveredSelect from "./BenefitsCoveredSelect";
 import IncludedNoneToggle from "./IncludedNoneToggle";
 import TerminalLiabilityInput, { formatTloDisplay } from "./TerminalLiabilityInput";
 import AggregateRunInLimitInput, { formatRunInLimitDisplay } from "./AggregateRunInLimitInput";
+import GroupAdministrationSection from "./GroupAdministrationSection";
 
 interface BillingEnrollmentSectionProps {
   clientId: string;
@@ -160,6 +161,9 @@ export default function BillingEnrollmentSection({
 
     organTransplantPolicy: activeBAndE.organTransplantPolicy || "",
 
+    adminMasterType: activeBAndE.adminMasterType || "COMPOSITE",
+    adminSections: activeBAndE.adminSections || "",
+
     compositeAdminFee: activeBAndE.compositeAdminFee || "",
     medicalFee: activeBAndE.medicalFee || "",
     urFee: activeBAndE.urFee || "",
@@ -240,6 +244,9 @@ export default function BillingEnrollmentSection({
       stopLossNotes: rec.stopLossNotes || "",
 
       organTransplantPolicy: rec.organTransplantPolicy || "",
+
+      adminMasterType: rec.adminMasterType || "COMPOSITE",
+      adminSections: rec.adminSections || "",
 
       compositeAdminFee: rec.compositeAdminFee || "",
       medicalFee: rec.medicalFee || "",
@@ -335,6 +342,9 @@ export default function BillingEnrollmentSection({
       stopLossNotes: sourceRecord.stopLossNotes || "",
 
       organTransplantPolicy: sourceRecord.organTransplantPolicy || "",
+
+      adminMasterType: sourceRecord.adminMasterType || "COMPOSITE",
+      adminSections: sourceRecord.adminSections || "",
 
       compositeAdminFee: sourceRecord.compositeAdminFee || "",
       medicalFee: sourceRecord.medicalFee || "",
@@ -1451,7 +1461,7 @@ export default function BillingEnrollmentSection({
                 alignItems: "stretch",
               }}
             >
-              {/* Composite Administration & PPO Network Information (Stacked Single Column for Billing Portal Entry) */}
+              {/* Administration Master Sections & Custom Fields (Composite, Non-Composite, Non-Med) */}
               <div
                 className="glass-card"
                 style={{
@@ -1463,217 +1473,18 @@ export default function BillingEnrollmentSection({
                   height: "100%",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.85rem" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                    <Network size={18} style={{ color: "var(--accent-yellow)" }} />
-                    <h3 style={{ fontSize: "1rem", fontWeight: "700" }}>
-                      Composite Administration & PPO Network Information
-                    </h3>
-                  </div>
-                  {!isInlineEditing && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsExpanded(true);
-                        setIsInlineEditing(true);
-                      }}
-                      className="btn btn-secondary btn-sm"
-                      style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
-                      title="Edit section"
-                    >
-                      <Edit3 size={12} />
-                      <span>Edit</span>
-                    </button>
-                  )}
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.85rem", flex: 1 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                    <span style={{ color: "var(--text-muted)" }}>Composite Admin Fee</span>
-                    {isInlineEditing ? (
-                      <CurrencyInput
-                        style={{ width: "160px" }}
-                        value={editFormData.compositeAdminFee}
-                        onChange={(val) => setEditFormData({ ...editFormData, compositeAdminFee: val })}
-                        placeholder="0.00"
-                        suffix="PEPM"
-                      />
-                    ) : (
-                      <strong style={{ color: "#ffc20e" }}>{activeBAndE.compositeAdminFee || "—"}</strong>
-                    )}
-                  </div>
-
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                    <span style={{ color: "var(--text-muted)" }}>Medical Administration</span>
-                    {isInlineEditing ? (
-                      <CurrencyInput
-                        style={{ width: "160px" }}
-                        value={editFormData.medicalFee}
-                        onChange={(val) => setEditFormData({ ...editFormData, medicalFee: val })}
-                        placeholder="0.00"
-                        suffix="PEPM"
-                      />
-                    ) : (
-                      <span>{activeBAndE.medicalFee || "—"}</span>
-                    )}
-                  </div>
-
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                    <span style={{ color: "var(--text-muted)" }}>UR (Utilization Review)</span>
-                    {isInlineEditing ? (
-                      <CurrencyInput
-                        style={{ width: "160px" }}
-                        value={editFormData.urFee}
-                        onChange={(val) => setEditFormData({ ...editFormData, urFee: val })}
-                        placeholder="0.00"
-                        suffix="PEPM"
-                      />
-                    ) : (
-                      <span>{activeBAndE.urFee || "—"}</span>
-                    )}
-                  </div>
-
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                    <span style={{ color: "var(--text-muted)" }}>Amwell Telehealth</span>
-                    {isInlineEditing ? (
-                      <CurrencyInput
-                        style={{ width: "160px" }}
-                        value={editFormData.amwellFee}
-                        onChange={(val) => setEditFormData({ ...editFormData, amwellFee: val })}
-                        placeholder="0.00"
-                        suffix="PEPM"
-                      />
-                    ) : (
-                      <span>{activeBAndE.amwellFee || "—"}</span>
-                    )}
-                  </div>
-
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                    <span style={{ color: "var(--text-muted)" }}>Physicians Care / HAP</span>
-                    {isInlineEditing ? (
-                      <CurrencyInput
-                        style={{ width: "160px" }}
-                        value={editFormData.physiciansCareHapFee}
-                        onChange={(val) => setEditFormData({ ...editFormData, physiciansCareHapFee: val })}
-                        placeholder="0.00"
-                        suffix="PEPM"
-                      />
-                    ) : (
-                      <span>{activeBAndE.physiciansCareHapFee || "—"}</span>
-                    )}
-                  </div>
-
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                    <span style={{ color: "var(--text-muted)" }}>Aetna Signature Admin</span>
-                    {isInlineEditing ? (
-                      <CurrencyInput
-                        style={{ width: "160px" }}
-                        value={editFormData.aetnaSignatureAdminFee}
-                        onChange={(val) => setEditFormData({ ...editFormData, aetnaSignatureAdminFee: val })}
-                        placeholder="0.00"
-                        suffix="PEPM"
-                      />
-                    ) : (
-                      <span>{activeBAndE.aetnaSignatureAdminFee || "—"}</span>
-                    )}
-                  </div>
-
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                    <span style={{ color: "var(--text-muted)" }}>Network Access Fee</span>
-                    {isInlineEditing ? (
-                      <CurrencyInput
-                        style={{ width: "160px" }}
-                        value={editFormData.networkAccessFee}
-                        onChange={(val) => setEditFormData({ ...editFormData, networkAccessFee: val })}
-                        placeholder="0.00"
-                        suffix="PEPM"
-                      />
-                    ) : (
-                      <span>{activeBAndE.networkAccessFee || "—"}</span>
-                    )}
-                  </div>
-
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                    <span style={{ color: "var(--text-muted)" }}>Reinsurance Fee</span>
-                    {isInlineEditing ? (
-                      <CurrencyInput
-                        style={{ width: "160px" }}
-                        value={editFormData.reinsuranceFee}
-                        onChange={(val) => setEditFormData({ ...editFormData, reinsuranceFee: val })}
-                        placeholder="0.00"
-                        suffix="PEPM"
-                      />
-                    ) : (
-                      <span>{activeBAndE.reinsuranceFee || "—"}</span>
-                    )}
-                  </div>
-
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                    <span style={{ color: "var(--text-muted)" }}>LCM / SPA (AHH)</span>
-                    {isInlineEditing ? (
-                      <CurrencyInput
-                        style={{ width: "160px" }}
-                        value={editFormData.lcmSpaFee}
-                        onChange={(val) => setEditFormData({ ...editFormData, lcmSpaFee: val })}
-                        placeholder="0.00"
-                        suffix="hr"
-                      />
-                    ) : (
-                      <span>{activeBAndE.lcmSpaFee || "—"}</span>
-                    )}
-                  </div>
-
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                    <span style={{ color: "var(--text-muted)" }}>Agent Fee</span>
-                    {isInlineEditing ? (
-                      <CurrencyInput
-                        style={{ width: "160px" }}
-                        value={editFormData.agentFee}
-                        onChange={(val) => setEditFormData({ ...editFormData, agentFee: val })}
-                        placeholder="0.00"
-                        suffix="PEPM"
-                      />
-                    ) : (
-                      <span>{activeBAndE.agentFee || "—"}</span>
-                    )}
-                  </div>
-
-                  <div style={{ borderBottom: "1px dashed var(--border)", paddingBottom: "0.4rem" }}>
-                    <div style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>Wrap Networks</div>
-                    {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
-                        style={{ width: "100%", marginTop: "0.2rem", padding: "0.25rem 0.5rem", fontSize: "0.8rem" }}
-                        value={editFormData.wrapNetwork}
-                        onChange={(e) => setEditFormData({ ...editFormData, wrapNetwork: e.target.value })}
-                        placeholder="e.g. MultiPlan, PHCS"
-                      />
-                    ) : (
-                      <div style={{ fontWeight: "600", color: "var(--text-primary)", marginTop: "0.15rem" }}>
-                        {activeBAndE.wrapNetwork || "—"}
-                      </div>
-                    )}
-                  </div>
-
-                  <div style={{ paddingBottom: "0.4rem" }}>
-                    <div style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>PPO Fee Notes</div>
-                    {isInlineEditing ? (
-                      <input
-                        type="text"
-                        className="form-input"
-                        style={{ width: "100%", marginTop: "0.2rem", padding: "0.25rem 0.5rem", fontSize: "0.8rem" }}
-                        value={editFormData.ppoFee}
-                        onChange={(e) => setEditFormData({ ...editFormData, ppoFee: e.target.value })}
-                        placeholder="PPO network discount details..."
-                      />
-                    ) : (
-                      <div style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginTop: "0.15rem", lineHeight: "1.4" }}>
-                        {activeBAndE.ppoFee || "—"}
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <GroupAdministrationSection
+                  adminMasterType={isInlineEditing ? editFormData.adminMasterType : activeBAndE.adminMasterType}
+                  adminSections={isInlineEditing ? editFormData.adminSections : activeBAndE.adminSections}
+                  isEditing={isInlineEditing}
+                  onChangeMasterType={(newType) => setEditFormData((prev: any) => ({ ...prev, adminMasterType: newType }))}
+                  onChangeSections={(newSectionsJson) => setEditFormData((prev: any) => ({ ...prev, adminSections: newSectionsJson }))}
+                  onEdit={() => {
+                    setIsExpanded(true);
+                    setIsInlineEditing(true);
+                  }}
+                  legacyData={activeBAndE}
+                />
               </div>
 
               {/* Right Side Column Container for PBM, Commission, Transplant & Domestic */}

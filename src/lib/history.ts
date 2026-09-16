@@ -64,6 +64,10 @@ export const FIELD_LABELS: Record<string, string> = {
   aggregateBenefitsCovered: "Aggregate Benefits Covered",
   aggregateRunInLimit: "Aggregate Run-In Limit",
 
+  // B&E - Administration Master Information
+  adminMasterType: "Administration Master Structure",
+  adminSections: "Administration Custom Sections & Fields",
+
   // B&E - Composite Administration & PPO Network Information
   compositeAdminFee: "Composite Admin Fee",
   medicalFee: "Medical Admin Fee",

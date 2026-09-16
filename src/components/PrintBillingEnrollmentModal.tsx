@@ -239,25 +239,66 @@ export default function PrintBillingEnrollmentModal({
             )}
           </div>
 
-          {/* Section 4: Composite Administration & PPO Network Information */}
+          {/* Section 4: Administration & Network Information */}
           <div style={{ marginBottom: "1.5rem" }}>
             <h2 style={{ fontSize: "1rem", fontWeight: "700", color: "#0f172a", borderBottom: "1px solid #e2e8f0", paddingBottom: "0.3rem", marginBottom: "0.75rem" }}>
-              Composite Administration & PPO Network Information
+              {(() => {
+                const norm = (bAndE.adminMasterType || "COMPOSITE").toUpperCase();
+                if (norm === "NON_COMPOSITE") return "Non-Composite Administration & Network Information";
+                if (norm === "NON_MED") return "Non-Med";
+                return "Composite Administration & Network Information";
+              })()}
             </h2>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", fontSize: "0.85rem" }}>
-              <div><strong>Composite Administration Fee:</strong> {bAndE.compositeAdminFee || "N/A"}</div>
-              <div><strong>Medical Administration:</strong> {bAndE.medicalFee || "N/A"}</div>
-              <div><strong>UR (AHH):</strong> {bAndE.urFee || "N/A"}</div>
-              <div><strong>Amwell Telehealth:</strong> {bAndE.amwellFee || "N/A"}</div>
-              <div><strong>Physicians Care / HAP:</strong> {bAndE.physiciansCareHapFee || "N/A"}</div>
-              <div><strong>Wrap Networks:</strong> {bAndE.wrapNetwork || "N/A"}</div>
-              <div><strong>Aetna Signature Administrators:</strong> {bAndE.aetnaSignatureAdminFee || "N/A"}</div>
-              <div><strong>Network Access Fee:</strong> {bAndE.networkAccessFee || "N/A"}</div>
-              <div><strong>Reinsurance Fee:</strong> {bAndE.reinsuranceFee || "N/A"}</div>
-              <div><strong>LCM / SPA (AHH):</strong> {bAndE.lcmSpaFee || "N/A"}</div>
-              <div><strong>Agent Fee:</strong> {bAndE.agentFee || "N/A"}</div>
-              <div style={{ gridColumn: "span 2" }}><strong>PPO Fee Notes:</strong> {bAndE.ppoFee || "N/A"}</div>
-            </div>
+            {(() => {
+              let sections: any[] = [];
+              if (bAndE.adminSections) {
+                try {
+                  sections = JSON.parse(bAndE.adminSections);
+                } catch (e) {}
+              }
+              if (!sections || sections.length === 0) {
+                sections = [
+                  {
+                    title: "Administration & Network Information",
+                    fields: [
+                      { label: "Composite Administration Fee", defaultValue: bAndE.compositeAdminFee || "N/A" },
+                      { label: "Medical Administration", defaultValue: bAndE.medicalFee || "N/A" },
+                      { label: "UR (AHH)", defaultValue: bAndE.urFee || "N/A" },
+                      { label: "Amwell Telehealth", defaultValue: bAndE.amwellFee || "N/A" },
+                      { label: "Physicians Care / HAP", defaultValue: bAndE.physiciansCareHapFee || "N/A" },
+                      { label: "Wrap Networks", defaultValue: bAndE.wrapNetwork || "N/A" },
+                      { label: "Aetna Signature Administrators", defaultValue: bAndE.aetnaSignatureAdminFee || "N/A" },
+                      { label: "Network Access Fee", defaultValue: bAndE.networkAccessFee || "N/A" },
+                      { label: "Reinsurance Fee", defaultValue: bAndE.reinsuranceFee || "N/A" },
+                      { label: "LCM / SPA (AHH)", defaultValue: bAndE.lcmSpaFee || "N/A" },
+                      { label: "Agent Fee", defaultValue: bAndE.agentFee || "N/A" },
+                      { label: "PPO Fee Notes", defaultValue: bAndE.ppoFee || "N/A" },
+                    ],
+                  },
+                ];
+              }
+
+              return (
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                  {sections.map((sec: any, sIdx: number) => (
+                    <div key={sec.id || sIdx}>
+                      {sections.length > 1 && (
+                        <div style={{ fontSize: "0.85rem", fontWeight: "700", color: "#475569", marginBottom: "0.4rem", textTransform: "uppercase" }}>
+                          {sec.title}
+                        </div>
+                      )}
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", fontSize: "0.85rem" }}>
+                        {(sec.fields || []).map((f: any, fIdx: number) => (
+                          <div key={f.id || fIdx}>
+                            <strong>{f.label}:</strong> {f.defaultValue && f.defaultValue.trim() !== "" ? f.defaultValue : "N/A"}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Section 5: PBM, Commissions & Organ Transplant */}

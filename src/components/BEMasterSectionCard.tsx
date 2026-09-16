@@ -52,7 +52,6 @@ export function BEMasterSectionCard({
       id: `fld_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       label: newFieldLabel.trim(),
       defaultValue: "",
-      placeholder: "e.g. $0.00 PEPM or Text",
     };
 
     onUpdateSection({
@@ -413,7 +412,6 @@ export function BEMasterSectionCard({
                     type="text"
                     className="form-input"
                     style={{ width: "100%", fontSize: "0.85rem", padding: "0.4rem 0.65rem" }}
-                    placeholder={field.placeholder || "Enter default value..."}
                     value={field.defaultValue || ""}
                     onChange={(e) => handleFieldChange(field.id, { defaultValue: e.target.value })}
                   />

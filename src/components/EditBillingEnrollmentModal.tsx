@@ -22,6 +22,7 @@ import { TierStructure } from "./TierStructureSelector";
 import IncludedNoneToggle from "./IncludedNoneToggle";
 import TerminalLiabilityInput from "./TerminalLiabilityInput";
 import AggregateRunInLimitInput from "./AggregateRunInLimitInput";
+import GroupAdministrationSection from "./GroupAdministrationSection";
 
 interface EditBillingEnrollmentModalProps {
   clientId: string;
@@ -92,6 +93,9 @@ export default function EditBillingEnrollmentModal({
     aggregateRunInLimit: initialData?.aggregateRunInLimit || "",
 
     organTransplantPolicy: initialData?.organTransplantPolicy || "",
+
+    adminMasterType: initialData?.adminMasterType || "COMPOSITE",
+    adminSections: initialData?.adminSections || "",
 
     compositeAdminFee: initialData?.compositeAdminFee || "",
     medicalFee: initialData?.medicalFee || "",
@@ -191,6 +195,9 @@ export default function EditBillingEnrollmentModal({
       aggregateRunInLimit: sourceRecord.aggregateRunInLimit || "",
 
       organTransplantPolicy: sourceRecord.organTransplantPolicy || "",
+
+      adminMasterType: sourceRecord.adminMasterType || "COMPOSITE",
+      adminSections: sourceRecord.adminSections || "",
 
       compositeAdminFee: sourceRecord.compositeAdminFee || "",
       medicalFee: sourceRecord.medicalFee || "",
@@ -710,146 +717,16 @@ export default function EditBillingEnrollmentModal({
               </div>
             )}
 
-            {/* TAB 4: Admin Fees & Networks */}
+            {/* TAB 4: Admin Fees & Networks (Dynamic Administration Sections) */}
             {activeTab === "ADMIN" && (
-              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                <div className="grid-cols-2">
-                  <div className="form-group">
-                    <label className="form-label">Composite Admin Fee</label>
-                    <CurrencyInput
-                      style={{ width: "100%" }}
-                      placeholder="0.00"
-                      suffix="PEPM"
-                      value={formData.compositeAdminFee}
-                      onChange={(val) => setFormData({ ...formData, compositeAdminFee: val })}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Medical Administration Fee</label>
-                    <CurrencyInput
-                      style={{ width: "100%" }}
-                      placeholder="0.00"
-                      suffix="PEPM"
-                      value={formData.medicalFee}
-                      onChange={(val) => setFormData({ ...formData, medicalFee: val })}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid-cols-3">
-                  <div className="form-group">
-                    <label className="form-label">UR (AHH)</label>
-                    <CurrencyInput
-                      style={{ width: "100%" }}
-                      placeholder="0.00"
-                      suffix="PEPM"
-                      value={formData.urFee}
-                      onChange={(val) => setFormData({ ...formData, urFee: val })}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Amwell Telehealth</label>
-                    <CurrencyInput
-                      style={{ width: "100%" }}
-                      placeholder="0.00"
-                      suffix="PEPM"
-                      value={formData.amwellFee}
-                      onChange={(val) => setFormData({ ...formData, amwellFee: val })}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Physicians Care / HAP</label>
-                    <CurrencyInput
-                      style={{ width: "100%" }}
-                      placeholder="0.00"
-                      suffix="PEPM"
-                      value={formData.physiciansCareHapFee}
-                      onChange={(val) => setFormData({ ...formData, physiciansCareHapFee: val })}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid-cols-2">
-                  <div className="form-group">
-                    <label className="form-label">Wrap Networks</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="e.g. Wrap Network..."
-                      value={formData.wrapNetwork}
-                      onChange={(e) => setFormData({ ...formData, wrapNetwork: e.target.value })}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Aetna Signature Administrators</label>
-                    <CurrencyInput
-                      style={{ width: "100%" }}
-                      placeholder="0.00"
-                      value={formData.aetnaSignatureAdminFee}
-                      onChange={(val) => setFormData({ ...formData, aetnaSignatureAdminFee: val })}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid-cols-3">
-                  <div className="form-group">
-                    <label className="form-label">Network Access Fee</label>
-                    <CurrencyInput
-                      style={{ width: "100%" }}
-                      placeholder="0.00"
-                      value={formData.networkAccessFee}
-                      onChange={(val) => setFormData({ ...formData, networkAccessFee: val })}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Reinsurance Fee</label>
-                    <CurrencyInput
-                      style={{ width: "100%" }}
-                      placeholder="0.00"
-                      value={formData.reinsuranceFee}
-                      onChange={(val) => setFormData({ ...formData, reinsuranceFee: val })}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">LCM / SPA (AHH)</label>
-                    <CurrencyInput
-                      style={{ width: "100%" }}
-                      placeholder="0.00"
-                      value={formData.lcmSpaFee}
-                      onChange={(val) => setFormData({ ...formData, lcmSpaFee: val })}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid-cols-2">
-                  <div className="form-group">
-                    <label className="form-label">Agent Fee</label>
-                    <CurrencyInput
-                      style={{ width: "100%" }}
-                      placeholder="0.00"
-                      value={formData.agentFee}
-                      onChange={(val) => setFormData({ ...formData, agentFee: val })}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">PPO Fee Notes / Structure</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="e.g. 5.5% of savings, $8.50 PEPM..."
-                      value={formData.ppoFee}
-                      onChange={(e) => setFormData({ ...formData, ppoFee: e.target.value })}
-                    />
-                  </div>
-                </div>
-              </div>
+              <GroupAdministrationSection
+                adminMasterType={formData.adminMasterType}
+                adminSections={formData.adminSections}
+                isEditing={true}
+                onChangeMasterType={(newType) => setFormData((prev) => ({ ...prev, adminMasterType: newType }))}
+                onChangeSections={(newSectionsJson) => setFormData((prev) => ({ ...prev, adminSections: newSectionsJson }))}
+                legacyData={initialData}
+              />
             )}
 
             {/* TAB 5: PBM & Commissions */}

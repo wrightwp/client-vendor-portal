@@ -72,20 +72,59 @@ export function exportBEToExcel(clientName: string, data: any) {
     ["Aggregate Factor - Family", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : formatCurrencyDisplay(bAndE.aggregateFactorFamily)],
     [""],
 
-    ["5. COMPOSITE ADMINISTRATION & PPO NETWORK INFORMATION"],
-    ["Composite Admin Fee", bAndE.compositeAdminFee || "—"],
-    ["Medical Administration Fee", bAndE.medicalFee || "—"],
-    ["Utilization Review (UR) Fee", bAndE.urFee || "—"],
-    ["Amwell Telehealth Fee", bAndE.amwellFee || "—"],
-    ["Physicians Care / HAP Fee", bAndE.physiciansCareHapFee || "—"],
-    ["Aetna Signature Admin Fee", bAndE.aetnaSignatureAdminFee || "—"],
-    ["Network Access Fee", bAndE.networkAccessFee || "—"],
-    ["Reinsurance Fee", bAndE.reinsuranceFee || "—"],
-    ["LCM / SPA Fee (AHH)", bAndE.lcmSpaFee || "—"],
-    ["Agent Fee", bAndE.agentFee || "—"],
-    ["Wrap Networks", bAndE.wrapNetwork || "—"],
-    ["PPO Fee Notes", bAndE.ppoFee || "—"],
-    [""],
+    ...(() => {
+      let sections: any[] = [];
+      if (bAndE.adminSections) {
+        try {
+          sections = JSON.parse(bAndE.adminSections);
+        } catch (e) {}
+      }
+      if (!sections || sections.length === 0) {
+        // Fallback default
+        sections = [
+          {
+            title: "Administration & Network Information",
+            fields: [
+              { label: "Composite Admin Fee", defaultValue: bAndE.compositeAdminFee || "—" },
+              { label: "Medical Administration Fee", defaultValue: bAndE.medicalFee || "—" },
+              { label: "Utilization Review (UR) Fee", defaultValue: bAndE.urFee || "—" },
+              { label: "Amwell Telehealth Fee", defaultValue: bAndE.amwellFee || "—" },
+              { label: "Physicians Care / HAP Fee", defaultValue: bAndE.physiciansCareHapFee || "—" },
+              { label: "Aetna Signature Admin Fee", defaultValue: bAndE.aetnaSignatureAdminFee || "—" },
+              { label: "Network Access Fee", defaultValue: bAndE.networkAccessFee || "—" },
+              { label: "Reinsurance Fee", defaultValue: bAndE.reinsuranceFee || "—" },
+              { label: "LCM / SPA Fee (AHH)", defaultValue: bAndE.lcmSpaFee || "—" },
+              { label: "Agent Fee", defaultValue: bAndE.agentFee || "—" },
+              { label: "Wrap Networks", defaultValue: bAndE.wrapNetwork || "—" },
+              { label: "PPO Fee Notes", defaultValue: bAndE.ppoFee || "—" },
+            ],
+          },
+        ];
+      }
+
+      const headerTitle = (() => {
+        const norm = (bAndE.adminMasterType || "COMPOSITE").toUpperCase();
+        if (norm === "NON_COMPOSITE") return "NON-COMPOSITE ADMINISTRATION & NETWORK INFORMATION";
+        if (norm === "NON_MED") return "NON-MED";
+        return "COMPOSITE ADMINISTRATION & NETWORK INFORMATION";
+      })();
+
+      const rows: (string | number)[][] = [
+        [`5. ${headerTitle}`],
+      ];
+
+      sections.forEach((sec: any) => {
+        if (sections.length > 1) {
+          rows.push([`[ ${sec.title} ]`, ""]);
+        }
+        (sec.fields || []).forEach((f: any) => {
+          rows.push([f.label, f.defaultValue && f.defaultValue.trim() !== "" ? f.defaultValue : "—"]);
+        });
+      });
+
+      rows.push([""]);
+      return rows;
+    })(),
 
     ["6. PBM (PHARMACY BENEFIT MANAGER) INFORMATION"],
     ["PBM Provider / Rx", bAndE.pbmRx || "—"],

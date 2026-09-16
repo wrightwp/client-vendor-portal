@@ -155,7 +155,11 @@ model ClientBillingEnrollment {
   // Organ Transplant Policy Information
   organTransplantPolicy               String?
 
-  // Composite Administration & PPO Network Information
+  // Dynamic Administration Master Sections & Fields
+  adminMasterType                     String?  @default("COMPOSITE")
+  adminSections                       String?
+
+  // Legacy Composite Administration & PPO Network Information (preserved for historical fallback)
   compositeAdminFee                   String?
   medicalFee                          String?
   urFee                               String?
