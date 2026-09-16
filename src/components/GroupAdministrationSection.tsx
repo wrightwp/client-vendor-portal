@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   Layers,
   Plus,
@@ -16,6 +17,7 @@ import {
   Sparkles,
   Network,
   ShieldAlert,
+  AlertTriangle,
 } from "lucide-react";
 import { BEMasterField, BEMasterSection } from "./BEMasterSectionCard";
 import CurrencyInput, { formatCurrencyDisplay } from "./CurrencyInput";
@@ -174,16 +176,61 @@ export function GroupAdministrationSection({
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [draggedSectionId, setDraggedSectionId] = useState<string | null>(null);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const [masterTemplatesCache, setMasterTemplatesCache] = useState<Record<string, BEMasterSection[]>>({});
+  const [pendingSwapType, setPendingSwapType] = useState<string | null>(null);
+
+  // Helper to check if current group setup differs from the active master template
+  const checkHasDifferencesFromMaster = (
+    currentSections: BEMasterSection[],
+    masterSections?: BEMasterSection[]
+  ): boolean => {
+    if (!masterSections || masterSections.length === 0) {
+      return currentSections.some((s) => s.fields.some((f) => f.defaultValue && f.defaultValue.trim() !== ""));
+    }
+
+    if (currentSections.length !== masterSections.length) return true;
+
+    for (let sIdx = 0; sIdx < currentSections.length; sIdx++) {
+      const curSec = currentSections[sIdx];
+      const mSec = masterSections[sIdx];
+
+      if (!mSec) return true;
+      if (curSec.title !== mSec.title) return true;
+      if (curSec.fields.length !== mSec.fields.length) return true;
+
+      for (let fIdx = 0; fIdx < curSec.fields.length; fIdx++) {
+        const curF = curSec.fields[fIdx];
+        const mF = mSec.fields[fIdx];
+        if (!mF) return true;
+        if (curF.id !== mF.id) return true;
+        if (curF.label !== mF.label) return true;
+        if ((curF.defaultValue || "").trim() !== (mF.defaultValue || "").trim()) return true;
+      }
+    }
+
+    return false;
+  };
+
   // Sync internal state when external props change, or fetch latest DB master template if empty
   useEffect(() => {
-    if (adminSections && adminSections.trim() && adminSections !== "[]") {
-      setSections(parseGroupAdminSections(adminSections, currentType, legacyData));
-    } else {
-      let isCancelled = false;
-      fetch("/api/admin/be-masters/templates")
-        .then((res) => res.json())
-        .then((data) => {
-          if (!isCancelled && data.success && Array.isArray(data.templates)) {
+    let isCancelled = false;
+
+    fetch("/api/admin/be-masters/templates")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!isCancelled && data.success && Array.isArray(data.templates)) {
+          const cache: Record<string, BEMasterSection[]> = {};
+          data.templates.forEach((t: any) => {
+            cache[t.type] = t.sections;
+          });
+          setMasterTemplatesCache(cache);
+
+          if (!adminSections || !adminSections.trim() || adminSections === "[]") {
             const found = data.templates.find((t: any) => t.type === currentType);
             if (found && Array.isArray(found.sections) && found.sections.length > 0) {
               setSections(found.sections);
@@ -193,19 +240,18 @@ export function GroupAdministrationSection({
               return;
             }
           }
-          if (!isCancelled) {
-            setSections(parseGroupAdminSections(adminSections, currentType, legacyData));
-          }
-        })
-        .catch(() => {
-          if (!isCancelled) {
-            setSections(parseGroupAdminSections(adminSections, currentType, legacyData));
-          }
-        });
-      return () => {
-        isCancelled = true;
-      };
-    }
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!isCancelled && adminSections && adminSections.trim() && adminSections !== "[]") {
+          setSections(parseGroupAdminSections(adminSections, currentType, legacyData));
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
   }, [adminSections, currentType]);
 
   const emitSectionsChange = (newSections: BEMasterSection[]) => {
@@ -215,9 +261,29 @@ export function GroupAdministrationSection({
     }
   };
 
-  const handleSwapMasterType = async (newType: string) => {
+  const handleRequestSwap = (targetType: string) => {
+    if (targetType === currentType) return;
+    const masterForCurrent = masterTemplatesCache[currentType] || FALLBACK_DEFAULT_TEMPLATES[currentType]?.sections;
+    const hasDifferences = checkHasDifferencesFromMaster(sections, masterForCurrent);
+
+    if (hasDifferences) {
+      setPendingSwapType(targetType);
+    } else {
+      executeSwapMasterType(targetType);
+    }
+  };
+
+  const executeSwapMasterType = async (newType: string) => {
+    setPendingSwapType(null);
+    const targetType = newType.toUpperCase();
     if (onChangeMasterType) {
-      onChangeMasterType(newType);
+      onChangeMasterType(targetType);
+    }
+
+    const cached = masterTemplatesCache[targetType];
+    if (cached && Array.isArray(cached) && cached.length > 0) {
+      emitSectionsChange(JSON.parse(JSON.stringify(cached)));
+      return;
     }
 
     // Attempt to fetch fresh master defaults from database for newType
@@ -225,7 +291,7 @@ export function GroupAdministrationSection({
       const res = await fetch("/api/admin/be-masters/templates");
       const data = await res.json();
       if (data.success && Array.isArray(data.templates)) {
-        const found = data.templates.find((t: any) => t.type === newType);
+        const found = data.templates.find((t: any) => t.type === targetType);
         if (found && Array.isArray(found.sections) && found.sections.length > 0) {
           emitSectionsChange(found.sections);
           return;
@@ -236,7 +302,7 @@ export function GroupAdministrationSection({
     }
 
     // Fallback template defaults
-    const fallback = FALLBACK_DEFAULT_TEMPLATES[newType] || FALLBACK_DEFAULT_TEMPLATES.COMPOSITE;
+    const fallback = FALLBACK_DEFAULT_TEMPLATES[targetType] || FALLBACK_DEFAULT_TEMPLATES.COMPOSITE;
     emitSectionsChange(JSON.parse(JSON.stringify(fallback.sections)));
   };
 
@@ -471,7 +537,7 @@ export function GroupAdministrationSection({
               <button
                 key={m.id}
                 type="button"
-                onClick={() => handleSwapMasterType(m.id)}
+                onClick={() => handleRequestSwap(m.id)}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -859,6 +925,143 @@ export function GroupAdministrationSection({
           </div>
         ))}
       </div>
+
+      {/* Plan Template Change Confirmation Modal - Portaled to document.body to avoid parent transforms */}
+      {pendingSwapType && mounted && typeof document !== "undefined" && createPortal(
+        <div
+          className="modal-overlay"
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 99999,
+            background: "rgba(15, 23, 42, 0.45)",
+            backdropFilter: "blur(4px)",
+            WebkitBackdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "1.5rem",
+          }}
+          onClick={() => setPendingSwapType(null)}
+        >
+          <div
+            className="modal-content"
+            style={{
+              maxWidth: "500px",
+              background: "var(--bg-card, #ffffff)",
+              border: "1px solid rgba(249, 115, 22, 0.4)",
+              borderRadius: "12px",
+              boxShadow: "0 20px 45px rgba(0, 0, 0, 0.2)",
+              padding: "1.5rem",
+              position: "relative",
+              zIndex: 100000,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              className="modal-header"
+              style={{
+                borderBottom: "1px solid rgba(249, 115, 22, 0.2)",
+                paddingBottom: "0.75rem",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+                <div
+                  style={{
+                    width: "36px",
+                    height: "36px",
+                    borderRadius: "8px",
+                    background: "rgba(249, 115, 22, 0.12)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#ea580c",
+                    flexShrink: 0,
+                  }}
+                >
+                  <AlertTriangle size={20} />
+                </div>
+                <div>
+                  <h3 className="modal-title" style={{ margin: 0, fontSize: "1.05rem", fontWeight: 700 }}>
+                    Change Plan Template?
+                  </h3>
+                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.15rem" }}>
+                    Switching template structure will reset customized fields
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPendingSwapType(null)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "var(--text-muted)",
+                  cursor: "pointer",
+                  padding: "4px",
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="modal-body" style={{ padding: "1.25rem 0", display: "flex", flexDirection: "column", gap: "0.85rem" }}>
+              <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--text-primary)", lineHeight: "1.5" }}>
+                Customized fields or entered values in this <strong>{masterTypesList.find((m) => m.id === currentType)?.label || currentType}</strong> setup differ from the master template.
+              </p>
+              <div
+                style={{
+                  padding: "0.75rem 1rem",
+                  borderRadius: "8px",
+                  background: "rgba(239, 68, 68, 0.08)",
+                  border: "1px solid rgba(239, 68, 68, 0.2)",
+                  color: "#b91c1c",
+                  fontSize: "0.825rem",
+                  lineHeight: "1.4",
+                }}
+              >
+                <strong>Warning:</strong> If you switch to <strong>{masterTypesList.find((m) => m.id === pendingSwapType)?.label || pendingSwapType}</strong>, your current changes will be lost and replaced with the default master template.
+              </div>
+            </div>
+
+            <div
+              className="modal-footer"
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "0.75rem",
+                borderTop: "1px solid var(--border)",
+                paddingTop: "0.85rem",
+              }}
+            >
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setPendingSwapType(null)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                style={{
+                  background: "#ea580c",
+                  borderColor: "#ea580c",
+                  color: "#ffffff",
+                  fontWeight: 600,
+                }}
+                onClick={() => executeSwapMasterType(pendingSwapType)}
+              >
+                Change to {masterTypesList.find((m) => m.id === pendingSwapType)?.label || pendingSwapType}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
