@@ -32,6 +32,7 @@ export const FIELD_LABELS: Record<string, string> = {
   currentManagingGeneralUnderwriter: "Current Managing General Underwriter",
   priorStopLossCarrier: "Prior Stop-Loss Carrier",
   priorManagingGeneralUnderwriter: "Prior Managing General Underwriter",
+  stopLossCustomFields: "Stop-Loss Custom Fields",
 
   // B&E - Specific Stop-Loss Information
   specificStopLossStatus: "Specific Stop-Loss Status",
@@ -41,6 +42,7 @@ export const FIELD_LABELS: Record<string, string> = {
   noLaserRenewalGuarantee: "No Laser Renewal Guarantee",
   maxSpecificPremiumRenewalIncrease: "Max Specific Renewal Increase",
   laseredIndividuals: "Lasered Individuals",
+  specificCustomFields: "Specific Custom Fields",
   specificTierStructure: "Specific Tier Structure",
   specificPremiumSingle: "Specific Rate (Single)",
   specificPremiumEmployeePlusOne: "Specific Rate (EE+1)",
@@ -55,6 +57,7 @@ export const FIELD_LABELS: Record<string, string> = {
   aggregatePremium: "Aggregate Premium",
   monthlyAggregateAccommodation: "Monthly Agg Accommodation",
   terminalLiabilityOption: "Terminal Liability Option",
+  aggregateCustomFields: "Aggregate Custom Fields",
   aggregateFactorSingle: "Aggregate Factor (Single)",
   aggregateFactorEmployeePlusOne: "Aggregate Factor (EE+1)",
   aggregateFactorEmployeeSpouse: "Aggregate Factor (EE+Spouse)",

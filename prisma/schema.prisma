@@ -120,6 +120,7 @@ model ClientBillingEnrollment {
   currentManagingGeneralUnderwriter   String?
   priorStopLossCarrier                String?
   priorManagingGeneralUnderwriter     String?
+  stopLossCustomFields                String?
 
   // Specific Stop-Loss Information
   specificStopLossStatus              String?  @default("Included")
@@ -136,6 +137,7 @@ model ClientBillingEnrollment {
   specificPremiumFamily               String?
   specificBenefitsCovered             String?
   specificContract                    String?
+  specificCustomFields                String?
 
   // Aggregate Stop-Loss Information
   aggregateStopLossStatus             String?  @default("Included")
@@ -151,6 +153,7 @@ model ClientBillingEnrollment {
   aggregateBenefitsCovered            String?
   aggregateContract                   String?
   aggregateRunInLimit                 String?
+  aggregateCustomFields               String?
 
   // Organ Transplant Policy Information
   organTransplantPolicy               String?

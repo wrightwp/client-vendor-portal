@@ -162,6 +162,18 @@ export default function PrintBillingEnrollmentModal({
               <div><strong>Current Managing General Underwriter:</strong> {bAndE.currentManagingGeneralUnderwriter || "N/A"}</div>
               <div><strong>Prior Stop-Loss Insurance Carrier:</strong> {bAndE.priorStopLossCarrier || "N/A"}</div>
               <div><strong>Prior Managing General Underwriter:</strong> {bAndE.priorManagingGeneralUnderwriter || "N/A"}</div>
+              {(() => {
+                if (!bAndE.stopLossCustomFields) return null;
+                try {
+                  const fields = JSON.parse(bAndE.stopLossCustomFields);
+                  if (Array.isArray(fields)) {
+                    return fields.map((f: any) => (
+                      <div key={f.id}><strong>{f.label}:</strong> {f.defaultValue || "N/A"}</div>
+                    ));
+                  }
+                } catch (e) {}
+                return null;
+              })()}
             </div>
           </div>
 
@@ -184,6 +196,18 @@ export default function PrintBillingEnrollmentModal({
                   <div><strong>Lasered Individuals:</strong> {bAndE.laseredIndividuals || "No"}</div>
                   <div><strong>Specific Stop-Loss Benefits Covered:</strong> {bAndE.specificBenefitsCovered || "Med/Rx"}</div>
                   <div><strong>Specific Stop-Loss Contract:</strong> {bAndE.specificContract || "N/A"}</div>
+                  {(() => {
+                    if (!bAndE.specificCustomFields) return null;
+                    try {
+                      const fields = JSON.parse(bAndE.specificCustomFields);
+                      if (Array.isArray(fields)) {
+                        return fields.map((f: any) => (
+                          <div key={f.id}><strong>{f.label}:</strong> {f.defaultValue || "N/A"}</div>
+                        ));
+                      }
+                    } catch (e) {}
+                    return null;
+                  })()}
                 </div>
 
                 <div style={{ marginTop: "0.75rem", background: "#f8fafc", padding: "0.75rem 1rem", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
@@ -221,6 +245,18 @@ export default function PrintBillingEnrollmentModal({
                   <div><strong>Aggregate Run-in Limit:</strong> {formatRunInLimitDisplay(bAndE.aggregateRunInLimit)}</div>
                   <div><strong>Aggregate Benefits Covered:</strong> {bAndE.aggregateBenefitsCovered || "Med/Rx"}</div>
                   <div><strong>Aggregate Stop-Loss Contract:</strong> {bAndE.aggregateContract || "N/A"}</div>
+                  {(() => {
+                    if (!bAndE.aggregateCustomFields) return null;
+                    try {
+                      const fields = JSON.parse(bAndE.aggregateCustomFields);
+                      if (Array.isArray(fields)) {
+                        return fields.map((f: any) => (
+                          <div key={f.id}><strong>{f.label}:</strong> {f.defaultValue || "N/A"}</div>
+                        ));
+                      }
+                    } catch (e) {}
+                    return null;
+                  })()}
                 </div>
 
                 <div style={{ marginTop: "0.75rem", background: "#f8fafc", padding: "0.75rem 1rem", borderRadius: "6px", border: "1px solid #e2e8f0" }}>

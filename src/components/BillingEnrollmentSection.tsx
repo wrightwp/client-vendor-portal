@@ -52,6 +52,7 @@ import IncludedNoneToggle from "./IncludedNoneToggle";
 import TerminalLiabilityInput, { formatTloDisplay } from "./TerminalLiabilityInput";
 import AggregateRunInLimitInput, { formatRunInLimitDisplay } from "./AggregateRunInLimitInput";
 import GroupAdministrationSection from "./GroupAdministrationSection";
+import BECustomFieldsSection, { parseBECustomFields } from "./BECustomFieldsSection";
 
 interface BillingEnrollmentSectionProps {
   clientId: string;
@@ -127,6 +128,7 @@ export default function BillingEnrollmentSection({
     currentManagingGeneralUnderwriter: activeBAndE.currentManagingGeneralUnderwriter || "",
     priorStopLossCarrier: activeBAndE.priorStopLossCarrier || "",
     priorManagingGeneralUnderwriter: activeBAndE.priorManagingGeneralUnderwriter || "",
+    stopLossCustomFields: activeBAndE.stopLossCustomFields || "",
 
     specificStopLossStatus: activeBAndE.specificStopLossStatus || (activeBAndE.specificContract?.trim().toLowerCase() === "none" ? "None" : "Included"),
     specificDeductible: activeBAndE.specificDeductible || "",
@@ -134,6 +136,7 @@ export default function BillingEnrollmentSection({
     noLaserRenewalGuarantee: activeBAndE.noLaserRenewalGuarantee || "",
     maxSpecificPremiumRenewalIncrease: activeBAndE.maxSpecificPremiumRenewalIncrease || "",
     laseredIndividuals: activeBAndE.laseredIndividuals || "",
+    specificCustomFields: activeBAndE.specificCustomFields || "",
     specificTierStructure: activeBAndE.specificTierStructure || "",
     specificPremiumSingle: activeBAndE.specificPremiumSingle || "",
     specificPremiumEmployeePlusOne: activeBAndE.specificPremiumEmployeePlusOne || "",
@@ -147,6 +150,7 @@ export default function BillingEnrollmentSection({
     aggregatePremium: activeBAndE.aggregatePremium || "",
     monthlyAggregateAccommodation: activeBAndE.monthlyAggregateAccommodation || "",
     terminalLiabilityOption: activeBAndE.terminalLiabilityOption || "",
+    aggregateCustomFields: activeBAndE.aggregateCustomFields || "",
     aggregateFactorSingle: activeBAndE.aggregateFactorSingle || "",
     aggregateFactorEmployeePlusOne: activeBAndE.aggregateFactorEmployeePlusOne || "",
     aggregateFactorEmployeeSpouse: activeBAndE.aggregateFactorEmployeeSpouse || "",
@@ -211,6 +215,7 @@ export default function BillingEnrollmentSection({
       currentManagingGeneralUnderwriter: rec.currentManagingGeneralUnderwriter || "",
       priorStopLossCarrier: rec.priorStopLossCarrier || "",
       priorManagingGeneralUnderwriter: rec.priorManagingGeneralUnderwriter || "",
+      stopLossCustomFields: rec.stopLossCustomFields || "",
 
       specificStopLossStatus: rec.specificStopLossStatus || (rec.specificContract?.trim().toLowerCase() === "none" ? "None" : "Included"),
       specificDeductible: rec.specificDeductible || "",
@@ -218,6 +223,7 @@ export default function BillingEnrollmentSection({
       noLaserRenewalGuarantee: rec.noLaserRenewalGuarantee || "",
       maxSpecificPremiumRenewalIncrease: rec.maxSpecificPremiumRenewalIncrease || "",
       laseredIndividuals: rec.laseredIndividuals || "",
+      specificCustomFields: rec.specificCustomFields || "",
       specificTierStructure: rec.specificTierStructure || "",
       specificPremiumSingle: rec.specificPremiumSingle || "",
       specificPremiumEmployeePlusOne: rec.specificPremiumEmployeePlusOne || "",
@@ -231,6 +237,7 @@ export default function BillingEnrollmentSection({
       aggregatePremium: rec.aggregatePremium || "",
       monthlyAggregateAccommodation: rec.monthlyAggregateAccommodation || "",
       terminalLiabilityOption: rec.terminalLiabilityOption || "",
+      aggregateCustomFields: rec.aggregateCustomFields || "",
       aggregateFactorSingle: rec.aggregateFactorSingle || "",
       aggregateFactorEmployeePlusOne: rec.aggregateFactorEmployeePlusOne || "",
       aggregateFactorEmployeeSpouse: rec.aggregateFactorEmployeeSpouse || "",
@@ -338,6 +345,10 @@ export default function BillingEnrollmentSection({
       aggregateBenefitsCovered: sourceRecord.aggregateBenefitsCovered || "",
       aggregateContract: sourceRecord.aggregateContract || "",
       aggregateRunInLimit: sourceRecord.aggregateRunInLimit || "",
+
+      stopLossCustomFields: sourceRecord.stopLossCustomFields || "",
+      specificCustomFields: sourceRecord.specificCustomFields || "",
+      aggregateCustomFields: sourceRecord.aggregateCustomFields || "",
 
       stopLossNotes: sourceRecord.stopLossNotes || "",
 
@@ -892,6 +903,17 @@ export default function BillingEnrollmentSection({
                     )}
                   </div>
                 </div>
+
+                {/* Stop-Loss Custom Fields */}
+                <div style={{ marginTop: "0.75rem", borderTop: "1px dashed var(--border)", paddingTop: "0.6rem" }}>
+                  <BECustomFieldsSection
+                    fields={parseBECustomFields(isInlineEditing ? editFormData.stopLossCustomFields : activeBAndE.stopLossCustomFields)}
+                    isEditing={isInlineEditing}
+                    onChange={(newFields) => setEditFormData((prev) => ({ ...prev, stopLossCustomFields: JSON.stringify(newFields) }))}
+                    accentColor="var(--accent-pink)"
+                    addLabel="Add Stop-Loss Field"
+                  />
+                </div>
               </div>
             )}
 
@@ -1141,6 +1163,17 @@ export default function BillingEnrollmentSection({
                         )}
                       </div>
 
+                      {/* Custom Specific Stop-Loss Fields (Placed just above Specific Premium Rates) */}
+                      <div style={{ marginBottom: "0.75rem" }}>
+                        <BECustomFieldsSection
+                          fields={parseBECustomFields(isInlineEditing ? editFormData.specificCustomFields : activeBAndE.specificCustomFields)}
+                          isEditing={isInlineEditing}
+                          onChange={(newFields) => setEditFormData((prev) => ({ ...prev, specificCustomFields: JSON.stringify(newFields) }))}
+                          accentColor="var(--accent-blue)"
+                          addLabel="Add Specific Field"
+                        />
+                      </div>
+
                       {/* Specific Rates (Placed at bottom to align with Aggregate Factors) */}
                       <div style={{ marginTop: "auto", background: "rgba(0, 174, 219, 0.05)", padding: "0.75rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
                         <div style={{ fontSize: "0.75rem", fontWeight: "700", color: "var(--accent-blue)", marginBottom: "0.4rem" }}>
@@ -1362,6 +1395,17 @@ export default function BillingEnrollmentSection({
                             onChange={(val) => setEditFormData({ ...editFormData, aggregateBenefitsCovered: val })}
                           />
                         )}
+                      </div>
+
+                      {/* Custom Aggregate Stop-Loss Fields (Placed just above Aggregate Factors) */}
+                      <div style={{ marginBottom: "0.75rem" }}>
+                        <BECustomFieldsSection
+                          fields={parseBECustomFields(isInlineEditing ? editFormData.aggregateCustomFields : activeBAndE.aggregateCustomFields)}
+                          isEditing={isInlineEditing}
+                          onChange={(newFields) => setEditFormData((prev) => ({ ...prev, aggregateCustomFields: JSON.stringify(newFields) }))}
+                          accentColor="var(--accent-purple)"
+                          addLabel="Add Aggregate Field"
+                        />
                       </div>
 
                       {/* Aggregate Factors (Placed at bottom to align with Specific Premium Rates) */}

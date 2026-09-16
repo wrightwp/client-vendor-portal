@@ -27,6 +27,16 @@ export function exportBEToExcel(clientName: string, data: any) {
     ["Current Managing General Underwriter", bAndE.currentManagingGeneralUnderwriter || "Not specified"],
     ["Prior Stop-Loss Carrier", bAndE.priorStopLossCarrier || "—"],
     ["Prior Managing General Underwriter", bAndE.priorManagingGeneralUnderwriter || "—"],
+    ...(() => {
+      if (!bAndE.stopLossCustomFields) return [];
+      try {
+        const fields = JSON.parse(bAndE.stopLossCustomFields);
+        if (Array.isArray(fields)) {
+          return fields.map((f: any) => [f.label, f.defaultValue || "—"]);
+        }
+      } catch (e) {}
+      return [];
+    })(),
     [""],
 
     ["2. ENROLLMENT CENSUS / TIER BREAKDOWN"],
@@ -49,6 +59,16 @@ export function exportBEToExcel(clientName: string, data: any) {
     ["Lasered Individuals", (bAndE.specificStopLossStatus === "None") ? "None" : (bAndE.laseredIndividuals || "No")],
     ["Specific Contract", (bAndE.specificStopLossStatus === "None") ? "None" : (bAndE.specificContract || "12/12")],
     ["Specific Benefits Covered", (bAndE.specificStopLossStatus === "None") ? "None" : (bAndE.specificBenefitsCovered || "Med/Rx")],
+    ...(() => {
+      if (!bAndE.specificCustomFields) return [];
+      try {
+        const fields = JSON.parse(bAndE.specificCustomFields);
+        if (Array.isArray(fields)) {
+          return fields.map((f: any) => [f.label, f.defaultValue || "—"]);
+        }
+      } catch (e) {}
+      return [];
+    })(),
     ["Specific Rate - Single", (bAndE.specificStopLossStatus === "None") ? "None" : (bAndE.specificPremiumSingle || "—")],
     ["Specific Rate - Employee + 1", (bAndE.specificStopLossStatus === "None") ? "None" : (bAndE.specificPremiumEmployeePlusOne || "—")],
     ["Specific Rate - EE + Spouse", (bAndE.specificStopLossStatus === "None") ? "None" : (bAndE.specificPremiumEmployeeSpouse || "—")],
@@ -65,6 +85,16 @@ export function exportBEToExcel(clientName: string, data: any) {
     ["Min Attachment Point", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : (bAndE.aggregateMinAttachmentPoint || "—")],
     ["Aggregate Run-In Limit", formatRunInLimitDisplay(bAndE.aggregateRunInLimit)],
     ["Aggregate Benefits Covered", bAndE.aggregateBenefitsCovered || "Med/Rx"],
+    ...(() => {
+      if (!bAndE.aggregateCustomFields) return [];
+      try {
+        const fields = JSON.parse(bAndE.aggregateCustomFields);
+        if (Array.isArray(fields)) {
+          return fields.map((f: any) => [f.label, f.defaultValue || "—"]);
+        }
+      } catch (e) {}
+      return [];
+    })(),
     ["Aggregate Factor - Single", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : formatCurrencyDisplay(bAndE.aggregateFactorSingle)],
     ["Aggregate Factor - Employee + 1", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : formatCurrencyDisplay(bAndE.aggregateFactorEmployeePlusOne)],
     ["Aggregate Factor - EE + Spouse", (bAndE.aggregateStopLossStatus === "None" || bAndE.aggregatePremium?.trim().toLowerCase() === "none") ? "None" : formatCurrencyDisplay(bAndE.aggregateFactorEmployeeSpouse)],

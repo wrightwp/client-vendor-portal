@@ -23,6 +23,7 @@ import IncludedNoneToggle from "./IncludedNoneToggle";
 import TerminalLiabilityInput from "./TerminalLiabilityInput";
 import AggregateRunInLimitInput from "./AggregateRunInLimitInput";
 import GroupAdministrationSection from "./GroupAdministrationSection";
+import BECustomFieldsSection, { parseBECustomFields } from "./BECustomFieldsSection";
 
 interface EditBillingEnrollmentModalProps {
   clientId: string;
@@ -62,6 +63,9 @@ export default function EditBillingEnrollmentModal({
     currentManagingGeneralUnderwriter: initialData?.currentManagingGeneralUnderwriter || "",
     priorStopLossCarrier: initialData?.priorStopLossCarrier || "",
     priorManagingGeneralUnderwriter: initialData?.priorManagingGeneralUnderwriter || "",
+    stopLossCustomFields: initialData?.stopLossCustomFields || "",
+    specificCustomFields: initialData?.specificCustomFields || "",
+    aggregateCustomFields: initialData?.aggregateCustomFields || "",
 
     specificStopLossStatus: initialData?.specificStopLossStatus || (initialData?.specificContract?.trim().toLowerCase() === "none" ? "None" : "Included"),
     specificDeductible: initialData?.specificDeductible || "",
@@ -164,6 +168,7 @@ export default function EditBillingEnrollmentModal({
       currentManagingGeneralUnderwriter: sourceRecord.currentManagingGeneralUnderwriter || "",
       priorStopLossCarrier: sourceRecord.priorStopLossCarrier || "",
       priorManagingGeneralUnderwriter: sourceRecord.priorManagingGeneralUnderwriter || "",
+      stopLossCustomFields: sourceRecord.stopLossCustomFields || "",
 
       specificStopLossStatus: sourceRecord.specificStopLossStatus || (sourceRecord.specificContract?.trim().toLowerCase() === "none" ? "None" : "Included"),
       specificDeductible: sourceRecord.specificDeductible || "",
@@ -171,6 +176,7 @@ export default function EditBillingEnrollmentModal({
       noLaserRenewalGuarantee: sourceRecord.noLaserRenewalGuarantee || "",
       maxSpecificPremiumRenewalIncrease: sourceRecord.maxSpecificPremiumRenewalIncrease || "",
       laseredIndividuals: sourceRecord.laseredIndividuals || "",
+      specificCustomFields: sourceRecord.specificCustomFields || "",
       specificTierStructure: sourceRecord.specificTierStructure || "",
       specificPremiumSingle: sourceRecord.specificPremiumSingle || "",
       specificPremiumEmployeePlusOne: sourceRecord.specificPremiumEmployeePlusOne || "",
@@ -184,6 +190,7 @@ export default function EditBillingEnrollmentModal({
       aggregatePremium: sourceRecord.aggregatePremium || "",
       monthlyAggregateAccommodation: sourceRecord.monthlyAggregateAccommodation || "",
       terminalLiabilityOption: sourceRecord.terminalLiabilityOption || "",
+      aggregateCustomFields: sourceRecord.aggregateCustomFields || "",
       aggregateFactorSingle: sourceRecord.aggregateFactorSingle || "",
       aggregateFactorEmployeePlusOne: sourceRecord.aggregateFactorEmployeePlusOne || "",
       aggregateFactorEmployeeSpouse: sourceRecord.aggregateFactorEmployeeSpouse || "",
@@ -495,6 +502,19 @@ export default function EditBillingEnrollmentModal({
                     />
                   </div>
                 </div>
+
+                <div style={{ marginTop: "0.5rem", borderTop: "1px dashed var(--border)", paddingTop: "0.75rem" }}>
+                  <label className="form-label" style={{ color: "var(--accent-pink)", fontWeight: 700 }}>
+                    Additional Stop-Loss Fields
+                  </label>
+                  <BECustomFieldsSection
+                    fields={parseBECustomFields(formData.stopLossCustomFields)}
+                    isEditing={true}
+                    onChange={(newFields) => setFormData((prev) => ({ ...prev, stopLossCustomFields: JSON.stringify(newFields) }))}
+                    accentColor="var(--accent-pink)"
+                    addLabel="Add Stop-Loss Field"
+                  />
+                </div>
               </div>
             )}
 
@@ -576,6 +596,19 @@ export default function EditBillingEnrollmentModal({
                           onChange={(val) => setFormData((prev) => ({ ...prev, specificContract: val }))}
                         />
                       </div>
+                    </div>
+
+                    <div style={{ marginTop: "0.25rem" }}>
+                      <label className="form-label" style={{ color: "var(--accent-blue)", fontWeight: 700 }}>
+                        Additional Specific Stop-Loss Fields
+                      </label>
+                      <BECustomFieldsSection
+                        fields={parseBECustomFields(formData.specificCustomFields)}
+                        isEditing={true}
+                        onChange={(newFields) => setFormData((prev) => ({ ...prev, specificCustomFields: JSON.stringify(newFields) }))}
+                        accentColor="var(--accent-blue)"
+                        addLabel="Add Specific Field"
+                      />
                     </div>
 
                     <div style={{ background: "rgba(0, 174, 219, 0.04)", padding: "1rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
@@ -692,6 +725,19 @@ export default function EditBillingEnrollmentModal({
                           onChange={(val) => setFormData({ ...formData, aggregateContract: val })}
                         />
                       </div>
+                    </div>
+
+                    <div style={{ marginTop: "0.25rem" }}>
+                      <label className="form-label" style={{ color: "#c084fc", fontWeight: 700 }}>
+                        Additional Aggregate Stop-Loss Fields
+                      </label>
+                      <BECustomFieldsSection
+                        fields={parseBECustomFields(formData.aggregateCustomFields)}
+                        isEditing={true}
+                        onChange={(newFields) => setFormData((prev) => ({ ...prev, aggregateCustomFields: JSON.stringify(newFields) }))}
+                        accentColor="var(--accent-purple)"
+                        addLabel="Add Aggregate Field"
+                      />
                     </div>
 
                     <div style={{ background: "rgba(255, 255, 255, 0.03)", padding: "1rem", borderRadius: "8px", border: "1px solid var(--border)" }}>
