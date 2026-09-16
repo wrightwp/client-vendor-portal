@@ -15,6 +15,8 @@ import {
 import {
   CustomFieldColorPicker,
   CustomFieldColorDropdown,
+  IndentToggleButton,
+  IndentRowButton,
   normalizeFieldColor,
 } from "./CustomFieldColorPicker";
 
@@ -24,6 +26,7 @@ export interface BEMasterField {
   defaultValue?: string;
   placeholder?: string;
   color?: string;
+  indented?: boolean;
 }
 
 export interface BEMasterSection {
@@ -46,6 +49,7 @@ export function BEMasterSectionCard({
   const [isAddingField, setIsAddingField] = useState(false);
   const [newFieldLabel, setNewFieldLabel] = useState("");
   const [newFieldColor, setNewFieldColor] = useState("#000000");
+  const [newFieldIndented, setNewFieldIndented] = useState(false);
   const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
   const [editingFieldLabel, setEditingFieldLabel] = useState("");
 
@@ -60,6 +64,7 @@ export function BEMasterSectionCard({
       label: newFieldLabel.trim(),
       defaultValue: "",
       color: newFieldColor || "#000000",
+      indented: newFieldIndented,
     };
 
     onUpdateSection({
@@ -69,6 +74,7 @@ export function BEMasterSectionCard({
 
     setNewFieldLabel("");
     setNewFieldColor("#000000");
+    setNewFieldIndented(false);
     setIsAddingField(false);
   };
 
@@ -226,8 +232,16 @@ export function BEMasterSectionCard({
                 setIsAddingField(false);
                 setNewFieldLabel("");
                 setNewFieldColor("#000000");
+                setNewFieldIndented(false);
               }
             }}
+          />
+
+          {/* Indent Toggle */}
+          <IndentToggleButton
+            indented={newFieldIndented}
+            onToggle={() => setNewFieldIndented(!newFieldIndented)}
+            size="sm"
           />
 
           {/* Color Picker */}
@@ -259,6 +273,7 @@ export function BEMasterSectionCard({
                 setIsAddingField(false);
                 setNewFieldLabel("");
                 setNewFieldColor("#000000");
+                setNewFieldIndented(false);
               }}
               className="btn btn-secondary"
               style={{ padding: "0.45rem 0.65rem", fontSize: "0.8rem" }}
@@ -327,7 +342,7 @@ export function BEMasterSectionCard({
                 }}
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "32px 240px 1fr auto auto",
+                  gridTemplateColumns: "32px 240px 1fr auto auto auto",
                   alignItems: "center",
                   gap: "0.65rem",
                   padding: "0.6rem 0.85rem",
@@ -374,7 +389,20 @@ export function BEMasterSectionCard({
                 </div>
 
                 {/* Field Label (editable) */}
-                <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.4rem",
+                    paddingLeft: field.indented ? "1rem" : "0",
+                  }}
+                >
+                  {field.indented && (
+                    <span style={{ color: fieldColor, fontSize: "0.8rem", opacity: 0.8, flexShrink: 0, fontWeight: "bold" }}>
+                      ↳
+                    </span>
+                  )}
+
                   {editingFieldId === field.id ? (
                     <div style={{ display: "flex", alignItems: "center", gap: "0.3rem", width: "100%" }}>
                       <input
@@ -456,6 +484,14 @@ export function BEMasterSectionCard({
                     }}
                     value={field.defaultValue || ""}
                     onChange={(e) => handleFieldChange(field.id, { defaultValue: e.target.value })}
+                  />
+                </div>
+
+                {/* Indent Button */}
+                <div>
+                  <IndentRowButton
+                    indented={field.indented}
+                    onToggle={() => handleFieldChange(field.id, { indented: !field.indented })}
                   />
                 </div>
 

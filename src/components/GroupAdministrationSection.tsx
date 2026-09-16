@@ -24,6 +24,8 @@ import CurrencyInput, { formatCurrencyDisplay } from "./CurrencyInput";
 import {
   CustomFieldColorPicker,
   CustomFieldColorDropdown,
+  IndentToggleButton,
+  IndentRowButton,
   normalizeFieldColor,
 } from "./CustomFieldColorPicker";
 
@@ -174,6 +176,7 @@ export function GroupAdministrationSection({
   const [activeAddingSectionId, setActiveAddingSectionId] = useState<string | null>(null);
   const [newFieldLabel, setNewFieldLabel] = useState("");
   const [newFieldColor, setNewFieldColor] = useState("#000000");
+  const [newFieldIndented, setNewFieldIndented] = useState(false);
   const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
   const [editingFieldLabel, setEditingFieldLabel] = useState("");
 
@@ -319,6 +322,7 @@ export function GroupAdministrationSection({
       label: newFieldLabel.trim(),
       defaultValue: "$0.00",
       color: newFieldColor || "#000000",
+      indented: newFieldIndented,
     };
 
     const newSections = sections.map((sec) =>
@@ -328,6 +332,7 @@ export function GroupAdministrationSection({
     emitSectionsChange(newSections);
     setNewFieldLabel("");
     setNewFieldColor("#000000");
+    setNewFieldIndented(false);
     setActiveAddingSectionId(null);
   };
 
@@ -338,6 +343,20 @@ export function GroupAdministrationSection({
             ...sec,
             fields: sec.fields.map((f) =>
               f.id === fieldId ? { ...f, color } : f
+            ),
+          }
+        : sec
+    );
+    emitSectionsChange(newSections);
+  };
+
+  const handleFieldIndentToggle = (sectionId: string, fieldId: string) => {
+    const newSections = sections.map((sec) =>
+      sec.id === sectionId
+        ? {
+            ...sec,
+            fields: sec.fields.map((f) =>
+              f.id === fieldId ? { ...f, indented: !f.indented } : f
             ),
           }
         : sec
@@ -515,6 +534,7 @@ export function GroupAdministrationSection({
                         alignItems: "center",
                         borderBottom: "1px dashed var(--border)",
                         paddingBottom: "0.35rem",
+                        paddingLeft: field.indented ? "1.5rem" : "0",
                         fontSize: "0.85rem",
                       }}
                     >
@@ -522,9 +542,15 @@ export function GroupAdministrationSection({
                         style={{
                           color: isStandardBlack ? "var(--text-muted)" : fontColor,
                           fontWeight: isStandardBlack ? 500 : 700,
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "0.35rem",
                         }}
                       >
-                        {field.label}
+                        {field.indented && (
+                          <span style={{ color: fontColor, opacity: 0.75, fontWeight: "bold", fontSize: "0.9em" }}>↳</span>
+                        )}
+                        <span>{field.label}</span>
                       </span>
                       <strong
                         style={{
@@ -712,8 +738,15 @@ export function GroupAdministrationSection({
                       setActiveAddingSectionId(null);
                       setNewFieldLabel("");
                       setNewFieldColor("#000000");
+                      setNewFieldIndented(false);
                     }
                   }}
+                />
+
+                <IndentToggleButton
+                  indented={newFieldIndented}
+                  onToggle={() => setNewFieldIndented(!newFieldIndented)}
+                  size="sm"
                 />
 
                 <CustomFieldColorPicker
@@ -738,6 +771,7 @@ export function GroupAdministrationSection({
                       setActiveAddingSectionId(null);
                       setNewFieldLabel("");
                       setNewFieldColor("#000000");
+                      setNewFieldIndented(false);
                     }}
                     className="btn btn-secondary btn-sm"
                     style={{ padding: "0.3rem 0.5rem" }}
@@ -800,7 +834,7 @@ export function GroupAdministrationSection({
                       }}
                       style={{
                         display: "grid",
-                        gridTemplateColumns: "24px minmax(130px, 190px) 1fr auto auto",
+                        gridTemplateColumns: "24px minmax(130px, 190px) 1fr auto auto auto",
                         alignItems: "center",
                         gap: "0.5rem",
                         padding: "0.45rem 0.65rem",
@@ -834,9 +868,15 @@ export function GroupAdministrationSection({
                       </div>
 
                       {/* Field Label (editable inline) */}
-                      <div>
+                      <div style={{ paddingLeft: field.indented ? "0.75rem" : "0", display: "flex", alignItems: "center", gap: "0.25rem", minWidth: 0 }}>
+                        {field.indented && (
+                          <span style={{ color: fieldColor, fontSize: "0.8rem", opacity: 0.8, flexShrink: 0, fontWeight: "bold" }}>
+                            ↳
+                          </span>
+                        )}
+
                         {editingFieldId === field.id ? (
-                          <div style={{ display: "flex", alignItems: "center", gap: "0.2rem" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "0.2rem", width: "100%" }}>
                             <input
                               type="text"
                               className="form-input"
@@ -894,7 +934,7 @@ export function GroupAdministrationSection({
                             </button>
                           </div>
                         ) : (
-                          <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", minWidth: 0 }}>
                             <span
                               style={{
                                 fontSize: "0.78rem",
@@ -937,6 +977,14 @@ export function GroupAdministrationSection({
                           }}
                           value={field.defaultValue || ""}
                           onChange={(e) => handleFieldValueChange(sec.id, field.id, e.target.value)}
+                        />
+                      </div>
+
+                      {/* Indent Button */}
+                      <div>
+                        <IndentRowButton
+                          indented={field.indented}
+                          onToggle={() => handleFieldIndentToggle(sec.id, field.id)}
                         />
                       </div>
 

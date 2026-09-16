@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Check, Palette } from "lucide-react";
+import { Check, Palette, CornerDownRight } from "lucide-react";
 
 export const CUSTOM_FIELD_COLORS = [
   { id: "black", label: "Black", color: "#000000", border: "#475569" },
@@ -197,5 +197,83 @@ export function CustomFieldColorDropdown({
         </div>
       )}
     </div>
+  );
+}
+
+interface IndentToggleButtonProps {
+  indented?: boolean;
+  onToggle: () => void;
+  size?: "sm" | "md";
+}
+
+/**
+ * Toggle button for indents in add field prompt
+ */
+export function IndentToggleButton({
+  indented = false,
+  onToggle,
+  size = "sm",
+}: IndentToggleButtonProps) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      title={indented ? "Unindent (main field)" : "Indent as sub-data"}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "0.25rem",
+        background: indented ? "rgba(0, 174, 219, 0.12)" : "var(--bg-card, #ffffff)",
+        border: indented ? "1px solid #00aedb" : "1px solid var(--border, #cbd5e1)",
+        color: indented ? "#00aedb" : "var(--text-muted, #64748b)",
+        borderRadius: "4px",
+        padding: size === "sm" ? "2px 6px" : "3px 8px",
+        fontSize: "0.72rem",
+        fontWeight: indented ? 700 : 500,
+        cursor: "pointer",
+        transition: "all 0.15s ease",
+        whiteSpace: "nowrap",
+      }}
+    >
+      <CornerDownRight size={size === "sm" ? 12 : 14} style={{ strokeWidth: indented ? 2.5 : 2 }} />
+      <span>{indented ? "Indented" : "Indent"}</span>
+    </button>
+  );
+}
+
+/**
+ * Compact icon button for toggling indentation on existing field rows
+ */
+export function IndentRowButton({
+  indented = false,
+  onToggle,
+}: {
+  indented?: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      title={indented ? "Unindent field (set as main field)" : "Indent field (display as sub-data)"}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "2px",
+        background: indented ? "rgba(0, 174, 219, 0.12)" : "var(--bg-card, #ffffff)",
+        border: indented ? "1px solid #00aedb" : "1px solid var(--border, #cbd5e1)",
+        color: indented ? "#00aedb" : "var(--text-muted, #94a3b8)",
+        borderRadius: "4px",
+        padding: "2px 4px",
+        cursor: "pointer",
+        transition: "all 0.12s ease",
+      }}
+    >
+      <CornerDownRight size={11} style={{ strokeWidth: indented ? 2.5 : 1.75 }} />
+      <span style={{ fontSize: "0.68rem", fontWeight: indented ? 700 : 500 }}>
+        {indented ? "Sub" : "Main"}
+      </span>
+    </button>
   );
 }

@@ -32,7 +32,10 @@ export function exportBEToExcel(clientName: string, data: any) {
       try {
         const fields = JSON.parse(bAndE.stopLossCustomFields);
         if (Array.isArray(fields)) {
-          return fields.map((f: any) => [f.label, f.defaultValue || "—"]);
+          return fields.map((f: any) => [
+            f.indented ? `   ↳ ${f.label}` : f.label,
+            f.defaultValue || "—",
+          ]);
         }
       } catch (e) {}
       return [];
@@ -64,7 +67,10 @@ export function exportBEToExcel(clientName: string, data: any) {
       try {
         const fields = JSON.parse(bAndE.specificCustomFields);
         if (Array.isArray(fields)) {
-          return fields.map((f: any) => [f.label, f.defaultValue || "—"]);
+          return fields.map((f: any) => [
+            f.indented ? `   ↳ ${f.label}` : f.label,
+            f.defaultValue || "—",
+          ]);
         }
       } catch (e) {}
       return [];
@@ -90,7 +96,10 @@ export function exportBEToExcel(clientName: string, data: any) {
       try {
         const fields = JSON.parse(bAndE.aggregateCustomFields);
         if (Array.isArray(fields)) {
-          return fields.map((f: any) => [f.label, f.defaultValue || "—"]);
+          return fields.map((f: any) => [
+            f.indented ? `   ↳ ${f.label}` : f.label,
+            f.defaultValue || "—",
+          ]);
         }
       } catch (e) {}
       return [];
@@ -148,7 +157,10 @@ export function exportBEToExcel(clientName: string, data: any) {
           rows.push([`[ ${sec.title} ]`, ""]);
         }
         (sec.fields || []).forEach((f: any) => {
-          rows.push([f.label, f.defaultValue && f.defaultValue.trim() !== "" ? f.defaultValue : "—"]);
+          rows.push([
+            f.indented ? `   ↳ ${f.label}` : f.label,
+            f.defaultValue && f.defaultValue.trim() !== "" ? f.defaultValue : "—",
+          ]);
         });
       });
 

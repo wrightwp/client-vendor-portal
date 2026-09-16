@@ -170,7 +170,14 @@ export default function PrintBillingEnrollmentModal({
                     return fields.map((f: any) => {
                       const fontColor = f.color && f.color.toLowerCase() !== "#000000" ? f.color : undefined;
                       return (
-                        <div key={f.id} style={{ color: fontColor }}>
+                        <div
+                          key={f.id}
+                          style={{
+                            color: fontColor,
+                            paddingLeft: f.indented ? "1.25rem" : "0",
+                          }}
+                        >
+                          {f.indented && <span style={{ opacity: 0.75, marginRight: "0.25rem" }}>↳</span>}
                           <strong style={{ color: fontColor }}>{f.label}:</strong> {f.defaultValue || "N/A"}
                         </div>
                       );
@@ -209,7 +216,14 @@ export default function PrintBillingEnrollmentModal({
                         return fields.map((f: any) => {
                           const fontColor = f.color && f.color.toLowerCase() !== "#000000" ? f.color : undefined;
                           return (
-                            <div key={f.id} style={{ color: fontColor }}>
+                            <div
+                              key={f.id}
+                              style={{
+                                color: fontColor,
+                                paddingLeft: f.indented ? "1.25rem" : "0",
+                              }}
+                            >
+                              {f.indented && <span style={{ opacity: 0.75, marginRight: "0.25rem" }}>↳</span>}
                               <strong style={{ color: fontColor }}>{f.label}:</strong> {f.defaultValue || "N/A"}
                             </div>
                           );
@@ -263,7 +277,14 @@ export default function PrintBillingEnrollmentModal({
                         return fields.map((f: any) => {
                           const fontColor = f.color && f.color.toLowerCase() !== "#000000" ? f.color : undefined;
                           return (
-                            <div key={f.id} style={{ color: fontColor }}>
+                            <div
+                              key={f.id}
+                              style={{
+                                color: fontColor,
+                                paddingLeft: f.indented ? "1.25rem" : "0",
+                              }}
+                            >
+                              {f.indented && <span style={{ opacity: 0.75, marginRight: "0.25rem" }}>↳</span>}
                               <strong style={{ color: fontColor }}>{f.label}:</strong> {f.defaultValue || "N/A"}
                             </div>
                           );
@@ -342,7 +363,14 @@ export default function PrintBillingEnrollmentModal({
                         {(sec.fields || []).map((f: any, fIdx: number) => {
                           const fontColor = f.color && f.color.toLowerCase() !== "#000000" ? f.color : undefined;
                           return (
-                            <div key={f.id || fIdx} style={{ color: fontColor }}>
+                            <div
+                              key={f.id || fIdx}
+                              style={{
+                                color: fontColor,
+                                paddingLeft: f.indented ? "1.25rem" : "0",
+                              }}
+                            >
+                              {f.indented && <span style={{ opacity: 0.75, marginRight: "0.25rem" }}>↳</span>}
                               <strong style={{ color: fontColor }}>{f.label}:</strong> {f.defaultValue && f.defaultValue.trim() !== "" ? f.defaultValue : "N/A"}
                             </div>
                           );

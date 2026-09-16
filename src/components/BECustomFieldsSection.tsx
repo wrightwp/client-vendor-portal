@@ -14,6 +14,8 @@ import {
 import {
   CustomFieldColorPicker,
   CustomFieldColorDropdown,
+  IndentToggleButton,
+  IndentRowButton,
   normalizeFieldColor,
 } from "./CustomFieldColorPicker";
 
@@ -22,6 +24,7 @@ export interface BECustomField {
   label: string;
   defaultValue: string;
   color?: string;
+  indented?: boolean;
 }
 
 interface BECustomFieldsSectionProps {
@@ -42,6 +45,7 @@ export function parseBECustomFields(rawJson?: string | null): BECustomField[] {
         label: item.label || "Custom Field",
         defaultValue: item.defaultValue !== undefined ? item.defaultValue : item.value || "",
         color: item.color || "#000000",
+        indented: Boolean(item.indented),
       }));
     }
   } catch (e) {
@@ -60,6 +64,7 @@ export default function BECustomFieldsSection({
   const [isAdding, setIsAdding] = useState(false);
   const [newLabel, setNewLabel] = useState("");
   const [newColor, setNewColor] = useState("#000000");
+  const [newIndented, setNewIndented] = useState(false);
   const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
   const [editingLabel, setEditingLabel] = useState("");
 
@@ -74,10 +79,12 @@ export default function BECustomFieldsSection({
       label: newLabel.trim(),
       defaultValue: "",
       color: newColor || "#000000",
+      indented: newIndented,
     };
     onChange([...fields, newField]);
     setNewLabel("");
     setNewColor("#000000");
+    setNewIndented(false);
     setIsAdding(false);
   };
 
@@ -94,6 +101,11 @@ export default function BECustomFieldsSection({
   const handleFieldColorChange = (fieldId: string, color: string) => {
     if (!onChange) return;
     onChange(fields.map((f) => (f.id === fieldId ? { ...f, color } : f)));
+  };
+
+  const handleFieldIndentToggle = (fieldId: string) => {
+    if (!onChange) return;
+    onChange(fields.map((f) => (f.id === fieldId ? { ...f, indented: !f.indented } : f)));
   };
 
   const handleStartEditLabel = (field: BECustomField) => {
@@ -148,6 +160,7 @@ export default function BECustomFieldsSection({
                 alignItems: "center",
                 borderBottom: "1px dashed var(--border)",
                 paddingBottom: "0.4rem",
+                paddingLeft: field.indented ? "1.5rem" : "0",
                 fontSize: "0.85rem",
               }}
             >
@@ -155,9 +168,15 @@ export default function BECustomFieldsSection({
                 style={{
                   color: isStandardBlack ? "var(--text-muted)" : fontColor,
                   fontWeight: isStandardBlack ? 500 : 700,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.35rem",
                 }}
               >
-                {field.label}
+                {field.indented && (
+                  <span style={{ color: fontColor, opacity: 0.75, fontWeight: "bold", fontSize: "0.9em" }}>↳</span>
+                )}
+                <span>{field.label}</span>
               </span>
               <strong
                 style={{
@@ -214,7 +233,7 @@ export default function BECustomFieldsSection({
                 }}
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "22px minmax(130px, 190px) 1fr auto auto",
+                  gridTemplateColumns: "22px minmax(130px, 190px) 1fr auto auto auto",
                   alignItems: "center",
                   gap: "0.5rem",
                   padding: "0.45rem 0.6rem",
@@ -248,7 +267,21 @@ export default function BECustomFieldsSection({
                 </div>
 
                 {/* Field Label (Editable) */}
-                <div style={{ display: "flex", alignItems: "center", gap: "0.3rem", minWidth: 0 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                    minWidth: 0,
+                    paddingLeft: field.indented ? "0.75rem" : "0",
+                  }}
+                >
+                  {field.indented && (
+                    <span style={{ color: fieldColor, fontSize: "0.8rem", opacity: 0.8, flexShrink: 0, fontWeight: "bold" }}>
+                      ↳
+                    </span>
+                  )}
+
                   {editingFieldId === field.id ? (
                     <div style={{ display: "flex", alignItems: "center", gap: "0.2rem", width: "100%" }}>
                       <input
@@ -325,6 +358,14 @@ export default function BECustomFieldsSection({
                     }}
                     value={field.defaultValue || ""}
                     onChange={(e) => handleFieldValueChange(field.id, e.target.value)}
+                  />
+                </div>
+
+                {/* Indent Button */}
+                <div>
+                  <IndentRowButton
+                    indented={field.indented}
+                    onToggle={() => handleFieldIndentToggle(field.id)}
                   />
                 </div>
 
@@ -425,8 +466,16 @@ export default function BECustomFieldsSection({
                 setIsAdding(false);
                 setNewLabel("");
                 setNewColor("#000000");
+                setNewIndented(false);
               }
             }}
+          />
+
+          {/* Indent Toggle Button */}
+          <IndentToggleButton
+            indented={newIndented}
+            onToggle={() => setNewIndented(!newIndented)}
+            size="sm"
           />
 
           {/* Font Color Picker (Black, Pink, Blue, Green) */}
@@ -465,6 +514,7 @@ export default function BECustomFieldsSection({
                 setIsAdding(false);
                 setNewLabel("");
                 setNewColor("#000000");
+                setNewIndented(false);
               }}
               className="btn btn-secondary btn-sm"
               style={{ padding: "0.32rem 0.5rem", fontSize: "0.75rem", display: "inline-flex", alignItems: "center" }}
