@@ -1692,130 +1692,67 @@ export default function BillingEnrollmentSection({
                   </div>
                 </div>
 
-                {/* Organ Transplant & Domestic Claims */}
-                {showStopLoss && (
-                  <div
-                    className="glass-card"
-                    style={{
-                      padding: "1.25rem",
-                      background: "rgba(255, 255, 255, 0.02)",
-                      border: "1px solid var(--border)",
-                      display: "flex",
-                      flexDirection: "column",
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                        <HeartHandshake size={18} style={{ color: "#60a5fa" }} />
-                        <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>Transplant & Domestic</h3>
-                      </div>
-                      {!isInlineEditing && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsExpanded(true);
-                            setIsInlineEditing(true);
-                          }}
-                          className="btn btn-secondary btn-sm"
-                          style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
-                          title="Edit section"
-                        >
-                          <Edit3 size={12} />
-                          <span>Edit</span>
-                        </button>
+                {/* Organ Transplant & Domestic Claims (Shown under Billing & Both views) */}
+                <div
+                  className="glass-card"
+                  style={{
+                    padding: "1.25rem",
+                    background: "rgba(255, 255, 255, 0.02)",
+                    border: "1px solid var(--border)",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                      <HeartHandshake size={18} style={{ color: "#60a5fa" }} />
+                      <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>Transplant & Domestic</h3>
+                    </div>
+                    {!isInlineEditing && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsExpanded(true);
+                          setIsInlineEditing(true);
+                        }}
+                        className="btn btn-secondary btn-sm"
+                        style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                        title="Edit section"
+                      >
+                        <Edit3 size={12} />
+                        <span>Edit</span>
+                      </button>
+                    )}
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem", flex: 1 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ color: "var(--text-muted)" }}>Transplant Policy</span>
+                      {isInlineEditing ? (
+                        <YesNoToggle
+                          value={editFormData.organTransplantPolicy}
+                          onChange={(val) => setEditFormData({ ...editFormData, organTransplantPolicy: val })}
+                        />
+                      ) : (
+                        <span>{activeBAndE.organTransplantPolicy || "No"}</span>
                       )}
                     </div>
-
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem", flex: 1 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ color: "var(--text-muted)" }}>Transplant Policy</span>
-                        {isInlineEditing ? (
-                          <YesNoToggle
-                            value={editFormData.organTransplantPolicy}
-                            onChange={(val) => setEditFormData({ ...editFormData, organTransplantPolicy: val })}
-                          />
-                        ) : (
-                          <span>{activeBAndE.organTransplantPolicy || "No"}</span>
-                        )}
-                      </div>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ color: "var(--text-muted)" }}>Domestic Claims?</span>
-                        {isInlineEditing ? (
-                          <YesNoToggle
-                            value={editFormData.domesticClaims}
-                            onChange={(val) => setEditFormData({ ...editFormData, domesticClaims: val })}
-                          />
-                        ) : (
-                          <span>{activeBAndE.domesticClaims || "No"}</span>
-                        )}
-                      </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ color: "var(--text-muted)" }}>Domestic Claims?</span>
+                      {isInlineEditing ? (
+                        <YesNoToggle
+                          value={editFormData.domesticClaims}
+                          onChange={(val) => setEditFormData({ ...editFormData, domesticClaims: val })}
+                        />
+                      ) : (
+                        <span>{activeBAndE.domesticClaims || "No"}</span>
+                      )}
                     </div>
                   </div>
-                )}
+                </div>
               </div>
             </div>
-          ) : (
-            /* Organ Transplant & Domestic Claims (Shown when ONLY STOP_LOSS is enabled) */
-            showStopLoss && (
-              <div
-                className="glass-card"
-                style={{
-                  padding: "1.25rem",
-                  background: "rgba(255, 255, 255, 0.02)",
-                  border: "1px solid var(--border)",
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                    <HeartHandshake size={18} style={{ color: "#60a5fa" }} />
-                    <h3 style={{ fontSize: "0.95rem", fontWeight: "700" }}>Transplant & Domestic</h3>
-                  </div>
-                  {!isInlineEditing && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsExpanded(true);
-                        setIsInlineEditing(true);
-                      }}
-                      className="btn btn-secondary btn-sm"
-                      style={{ fontSize: "0.72rem", padding: "0.2rem 0.5rem", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
-                      title="Edit section"
-                    >
-                      <Edit3 size={12} />
-                      <span>Edit</span>
-                    </button>
-                  )}
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem", flex: 1 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ color: "var(--text-muted)" }}>Transplant Policy</span>
-                    {isInlineEditing ? (
-                      <YesNoToggle
-                        value={editFormData.organTransplantPolicy}
-                        onChange={(val) => setEditFormData({ ...editFormData, organTransplantPolicy: val })}
-                      />
-                    ) : (
-                      <span>{activeBAndE.organTransplantPolicy || "No"}</span>
-                    )}
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ color: "var(--text-muted)" }}>Domestic Claims?</span>
-                    {isInlineEditing ? (
-                      <YesNoToggle
-                        value={editFormData.domesticClaims}
-                        onChange={(val) => setEditFormData({ ...editFormData, domesticClaims: val })}
-                      />
-                    ) : (
-                      <span>{activeBAndE.domesticClaims || "No"}</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )
-          )}
+          ) : null}
 
           {/* General Operational Notes (Shown in BOTH and BILLING) */}
           {showBilling && (
